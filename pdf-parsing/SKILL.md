@@ -158,23 +158,6 @@ paper/
 - `img_paths`：Markdown 正文实际引用到的图片路径。
 - `imgs`：对应的 PIL 图片对象。
 
-## 网络问题与代理处理
-
-MinerU 处理和结果下载需要网络。如果遇到 `SSLError`、`UNEXPECTED_EOF_WHILE_READING`、`Max retries exceeded`、`Connection reset`、上传成功但结果压缩包下载失败等问题，优先关闭代理后重试。关闭代理时仍要保留 `MINERU_TOKEN`：
-
-```bash
-env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy -u NO_PROXY -u no_proxy MINERU_TOKEN="$MINERU_TOKEN" PYTHONDONTWRITEBYTECODE=1 python3 -c "from structai import read_pdf; read_pdf('paper.pdf')"
-```
-
-处理顺序：
-
-1. 保留当前目录，不要删除已经生成的解析缓存。
-2. 确认 `MINERU_TOKEN` 已设置。
-3. 用关闭代理的命令重试同一个 PDF。
-4. 如果重试成功，后续直接读取本地 `full.md`。
-5. 如果重试失败但已有可读 `full.md`，直接使用本地 Markdown。
-6. 如果没有 `full.md`，记录完整错误信息，稍后重试或更换网络环境。
-
 ## 读取与检查
 
 读取开头：
@@ -210,3 +193,20 @@ rg -n "!\\[" paper/full.md
 - 解析返回 `None`：确认 Token 已设置；关闭代理重试；检查是否已有可读 `full.md`；如果仍失败，记录错误信息。
 - Markdown 局部乱码或断词：用 `full.md` 快速定位章节，对关键段落、公式和表格回到 PDF 原文或抽取图片核对。
 - 图片目录文件很多：优先看 Markdown 中实际引用的图片，再按后续任务需要浏览其他图片。
+
+### 网络问题与代理处理
+
+MinerU 处理和结果下载需要网络。如果遇到 `SSLError`、`UNEXPECTED_EOF_WHILE_READING`、`Max retries exceeded`、`Connection reset`、上传成功但结果压缩包下载失败等问题，优先关闭代理后重试。关闭代理时仍要保留 `MINERU_TOKEN`：
+
+```bash
+env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy -u NO_PROXY -u no_proxy MINERU_TOKEN="$MINERU_TOKEN" PYTHONDONTWRITEBYTECODE=1 python3 -c "from structai import read_pdf; read_pdf('paper.pdf')"
+```
+
+处理顺序：
+
+1. 保留当前目录，不要删除已经生成的解析缓存。
+2. 确认 `MINERU_TOKEN` 已设置。
+3. 用关闭代理的命令重试同一个 PDF。
+4. 如果重试成功，后续直接读取本地 `full.md`。
+5. 如果重试失败但已有可读 `full.md`，直接使用本地 Markdown。
+6. 如果没有 `full.md`，记录完整错误信息，稍后重试或更换网络环境。
