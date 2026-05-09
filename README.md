@@ -24,7 +24,7 @@ skill-name/
 
 ## 下载 Skill 文件夹
 
-GitHub 网页不支持直接下载指定文件夹。可以先下载本目录下的 `download_skill.py`，之后用它下载本仓库中的某个 skill 文件夹。
+GitHub 网页不支持直接下载指定文件夹。可以先下载本目录下的 `download_skill.py`，之后用它下载本仓库中的一个或多个 skill 文件夹。
 
 ### 下载脚本
 
@@ -32,7 +32,7 @@ GitHub 网页不支持直接下载指定文件夹。可以先下载本目录下�
 curl -L -o download_skill.py https://raw.githubusercontent.com/black-yt/skills/main/download_skill.py
 ```
 
-### 下载 Skill
+### 下载单个 Skill
 
 ```bash
 python download_skill.py docx-splitting
@@ -51,6 +51,21 @@ docx-splitting/
 
 ```bash
 python download_skill.py docx-splitting -o my_skills/docx-splitting
+```
+
+### 一次下载多个 Skill
+
+```bash
+python download_skill.py docx-splitting pdf-parsing markdown-to-pdf -o skills
+```
+
+多个 skill 同时下载时，`-o` 表示父目录。上面的命令会生成：
+
+```text
+skills/
+  docx-splitting/
+  pdf-parsing/
+  markdown-to-pdf/
 ```
 
 默认不会覆盖已存在文件；需要覆盖时加 `--overwrite`。

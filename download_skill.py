@@ -78,41 +78,88 @@ def download_dir(repo_path, output_dir, overwrite=False):
     return count
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Download one skill folder from black-yt/skills.")
-    parser.add_argument("skill_name", help="Skill folder name, for example: docx-splitting")
-    parser.add_argument(
-        "-o",
-        "--output-dir",
-        default=None,
-        help="Output directory. Defaults to ./<skill_name>.",
-    )
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files.")
-    args = parser.parse_args()
-
-    skill_name = args.skill_name.strip("/ ")
+def validate_skill_name(raw_name):
+    skill_name = raw_name.strip("/ ")
     if not skill_name or "/" in skill_name or "\\" in skill_name:
-        print("error: skill_name must be a single folder name, for example: docx-splitting", file=sys.stderr)
-        sys.exit(1)
+        raise ValueError(f"invalid skill name: {raw_name!r}")
+    return skill_name
 
-    output_dir = Path(args.output_dir) if args.output_dir else Path(skill_name)
 
-    try:
-        count = download_dir(skill_name, output_dir, overwrite=args.overwrite)
-    except HTTPError as exc:
+def print_download_error(exc, skill_name):
+    if isinstance(exc, HTTPError):
         detail = exc.read().decode("utf-8", errors="replace")
         if exc.code == 404:
             print(f"error: skill not found: {skill_name}", file=sys.stderr)
         elif exc.code == 403 and "rate limit" in detail.lower():
             print("error: GitHub API rate limit exceeded. Set GITHUB_TOKEN and retry.", file=sys.stderr)
         else:
-            print(f"error: GitHub API error {exc.code}: {detail}", file=sys.stderr)
-        sys.exit(1)
-    except URLError as exc:
-        print(f"error: network error: {exc}", file=sys.stderr)
+            print(f"error: GitHub API error {exc.code} for {skill_name}: {detail}", file=sys.stderr)
+    elif isinstance(exc, URLError):
+        print(f"error: network error while downloading {skill_name}: {exc}", file=sys.stderr)
+    else:
+        print(f"error: failed to download {skill_name}: {exc}", file=sys.stderr)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Download one or more skill folders from black-yt/skills.")
+    parser.add_argument(
+        "skill_names",
+        nargs="+",
+        help="Skill folder name(s), for example: docx-splitting pdf-parsing",
+    )
+    parser.add_argument(
+        "-o",
+        "--output-dir",
+        default=None,
+        help=(
+            "Output directory. With one skill, defaults to ./<skill_name> and is used as that skill's target "
+            "directory. With multiple skills, defaults to ./skills and is used as the parent directory."
+        ),
+    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing files.")
+    args = parser.parse_args()
+
+    skill_names = []
+    seen = set()
+    for raw_name in args.skill_names:
+        try:
+            skill_name = validate_skill_name(raw_name)
+        except ValueError as exc:
+            print(f"error: {exc}; use folder names such as docx-splitting", file=sys.stderr)
+            sys.exit(1)
+        if skill_name in seen:
+            print(f"[skip] duplicate: {skill_name}")
+            continue
+        seen.add(skill_name)
+        skill_names.append(skill_name)
+
+    if len(skill_names) == 1:
+        output_dir = Path(args.output_dir) if args.output_dir else Path(skill_names[0])
+        targets = [(skill_names[0], output_dir)]
+    else:
+        output_base = Path(args.output_dir) if args.output_dir else Path("skills")
+        targets = [(skill_name, output_base / skill_name) for skill_name in skill_names]
+
+    total_count = 0
+    failures = 0
+
+    for skill_name, output_dir in targets:
+        print(f"[skill] {skill_name} -> {output_dir}")
+        try:
+            count = download_dir(skill_name, output_dir, overwrite=args.overwrite)
+        except (HTTPError, URLError) as exc:
+            print_download_error(exc, skill_name)
+            failures += 1
+            continue
+
+        print(f"[done] {skill_name}: {count} file(s)")
+        total_count += count
+
+    if failures:
+        print(f"done with errors: {failures} failed skill(s), {total_count} downloaded file(s)", file=sys.stderr)
         sys.exit(1)
 
-    print(f"done: {count} file(s)")
+    print(f"done: {len(targets)} skill(s), {total_count} file(s)")
 
 
 if __name__ == "__main__":
