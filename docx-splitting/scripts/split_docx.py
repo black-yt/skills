@@ -8,6 +8,14 @@ import win32com.client as win32
 def split_docx_lossless_by_pages(input_path, output_dir="split_output", parts=4):
     input_path = os.path.abspath(input_path)
     output_dir = os.path.abspath(output_dir)
+
+    if parts <= 0:
+        raise ValueError("parts must be a positive integer")
+    if not os.path.isfile(input_path):
+        raise FileNotFoundError(input_path)
+    if not input_path.lower().endswith(".docx"):
+        raise ValueError("input_path must point to a .docx file")
+
     os.makedirs(output_dir, exist_ok=True)
 
     word = win32.gencache.EnsureDispatch("Word.Application")

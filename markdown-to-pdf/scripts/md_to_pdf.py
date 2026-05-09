@@ -21,9 +21,6 @@ def md_to_pdf(md_path, pdf_path, base_path=None):
     """
     html_content = css_style + html_content
 
-    if base_path:
-        html_content = html_content.replace('src="', f'src="{base_path}/')
-
     HTML(string=html_content, base_url=base_path or ".").write_pdf(pdf_path)
     print(f"已生成 PDF: {pdf_path}")
 

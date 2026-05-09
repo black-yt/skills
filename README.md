@@ -1,6 +1,8 @@
 # Skills
 
-本目录存放可复用、可转发的技能。每个 skill 使用独立子文件夹，并按 Anthropic/Claude Skills 风格提供 `SKILL.md`。
+这是徐望瀚在日常工作中使用和维护的一组可复用 skills。每个 skill 使用独立子文件夹，并按 Anthropic/Claude Skills 风格提供 `SKILL.md`。
+
+这些 skill 可以包含必要的平台、系统或工具链前置条件，例如 Windows + Microsoft Word、系统级 Ghostscript、系统级 LaTeX 等。这里的“通用、可迁移”不是指必须跨平台，而是指不绑定个人目录、私有项目路径、特定仓库、特定任务、特定工作方式或真实密钥。
 
 每个 skill 的基本结构：
 

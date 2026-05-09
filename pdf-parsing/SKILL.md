@@ -15,7 +15,7 @@ description: "当需要用 structai.read_pdf 将 PDF 文档解析成本地 Markd
 pip install structai
 ```
 
-如果需要使用 GitHub 仓库中的最新代码：
+如果包索引中找不到 `structai`，或需要使用 GitHub 仓库中的最新代码：
 
 ```bash
 pip install "git+https://github.com/black-yt/structai.git"
@@ -25,6 +25,13 @@ pip install "git+https://github.com/black-yt/structai.git"
 
 ```bash
 python3 -c "from structai import read_pdf; import inspect; print(inspect.signature(read_pdf))"
+```
+
+如果当前环境同时有多个 Python，请确认 `pip` 和 `python3` 指向同一个环境：
+
+```bash
+python3 -m pip show structai
+python3 -c "import structai; print(structai.__file__)"
 ```
 
 ## MinerU Token
@@ -79,6 +86,8 @@ PYTHONDONTWRITEBYTECODE=1
 ## 基本解析
 
 当前 `structai.read_pdf` 封装使用 MinerU 批量本地文件上传接口 `/api/v4/file-urls/batch`，适合解析本地 PDF 文件。MinerU 官方文档说明：精准解析 API 需要 Token，支持表格和公式识别，单个文件大小上限为 200 MB，页数上限为 200 页；批量上传接口单次申请上传链接不能超过 50 个文件。
+
+如果 PDF 超过接口限制，先按页拆分或压缩，再分别解析。
 
 Python 调用：
 

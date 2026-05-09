@@ -17,6 +17,12 @@ pip install markdown2 weasyprint
 
 `WeasyPrint` 可能还需要系统图形/字体相关依赖。如果运行时报 Cairo、Pango、fontconfig 等错误，按 WeasyPrint 官方文档补齐系统依赖。
 
+检查：
+
+```bash
+python -c "import markdown2; from weasyprint import HTML; print('md2pdf deps ok')"
+```
+
 ## 脚本
 
 优先使用 bundled script：
@@ -39,13 +45,13 @@ python scripts/md_to_pdf.py input.md output.pdf
 python scripts/md_to_pdf.py input.md output_dir
 ```
 
-指定图片和相对资源的起始路径：
+指定图片和相对资源的起始路径。第三个参数会作为 WeasyPrint 的 `base_url`，用于解析 Markdown 中的相对图片路径、CSS 和本地资源：
 
 ```bash
 python scripts/md_to_pdf.py input.md output.pdf /path/to/base_dir
 ```
 
-如果 Markdown 中有相对图片路径，例如 `![figure](images/fig1.png)`，把第三个参数设为 Markdown 资源所在目录。
+如果 Markdown 中有相对图片路径，例如 `![figure](images/fig1.png)`，把第三个参数设为 Markdown 资源所在目录。不要把第三个参数设成某个图片文件本身。
 
 ## Python 调用
 
@@ -70,6 +76,7 @@ md_to_pdf("input.md", "output.pdf", base_path=".")
 - 外部网络图片是否能加载取决于当前网络环境和 WeasyPrint。
 - 复杂 HTML、MathJax、LaTeX 公式不一定能被 WeasyPrint 直接渲染。
 - 中文字体异常时，需要安装中文字体，并在 CSS 中指定字体。
+- 如果需要更复杂的页面尺寸、页边距或字体样式，优先在脚本中的 CSS 块里显式添加规则。
 
 ## 验证
 

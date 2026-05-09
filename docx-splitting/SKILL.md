@@ -13,8 +13,20 @@ description: "当需要在 Windows + Microsoft Word 环境中按页拆分 .docx 
 
 ## 依赖安装
 
+前置条件：
+
+- Windows。
+- 已安装 Microsoft Word 桌面版。
+- Python 与 Word 位数兼容，通常使用当前 Windows Python 即可。
+
 ```bash
 pip install pywin32
+```
+
+安装后可做最小检查：
+
+```bash
+python -c "import win32com.client; print('pywin32 ok')"
 ```
 
 ## 脚本
@@ -56,6 +68,7 @@ split_docx_lossless_by_pages(
 - 运行前关闭正在编辑的同一个 Word 文件。
 - 建议先复制原始 `.docx`，在副本上运行。
 - 字体缺失、页面设置差异或 Word 版本差异可能导致分页略有不同。
+- `--parts` 必须是正整数；如果总页数少于 `parts`，脚本只会生成实际需要的 part。
 - 如果拆分边界落在复杂表格、图片或分页符附近，需要人工检查边界页是否缺失或重复。
 
 ## 验证

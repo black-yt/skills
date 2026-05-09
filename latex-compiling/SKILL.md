@@ -24,6 +24,14 @@ apt-get clean
 
 如果没有 root 权限，让系统管理员安装，或使用已有系统级 TeX 环境。
 
+检查：
+
+```bash
+latexmk -version
+pdflatex --version
+gs --version
+```
+
 ## 推荐目录结构
 
 ```text
