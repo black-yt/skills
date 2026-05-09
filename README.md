@@ -1,16 +1,26 @@
 # Skills
 
-本目录存放可复用、可转发的技能文档。每个 skill 使用独立子文件夹，便于后续为同一技能添加示例、脚本、模板或辅助资料。
+本目录存放可复用、可转发的技能。每个 skill 使用独立子文件夹，并按 Anthropic/Claude Skills 风格提供 `SKILL.md`。
+
+每个 skill 的基本结构：
+
+```text
+skill-name/
+  SKILL.md
+  scripts/      # 可选，放可执行脚本
+  references/   # 可选，放按需读取的参考资料
+  assets/       # 可选，放模板、图片、示例文件等素材
+```
 
 ## Skill 列表
 
 | Skill | 入口文档 | 用途 |
 | --- | --- | --- |
-| `docx_splitting` | [`docx_splitting/README.md`](docx_splitting/README.md) | 在 Windows + Microsoft Word 环境中，通过 [`split_docx.py`](docx_splitting/split_docx.py) 按页无损拆分 `.docx` 文档。 |
-| `latex_compile` | [`latex_compile/README.md`](latex_compile/README.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
-| `md2pdf` | [`md2pdf/README.md`](md2pdf/README.md) | 使用 [`md_to_pdf.py`](md2pdf/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
-| `pdf2img` | [`pdf2img/README.md`](pdf2img/README.md) | 使用系统级 Ghostscript (`gs`) 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。 |
-| `pdf_parsing` | [`pdf_parsing/README.md`](pdf_parsing/README.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
+| `docx-splitting` | [`docx-splitting/SKILL.md`](docx-splitting/SKILL.md) | 在 Windows + Microsoft Word 环境中，通过 [`scripts/split_docx.py`](docx-splitting/scripts/split_docx.py) 按页无损拆分 `.docx` 文档。 |
+| `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
+| `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
+| `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。 |
+| `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 
 ## 下载 Skill 文件夹
 
@@ -25,21 +35,22 @@ curl -L -o download_skill.py https://raw.githubusercontent.com/black-yt/skills/m
 ### 下载 Skill
 
 ```bash
-python download_skill.py docx_splitting
+python download_skill.py docx-splitting
 ```
 
 下载后会生成同名目录：
 
 ```text
-docx_splitting/
-  README.md
-  split_docx.py
+docx-splitting/
+  SKILL.md
+  scripts/
+    split_docx.py
 ```
 
 指定输出目录：
 
 ```bash
-python download_skill.py docx_splitting -o my_skills/docx_splitting
+python download_skill.py docx-splitting -o my_skills/docx-splitting
 ```
 
 默认不会覆盖已存在文件；需要覆盖时加 `--overwrite`。
@@ -48,5 +59,5 @@ python download_skill.py docx_splitting -o my_skills/docx_splitting
 
 ```bash
 export GITHUB_TOKEN=<your_github_token>
-python download_skill.py docx_splitting
+python download_skill.py docx-splitting
 ```

@@ -80,7 +80,7 @@ def download_dir(repo_path, output_dir, overwrite=False):
 
 def main():
     parser = argparse.ArgumentParser(description="Download one skill folder from black-yt/skills.")
-    parser.add_argument("skill_name", help="Skill folder name, for example: docx_splitting")
+    parser.add_argument("skill_name", help="Skill folder name, for example: docx-splitting")
     parser.add_argument(
         "-o",
         "--output-dir",
@@ -92,7 +92,7 @@ def main():
 
     skill_name = args.skill_name.strip("/ ")
     if not skill_name or "/" in skill_name or "\\" in skill_name:
-        print("error: skill_name must be a single folder name, for example: docx_splitting", file=sys.stderr)
+        print("error: skill_name must be a single folder name, for example: docx-splitting", file=sys.stderr)
         sys.exit(1)
 
     output_dir = Path(args.output_dir) if args.output_dir else Path(skill_name)
