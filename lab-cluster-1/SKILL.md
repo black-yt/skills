@@ -53,7 +53,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 - `rlaunch` CPU worker：ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU；worker 自动退出，挂载检查通过。
 - `rlaunch` CPU worker 外网代理：`source /jobutils/scripts/worker_init.sh`、`source <(curl ...setup_proxy.sh)`、`curl -I https://www.google.com` 返回 HTTP 200。
 - `rjob` CPU 短任务：ai4sdata CPU 和 scieval CPU 均提交成功、任务 `Succeeded`、日志可读、job 可删除。
-- `rjob submit --dry-run true`：ai4sdata/scieval 的 CPU/GPU 常规模板均可生成 YAML。
+- `rjob submit --dry-run true`：ai4sdata/scieval 的 CPU/GPU 常规模板均可生成 YAML；1 GPU 模板也已 dry-run 通过，资源为 `--gpu=1 --cpu=22 --memory=230000`。
 - `rjob` host-network 服务访问：ai4sdata CPU rjob 内启动 `python3 -m http.server`，开发机通过内网 IP 访问成功，返回 `codex_service_ok`，job 已删除。
 - 模型与软件公共路径只读检查：`huggingface/hub`、`huggingface/zskj-hub`、`soft`、`soft-pkg`、大模型目标目录和 `rclone v1.68.2` 均存在；`find ... "*Qwen3-VL-4B*"` 可找到公共模型目录。
 
@@ -395,7 +395,7 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); nproc; test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok; test -d /mnt/shared-storage-user/sciprismax && echo mount_sciprismax_ok; test -d /mnt/shared-storage-gpfs2/gpfs2-shared-public && echo mount_public_ok; test -d /mnt/shared-storage-gpfs2/sciprismax2 && echo mount_sciprismax2_ok'
 ```
 
-## rlaunch CPU 联网
+CPU Worker 联网：
 
 CPU worker 可联网。ai4sdata 4 CPU worker 内代理和外网访问已实测成功，`curl -I https://www.google.com` 返回 HTTP 200。下面命令可直接复制到开发机交互 shell 中运行，会自动退出，不留下空闲 worker：
 
@@ -609,6 +609,51 @@ rjob delete "$JOB"
 ## rjob GPU 任务
 
 以下命令已实测真实提交、查询和删除链路；当前 GPU 资源不足，job 停在 `STARTING`/`Inqueue`，未执行到 `nvidia-smi`。
+
+1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。ai4sdata 和 scieval 的 1 GPU `rjob submit --dry-run true` 均已实测可生成 YAML。
+
+ai4sdata 1 GPU dry-run 模板：
+
+```bash
+rjob submit --dry-run true \
+  --name=xxxxx \
+  -P 1 \
+  --gpu=1 \
+  --memory=230000 \
+  --cpu=22 \
+  --charged-group=ai4sdata_gpu \
+  --private-machine=group \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -e DISTRIBUTED_JOB=true \
+  -- bash command.sh
+```
+
+scieval 1 GPU dry-run 模板：
+
+```bash
+rjob submit --dry-run true \
+  --name=xxxxx \
+  -P 1 \
+  --gpu=1 \
+  --memory=230000 \
+  --cpu=22 \
+  --charged-group=scieval_gpu \
+  --private-machine=group \
+  --namespace=ailab-scieval \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -e DISTRIBUTED_JOB=true \
+  -- bash command.sh
+```
 
 ai4sdata GPU rjob：
 
