@@ -1,6 +1,6 @@
 ---
 name: lab-cluster-1
-description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流时使用：交互式 SSH 登录开发机、安全边界、项目/数据/模型路径、conda 环境选择、网络代理、CPU/GPU 资源与分区、rlaunch 交互 worker、rjob 训练/评测/部署任务、模型权重复用或迁移、host-network/KAPI 服务访问、GPU+CPU 协作和排错；必须使用原始 rlaunch/rjob 命令，不依赖 .bashrc 快捷函数，不擅自改环境或泄露密钥。"
+description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流时使用：优先通过后台持久交互 SSH 终端登录开发机并连续操作，处理安全边界、项目/数据/模型路径、conda 环境选择、网络代理、CPU/GPU 资源与分区、rlaunch 交互 worker、rjob 训练/评测/部署任务、模型权重复用或迁移、host-network/KAPI 服务访问、GPU+CPU 协作和排错；只有单次简单检查才使用一次性 ssh 命令；必须使用原始 rlaunch/rjob 命令，不依赖 .bashrc 快捷函数，不擅自改环境或泄露密钥。"
 ---
 
 # Lab Cluster 1
@@ -8,7 +8,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 ## 覆盖范围
 
 - 安全边界：开发机、worker、共享环境、conda、包管理、密钥和长期配置。
-- 固定信息、登录与路径：SSH 登录、公共挂载、镜像、CUDA、conda、项目根目录、大文件目录。
+- 固定信息、登录与路径：后台持久交互 SSH、单次 SSH 适用边界、公共挂载、镜像、CUDA、conda、项目根目录、大文件目录。
 - 网络代理：开发机、CPU worker、CPU rjob、GPU 节点、私网服务和 OpenAI 相关代理边界。
 - 模型权重：公共 HuggingFace 目录、大模型保存目录、查找和迁移前检查。
 - 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 分区、`rlaunch`、`rjob`、日志和清理。
@@ -16,7 +16,8 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 
 ## 核心原则
 
-- 默认先交互式 SSH 登录开发机，再在开发机 shell 中执行命令。单次 `ssh 'command'` 只用于健康检查或自动化测试。
+- 默认打开一个后台持久交互 SSH 终端登录开发机，并在同一个远端 shell 中连续操作。单次 `ssh 'command'` 只用于健康检查、只读查询、dry-run 这类简单一次性任务。
+- 复杂任务必须走交互模式，包括远端文件编辑、项目内多步操作、调试、提交/监控 `rjob`、持续查看日志、启动/管理 `rlaunch` worker 或服务。不要为这类任务反复发送独立 `ssh` 命令。
 - 主路径必须使用原始 `rlaunch` 和 `rjob submit` 命令。不要依赖远端 `.bashrc` 中的 `gpu`、`cpu`、`pred`、`proxy_on`、`openai_on` 等函数或 alias。
 - 把开发机只当作登录、编辑、提交、监控和轻量检查入口。不要在开发机上跑训练、评测、部署、压力测试或依赖 GPU/大内存的任务；开发机联网但资源很少，高负载可能导致死机。
 - `rlaunch` 申请到的 CPU/GPU 交互节点称为 worker，适合临时调试、短测试和临时服务部署。worker 可能因长时间无操作或长时间占用被释放，不适合正式长期任务。
@@ -49,6 +50,9 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 已完整跑通：
 
 - 交互式 SSH 登录开发机，开发机上 `rlaunch` 位于 `/kubebrain/rlaunch`，`rjob` 位于 `/usr/local/bin/rjob`。
+- 后台持久 SSH 远端编辑流程：在 `/mnt/shared-storage-user/xuwanghan/projects` 创建测试文件、备份、用 `sed -i` 编辑、`diff -u` 校验、内容验证、删除测试文件和备份，清理检查通过。
+- 远端 git patch 流程：在项目根目录下创建临时 git repo，生成 `.tmp/change.patch`，执行 `git apply --check` 和 `git apply`，内容验证通过，随后删除 patch、`.tmp` 和整个临时测试目录，清理检查通过。
+- `scp` 传输流程：本地创建小测试文件，`scp` 到远端个人项目根目录，远端 `grep` 验证后删除远端测试文件，本地测试文件也已删除，清理检查通过。
 - `rlaunch --help`、`rjob submit --help`。`rjob` 在非交互 shell 中需要先执行 `source /etc/profile.d/ssh-init.sh 2>/dev/null || true`。
 - `rlaunch` CPU worker：ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU；worker 自动退出，挂载检查通过。
 - `rlaunch` CPU worker 外网代理：`source /jobutils/scripts/worker_init.sh`、`source <(curl ...setup_proxy.sh)`、`curl -I https://www.google.com` 返回 HTTP 200。
@@ -70,6 +74,111 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 
 ```bash
 ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
+```
+
+推荐工作方式：先保持一个后台持久 SSH 终端，再在这个终端内连续执行 `cd`、编辑、提交、日志查看和清理。对于 Codex 或其他自动化 agent，这意味着优先维护一个长期 PTY/session，而不是每一步都新发一次 `ssh 'command'`。只有下面这种单次简单检查才适合一次性 SSH：
+
+```bash
+ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=1 \
+  -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn \
+  'hostname; command -v rlaunch; command -v rjob'
+```
+
+远端文件编辑、项目内代码修改、任务脚本编写、`rjob` 提交后跟日志、`rlaunch` worker 交互、服务启动和端口测试，都应在后台持久 SSH 终端中完成。
+
+远端文件编辑工作流：
+
+本地编辑工具只能修改当前本地 workspace，不能直接修改开发机或 worker 上的文件。需要修改远端集群文件时，不要假装本地 `apply_patch` 已经改到了远端；按下面三种方式处理。
+
+远端目录不一定是 git repo。只有确认远端目录是 git repo 时，才使用 `git status`、`git diff`、`git apply --check`、`git apply`。非 git 目录不要套用 git 流程，改用远端编辑器或完整文件复制。
+
+所有远端临时文件都放到目标项目自己的 `.tmp` 子目录，文件名带任务名或时间戳；任务结束必须删除临时文件，避免 `.tmp` 被杂乱文件塞满。不要把临时编辑文件放到系统 `/tmp`、`/var/tmp` 或 worker 本地盘。
+
+方式一：远端项目是 git repo 时，优先用 patch。先在本地生成 patch，再传到远端项目 `.tmp`，在后台持久 SSH 终端中检查并应用，最后删除临时 patch 和空 `.tmp` 目录：
+
+```bash
+# 本地终端
+REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
+PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
+PATCH_NAME="cluster-change-$(date +%Y%m%d-%H%M%S).patch"
+PATCH_LOCAL="./$PATCH_NAME"
+
+git diff -- <files> > "$PATCH_LOCAL"
+ssh -CAXY "$REMOTE" "mkdir -p '$PROJECT/.tmp'"
+scp "$PATCH_LOCAL" "$REMOTE:$PROJECT/.tmp/$PATCH_NAME"
+rm -f "$PATCH_LOCAL"
+```
+
+```bash
+# 远端后台持久 SSH 终端
+PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
+PATCH_NAME='<patch-name-from-local-step>'
+cd "$PROJECT"
+test -d .git
+git status --short
+git apply --check ".tmp/$PATCH_NAME"
+git apply ".tmp/$PATCH_NAME"
+rm -f ".tmp/$PATCH_NAME"
+rmdir .tmp 2>/dev/null || true
+git status --short
+```
+
+方式二：少量手工改动，直接在后台持久 SSH 终端中用远端已有编辑器修改。不要安装新编辑器，不要改全局配置。git repo 用 `git diff` 检查；非 git 目录用 `diff -u` 前后备份检查，检查后删除备份：
+
+```bash
+cd /mnt/shared-storage-user/xuwanghan/projects/<project>
+vim path/to/file
+if [ -d .git ]; then
+  git diff -- path/to/file
+fi
+```
+
+```bash
+cd /mnt/shared-storage-user/xuwanghan/projects/<project>
+TARGET_FILE="path/to/file"
+BACKUP_FILE="${TARGET_FILE}.bak.$(date +%Y%m%d-%H%M%S)"
+cp "$TARGET_FILE" "$BACKUP_FILE"
+vim "$TARGET_FILE"
+diff -u "$BACKUP_FILE" "$TARGET_FILE" || true
+rm -f "$BACKUP_FILE"
+```
+
+方式三：本地编辑复杂文件后上传替换。这是传输/替换流程，不是远端编辑；命令叫 `scp`，用于通过 SSH 复制文件。适合一个文件太复杂、不适合在远端用 `sed` 或编辑器逐步修改时使用。先在本地编辑好完整文件，再复制到远端项目 `.tmp`，在远端校验后移动到目标路径，并清理临时文件：
+
+```bash
+# 本地终端
+REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
+PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
+LOCAL_FILE='./file.new'
+REMOTE_NAME="file.new.$(date +%Y%m%d-%H%M%S).$$"
+REMOTE_TMP="$PROJECT/.tmp/$REMOTE_NAME"
+
+ssh -CAXY "$REMOTE" "mkdir -p '$PROJECT/.tmp'"
+scp "$LOCAL_FILE" "$REMOTE:$REMOTE_TMP"
+```
+
+```bash
+# 远端后台持久 SSH 终端
+PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
+REMOTE_NAME='<remote-name-from-local-step>'
+TARGET_FILE='path/to/file'
+BACKUP_NAME="$(basename "$TARGET_FILE").bak.$(date +%Y%m%d-%H%M%S)"
+cd "$PROJECT"
+test -s ".tmp/$REMOTE_NAME"
+if [ -f "$TARGET_FILE" ]; then
+  cp "$TARGET_FILE" ".tmp/$BACKUP_NAME"
+fi
+cp ".tmp/$REMOTE_NAME" "$TARGET_FILE"
+rm -f ".tmp/$REMOTE_NAME"
+if [ -d .git ]; then
+  git diff -- "$TARGET_FILE"
+else
+  if [ -f ".tmp/$BACKUP_NAME" ]; then
+    diff -u ".tmp/$BACKUP_NAME" "$TARGET_FILE" || true
+  fi
+fi
+rm -f ".tmp/$BACKUP_NAME"
+rmdir .tmp 2>/dev/null || true
 ```
 
 登录后最小检查：
