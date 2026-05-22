@@ -9,6 +9,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 
 - 安全边界：开发机、worker、共享环境、conda、包管理、密钥和长期配置。
 - 固定信息、登录与路径：后台持久交互 SSH、单次 SSH 适用边界、公共挂载、镜像、CUDA、conda、项目根目录、大文件目录。
+- 远端文件编辑：本地编辑工具边界、后台持久 SSH、git patch、远端编辑器、`sed`、`scp` 传输替换和清理。
 - 网络代理：开发机、CPU worker、CPU rjob、GPU 节点、私网服务和 OpenAI 相关代理边界。
 - 模型权重：公共 HuggingFace 目录、大模型保存目录、查找和迁移前检查。
 - 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 分区、`rlaunch`、`rjob`、日志和清理。
@@ -45,7 +46,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 
 ## 实测状态
 
-以下结果在 2026-05-20 实测。不要把“已提交但未调度运行”的 GPU 功能描述成已完整跑通。
+以下结果包含 2026-05-20 实测和 2026-05-22 更新。不要把“已提交但未调度运行”的 GPU 功能描述成已完整跑通。
 
 已完整跑通：
 
@@ -57,16 +58,20 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 - `rlaunch` CPU worker：ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU；worker 自动退出，挂载检查通过。
 - `rlaunch` CPU worker 外网代理：`source /jobutils/scripts/worker_init.sh`、`source <(curl ...setup_proxy.sh)`、`curl -I https://www.google.com` 返回 HTTP 200。
 - `rjob` CPU 短任务：ai4sdata CPU 和 scieval CPU 均提交成功、任务 `Succeeded`、日志可读、job 可删除。
+- `rjob` CPU 外网代理：`--host-network=false`，job 启动后 `sleep 5`，再执行 `setup_proxy.sh`，`curl -I https://www.google.com` 返回 `HTTP/1.0 200 OK` 和 `HTTP/2 200`，`wget --spider` 返回 `200 OK`。测试 job `codex-skill-cpu-net-nohost-1779424506` 保留给运维排查。
+- `rjob` GPU 短任务：ai4sdata/scieval 均已真实提交并运行到 `nvidia-smi`，日志可读，测试后 job 已删除。
 - `rjob submit --dry-run true`：ai4sdata/scieval 的 CPU/GPU 常规模板均可生成 YAML；1 GPU 模板也已 dry-run 通过，资源为 `--gpu=1 --cpu=22 --memory=230000`。
 - `rjob` host-network 服务访问：ai4sdata CPU rjob 内启动 `python3 -m http.server`，开发机通过内网 IP 访问成功，返回 `codex_service_ok`，job 已删除。
+- GPU 模型服务和 GPU+CPU 协作部署：GPU 服务、CPU 侧调用 GPU 内网 URL、host-network/no_proxy 协作链路已跑通。
 - 模型与软件公共路径只读检查：`huggingface/hub`、`huggingface/zskj-hub`、`soft`、`soft-pkg`、大模型目标目录和 `rclone v1.68.2` 均存在；`find ... "*Qwen3-VL-4B*"` 可找到公共模型目录。
 
 已测试但当前未完整跑通：
 
 - `rlaunch` GPU worker：ai4sdata 1 GPU、ai4sdata 2 GPU、scieval 1 GPU 都可执行调度命令，但当前资源不足或 pending unschedulable，未进入 GPU worker。
-- `rjob` GPU 短任务：ai4sdata/scieval 都可提交并查询；当前停在 `STARTING`/`Inqueue`，未执行到 `nvidia-smi`，测试后已删除 job。
-- CPU rjob 外网代理：job 可成功运行，但 `curl https://www.google.com` 返回 `407 Proxy Authentication Required`，不要把 CPU rjob 外网访问写成已验证成功。
-- GPU 模型服务和 GPU+CPU 协作部署依赖 GPU job 真正调度运行；本次只验证了提交/查询/删除链路和 CPU host-network 访问链路。
+
+关键边界：
+
+- CPU rjob 外网任务使用 `--host-network=false`。`--host-network=true` 下代理访问外网返回 `407 Proxy Authentication Required`，不要用于 CPU rjob 外网任务。
 
 ## 固定信息、登录与路径
 
@@ -84,11 +89,95 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliv
   'hostname; command -v rlaunch; command -v rjob'
 ```
 
-远端文件编辑、项目内代码修改、任务脚本编写、`rjob` 提交后跟日志、`rlaunch` worker 交互、服务启动和端口测试，都应在后台持久 SSH 终端中完成。
+复杂远端操作，例如项目内多步修改、任务脚本编写、`rjob` 提交后跟日志、`rlaunch` worker 交互、服务启动和端口测试，都应在后台持久 SSH 终端中完成。
 
-远端文件编辑工作流：
+登录后最小检查：
 
-本地编辑工具只能修改当前本地 workspace，不能直接修改开发机或 worker 上的文件。需要修改远端集群文件时，不要假装本地 `apply_patch` 已经改到了远端；按下面三种方式处理。
+```bash
+hostname
+command -v rlaunch
+command -v rjob
+source /etc/profile.d/ssh-init.sh 2>/dev/null || true
+rlaunch --help | sed -n '1,20p'
+rjob submit --help | sed -n '1,20p'
+```
+
+公共挂载。所有 `rlaunch` 和 `rjob submit` 命令通常都带上这些挂载：
+
+```bash
+--mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan
+--mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax
+--mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public
+--mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2
+```
+
+常用镜像：
+
+```bash
+registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab
+```
+
+常用 CUDA：
+
+```bash
+/mnt/shared-storage-gpfs2/gpfs2-shared-public/soft/cuda/12.8
+```
+
+常用 conda env 目录：
+
+```bash
+/mnt/shared-storage-user/xuwanghan/conda_env
+```
+
+常用 conda 环境：
+
+```bash
+conda activate agent   # 开发机默认开发环境
+conda activate llmv2   # LLM 训练/部署推荐环境
+conda activate llm     # LLM 训练/部署旧环境
+```
+
+不要重新安装 conda，不要擅自创建环境或修改已有环境中的包。遇到不清楚的环境名，先问用户。
+
+个人项目根目录。不同项目都在这里，代码和普通项目数据不要存放到其他地方：
+
+```bash
+/mnt/shared-storage-user/xuwanghan/projects
+```
+
+大文件根目录。大于 5G 的数据或权重放到这里的合适子目录：
+
+```bash
+/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan
+```
+
+临时文件与缓存控制：
+
+```bash
+PROJECT_DIR="/mnt/shared-storage-user/xuwanghan/projects/<project>"
+BIG_DIR="/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/<project>"
+mkdir -p "$PROJECT_DIR" "$BIG_DIR"
+
+# 小型项目缓存。不要使用默认 ~/.cache。
+export XDG_CACHE_HOME="$PROJECT_DIR/.cache"
+export HF_HOME="$PROJECT_DIR/.cache/huggingface"
+export TRANSFORMERS_CACHE="$HF_HOME/transformers"
+export HF_DATASETS_CACHE="$HF_HOME/datasets"
+
+# 大于 5G 的缓存、数据或权重改放 BIG_DIR，并在命令结束后检查容量。
+# export HF_HOME="$BIG_DIR/huggingface"
+# export TRANSFORMERS_CACHE="$HF_HOME/transformers"
+# export HF_DATASETS_CACHE="$HF_HOME/datasets"
+
+# 必须用临时目录时，只放任务内短生命周期文件，并确保退出时清理。
+RUN_TMP="$PROJECT_DIR/.tmp/run-$(date +%Y%m%d-%H%M%S)-$$"
+mkdir -p "$RUN_TMP"
+trap 'rm -rf "$RUN_TMP"' EXIT
+```
+
+## 远端文件编辑工作流
+
+本地编辑工具只能修改当前本地 workspace，不能直接修改开发机或 worker 上的文件。需要修改远端集群文件时，不要假装本地 `apply_patch` 已经改到了远端；先建立后台持久 SSH 终端，再按下面三种方式处理。
 
 远端目录不一定是 git repo。只有确认远端目录是 git repo 时，才使用 `git status`、`git diff`、`git apply --check`、`git apply`。非 git 目录不要套用 git 流程，改用远端编辑器或完整文件复制。
 
@@ -181,90 +270,6 @@ rm -f ".tmp/$BACKUP_NAME"
 rmdir .tmp 2>/dev/null || true
 ```
 
-登录后最小检查：
-
-```bash
-hostname
-command -v rlaunch
-command -v rjob
-source /etc/profile.d/ssh-init.sh 2>/dev/null || true
-rlaunch --help | sed -n '1,20p'
-rjob submit --help | sed -n '1,20p'
-```
-
-公共挂载。所有 `rlaunch` 和 `rjob submit` 命令通常都带上这些挂载：
-
-```bash
---mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan
---mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax
---mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public
---mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2
-```
-
-常用镜像：
-
-```bash
-registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab
-```
-
-常用 CUDA：
-
-```bash
-/mnt/shared-storage-gpfs2/gpfs2-shared-public/soft/cuda/12.8
-```
-
-常用 conda env 目录：
-
-```bash
-/mnt/shared-storage-user/xuwanghan/conda_env
-```
-
-常用 conda 环境：
-
-```bash
-conda activate agent   # 开发机默认开发环境
-conda activate llmv2   # LLM 训练/部署推荐环境
-conda activate llm     # LLM 训练/部署旧环境
-```
-
-不要重新安装 conda，不要擅自创建环境或修改已有环境中的包。遇到不清楚的环境名，先问用户。
-
-个人项目根目录。不同项目都在这里，代码和普通项目数据不要存放到其他地方：
-
-```bash
-/mnt/shared-storage-user/xuwanghan/projects
-```
-
-大文件根目录。大于 5G 的数据或权重放到这里的合适子目录：
-
-```bash
-/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan
-```
-
-临时文件与缓存控制：
-
-```bash
-PROJECT_DIR="/mnt/shared-storage-user/xuwanghan/projects/<project>"
-BIG_DIR="/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/<project>"
-mkdir -p "$PROJECT_DIR" "$BIG_DIR"
-
-# 小型项目缓存。不要使用默认 ~/.cache。
-export XDG_CACHE_HOME="$PROJECT_DIR/.cache"
-export HF_HOME="$PROJECT_DIR/.cache/huggingface"
-export TRANSFORMERS_CACHE="$HF_HOME/transformers"
-export HF_DATASETS_CACHE="$HF_HOME/datasets"
-
-# 大于 5G 的缓存、数据或权重改放 BIG_DIR，并在命令结束后检查容量。
-# export HF_HOME="$BIG_DIR/huggingface"
-# export TRANSFORMERS_CACHE="$HF_HOME/transformers"
-# export HF_DATASETS_CACHE="$HF_HOME/datasets"
-
-# 必须用临时目录时，只放任务内短生命周期文件，并确保退出时清理。
-RUN_TMP="$PROJECT_DIR/.tmp/run-$(date +%Y%m%d-%H%M%S)-$$"
-mkdir -p "$RUN_TMP"
-trap 'rm -rf "$RUN_TMP"' EXIT
-```
-
 ## 网络代理
 
 不要依赖 `.bashrc` 里的 alias/function，但需要理解其语义并用原始命令复现。远端 `.bashrc` 中和代理相关的常用项：
@@ -280,8 +285,8 @@ trap 'rm -rf "$RUN_TMP"' EXIT
 网络边界：
 
 - 开发机联网，但只能做轻量下载、编辑、提交和监控，不要在开发机跑高负载任务。
-- CPU `rlaunch` worker 外网代理已实测成功。
-- CPU `rjob` 可以运行，但本次外网代理测试返回 `407 Proxy Authentication Required`，不要把 CPU rjob 外网写成已验证成功。
+- CPU `rlaunch` worker 可以按本节命令设置代理并测试外网。
+- CPU `rjob` 外网任务使用 `--host-network=false`，job 启动后先 `sleep 5`，再执行 `setup_proxy.sh` 并测试外网。`--host-network=true` 更适合服务/内网访问场景，外网代理可能返回 407。
 - GPU worker 和 GPU rjob 节点不可联网；GPU 任务脚本应显式 `unset` 代理，依赖和模型提前放到共享存储。
 - 访问私网服务时，私网地址必须进入 `no_proxy`；不要让 GPU/CPU 内网调用走外部代理。
 
@@ -313,7 +318,20 @@ wget --spider https://www.google.com
 unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ftp_proxy all_proxy ALL_PROXY
 ```
 
-ai4sdata 4 CPU worker 内代理和外网访问已实测成功，`curl -I https://www.google.com` 返回 HTTP 200：
+开发机执行需要外网的轻量命令前，先显式打开代理并验证连通性。典型场景包括 `git fetch`、`git pull`、`git push`、`gh`、访问 GitHub、下载小依赖、`curl` 外部 API。不要在网络未通时误判为 git 凭据、GitHub 权限或仓库配置问题：
+
+```bash
+source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh)
+export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147
+env | grep -i '^http_proxy\|^https_proxy\|^no_proxy'
+curl -I --max-time 20 https://github.com
+
+# 只有 curl 成功后再执行需要外网的命令。
+git fetch
+git push
+```
+
+ai4sdata 4 CPU worker 内代理和外网访问检查：
 
 ```bash
 rlaunch \
@@ -328,11 +346,13 @@ rlaunch \
   -- bash -lc 'source /jobutils/scripts/worker_init.sh 2>/dev/null || true; source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh); export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147; env | grep -i "^http_proxy\|^https_proxy\|^no_proxy"; curl -I --max-time 20 https://www.google.com | sed -n "1,5p"'
 ```
 
-CPU rjob 外网代理状态：
+CPU rjob 外网代理要求：
 
-- CPU rjob 短任务本身已实测成功。
-- CPU rjob 内执行代理脚本后，`curl https://www.google.com` 返回过 `407 Proxy Authentication Required`。
-- 需要 CPU rjob 联网时，先和用户确认代理认证方案，再重新测试。
+- CPU rjob 外网任务提交时使用 `--host-network=false`。
+- job 内先 `sleep 5`，再 `source /jobutils/scripts/worker_init.sh` 和 `source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh)`。
+- 正式联网任务前用短 job 测到 `HTTP/2 200`、`HTTP/1.1 200` 或 `network_test_done`。
+- 不要在 job 命令、日志、仓库或最终回复中打印带认证信息的代理 URL。
+- 如果测试返回 `407 Proxy Authentication Required`、`403 Forbidden` 或连接超时，先检查是否误用了 `--host-network=true`；仍失败时再让用户或运维确认代理策略。
 
 私网服务代理处理：
 
@@ -363,7 +383,7 @@ add_no_proxy_if_private(url)
 /mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/models
 ```
 
-只读查找模型命令已实测可用：
+只读查找模型命令：
 
 ```bash
 find /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface -maxdepth 3 -type d -name "*Qwen3-VL-4B*"
@@ -375,12 +395,11 @@ find /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface -maxdepth 3 -type
 find /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface -maxdepth 3 -type d \( -name "*Qwen3.5-9B*" -o -name "*Qwen3.5-35B*" \)
 ```
 
-2026-05-20 只读检查结果：
+迁移前检查：
 
-- `Qwen3-VL-4B` 在公共 `huggingface/hub` 下有多个目录。
-- `Qwen3.5-9B` 在公共 `huggingface/hub` 和大模型目标目录中可见；用户给出的 `zskj-hub/models--Qwen--Qwen3.5-9B` 路径当前不存在。
-- `Qwen3.5-35B-A3B` 在公共 `huggingface/hub` 和 `zskj-hub` 下可见；大模型目标目录 `Qwen--Qwen3.5-35B-A3B` 当前不存在。
-- `/mnt/shared-storage-user/xuwanghan/projects/rclone/rclone-v1.68.2-linux-amd64/rclone version` 返回 `rclone v1.68.2`。
+- 不要假设用户给出的迁移源路径一定存在。先 `test -d` 或 `find` 确认源目录，再 `rclone copy`。
+- 如果目标目录已经存在，先确认是否复用、增量同步或另存新目录；不要覆盖或移动现有权重。
+- 大模型迁移前先确认目标盘容量，超过 5G 的权重放到 `/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/` 下。
 
 使用模型前，先把 `MODEL_PATH` 指向已存在目录，不要重新下载：
 
@@ -452,13 +471,13 @@ rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=ai4sdata_gpu --private-
 rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=scieval_gpu --private-machine=group --namespace=ailab-scieval --predict-only
 ```
 
-实测结果：CPU 预测返回可用节点；GPU 预测/实际申请当前显示资源不足或不可调度。
+先用预测命令看调度结果；如果 GPU 返回资源不足或不可调度，不要循环提交或长期占用开发机轮询。
 
 ## rlaunch CPU Worker
 
-真实交互使用时把末尾命令写成 `-- bash`。本次为避免留下空闲 worker，使用同一组资源参数加 `-- bash -lc '...'` 自动退出完成实测。
+真实交互使用时把末尾命令写成 `-- bash`。需要做短检查时，可以把末尾命令改成 `-- bash -lc '...'`，让 worker 自动退出，避免留下空闲资源。
 
-ai4sdata 4 CPU，已实测成功：
+ai4sdata 4 CPU：
 
 ```bash
 rlaunch \
@@ -473,7 +492,7 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok; test -d /mnt/shared-storage-user/sciprismax && echo mount_sciprismax_ok; test -d /mnt/shared-storage-gpfs2/gpfs2-shared-public && echo mount_public_ok; test -d /mnt/shared-storage-gpfs2/sciprismax2 && echo mount_sciprismax2_ok'
 ```
 
-ai4sdata 8 CPU，已实测成功：
+ai4sdata 8 CPU：
 
 ```bash
 rlaunch \
@@ -488,7 +507,7 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); nproc; test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok; test -d /mnt/shared-storage-gpfs2/gpfs2-shared-public && echo mount_public_ok'
 ```
 
-scieval 8 CPU，已实测成功：
+scieval 8 CPU：
 
 ```bash
 rlaunch \
@@ -506,7 +525,7 @@ rlaunch \
 
 CPU Worker 联网：
 
-CPU worker 可联网。ai4sdata 4 CPU worker 内代理和外网访问已实测成功，`curl -I https://www.google.com` 返回 HTTP 200。下面命令可直接复制到开发机交互 shell 中运行，会自动退出，不留下空闲 worker：
+CPU worker 可联网。下面命令可直接复制到开发机交互 shell 中运行，设置代理、测试外网并自动退出，不留下空闲 worker：
 
 ```bash
 rlaunch \
@@ -534,9 +553,9 @@ wget --spider https://www.google.com
 
 ## rlaunch GPU Worker
 
-以下命令已实测调度路径，但当前未拿到 GPU 资源。资源恢复后，真实交互使用时把末尾命令写成 `-- bash`，进入 worker 后先运行 `hostname`、`nvidia-smi -L`、挂载检查。
+以下命令用于申请 GPU worker。真实交互使用时把末尾命令写成 `-- bash`，进入 worker 后先运行 `hostname`、`nvidia-smi -L` 和挂载检查；如果调度器提示资源不足或 pending unschedulable，不要反复提交。
 
-ai4sdata 1 GPU，当前结果：`Insufficient nvidia.com/gpu`：
+ai4sdata 1 GPU：
 
 ```bash
 rlaunch \
@@ -553,7 +572,7 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); nvidia-smi -L; test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok'
 ```
 
-ai4sdata 2 GPU，当前结果：`Insufficient nvidia.com/gpu`：
+ai4sdata 2 GPU：
 
 ```bash
 rlaunch \
@@ -570,7 +589,7 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); nvidia-smi -L'
 ```
 
-scieval 1 GPU，当前结果：pending unschedulable：
+scieval 1 GPU：
 
 ```bash
 rlaunch \
@@ -601,7 +620,7 @@ GPU worker 不可联网。不要在 GPU worker 中运行 `pip install`、`git cl
 7. 提交后记录 job name、job id、worker id 或服务 IP；只摘录必要日志，不复制 secret。
 8. scieval job 的查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
 
-最小 dry-run，已实测可生成 YAML：
+最小 dry-run，用于生成并检查 YAML：
 
 ```bash
 rjob submit --dry-run true \
@@ -618,7 +637,7 @@ rjob submit --dry-run true \
 
 ## rjob CPU 任务
 
-ai4sdata CPU rjob 已实测成功，任务 `Succeeded`，日志含 `real_rjob_done`，并已删除：
+ai4sdata CPU rjob 最小任务：
 
 ```bash
 JOB=codex-skill-cpu-ai4sdata-real-$(date +%s)
@@ -637,7 +656,7 @@ rjob logs job "$JOB" --tail-lines 50
 rjob delete "$JOB"
 ```
 
-scieval CPU rjob 已实测成功：
+scieval CPU rjob 最小任务：
 
 ```bash
 JOB=codex-skill-cpu-scieval-real-$(date +%s)
@@ -657,7 +676,7 @@ KUBEBRAIN_NAMESPACE=ailab-scieval rjob logs job "$JOB" --tail-lines 50
 KUBEBRAIN_NAMESPACE=ailab-scieval rjob delete "$JOB"
 ```
 
-8 CPU 常规模板已通过 dry-run。正式使用前替换 `--name` 和启动命令。
+8 CPU 常规模板。正式使用前替换 `--name` 和启动命令；需要检查语法时保留 `--dry-run true`。
 
 ai4sdata CPU 模板：
 
@@ -696,7 +715,7 @@ rjob submit --dry-run true \
   -- bash command.sh
 ```
 
-CPU rjob 外网代理当前不能写成已验证成功。本命令可完整复制用于重新测试；上次实测时 job 可运行，但 `curl https://www.google.com` 返回 `407 Proxy Authentication Required`。执行前先确认确实需要 CPU rjob 外网访问。
+CPU rjob 外网代理必须使用 `--host-network=false`，并先用短任务验证。本命令可完整复制用于测试默认代理；跑到 `HTTP/2 200`、`HTTP/1.1 200` 或 `network_test_done` 明确出现后，才能继续正式联网任务。
 
 ```bash
 JOB=codex-skill-cpu-network-$(date +%s)
@@ -707,8 +726,8 @@ rjob submit --name "$JOB" \
   --charged-group=ai4sdata_cpu_task \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
   --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
-  --host-network=true \
-  -- bash -lc 'echo network_test_start; source /jobutils/scripts/worker_init.sh 2>/dev/null || true; source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh); export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147; env | grep -i proxy; curl -I --max-time 20 https://www.google.com; echo network_test_done'
+  --host-network=false \
+  -- bash -lc 'set -eo pipefail; echo network_test_start; sleep 5; source /jobutils/scripts/worker_init.sh 2>/dev/null || true; unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ftp_proxy all_proxy ALL_PROXY; source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh); export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147; export NO_PROXY=$no_proxy; env | grep -i "^http_proxy\|^https_proxy\|^no_proxy"; curl -I -L --max-time 30 https://www.google.com | sed -n "1,12p"; wget --spider --timeout=30 --tries=1 https://www.google.com; echo network_test_done'
 sleep 30
 rjob get "$JOB"
 rjob logs job "$JOB" --tail-lines 100
@@ -717,9 +736,9 @@ rjob delete "$JOB"
 
 ## rjob GPU 任务
 
-以下命令已实测真实提交、查询和删除链路；当前 GPU 资源不足，job 停在 `STARTING`/`Inqueue`，未执行到 `nvidia-smi`。
+以下命令用于提交 GPU 短任务，检查调度、`nvidia-smi`、日志和删除链路。
 
-1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。ai4sdata 和 scieval 的 1 GPU `rjob submit --dry-run true` 均已实测可生成 YAML。
+1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。
 
 ai4sdata 1 GPU dry-run 模板：
 
@@ -813,7 +832,7 @@ KUBEBRAIN_NAMESPACE=ailab-scieval rjob get "$JOB"
 KUBEBRAIN_NAMESPACE=ailab-scieval rjob delete "$JOB"
 ```
 
-常规 GPU 模板已通过 dry-run。正式训练或部署时，把最后一行改为 `-- bash command.sh`，并确保 `command.sh` 已放在共享存储中。
+常规 GPU 模板。正式训练或部署时，把最后一行改为 `-- bash command.sh`，并确保 `command.sh` 已放在共享存储中；需要检查语法时保留 `--dry-run true`。
 
 ai4sdata GPU 模板：
 
@@ -891,13 +910,14 @@ nvidia-smi
 # Start training or deployment command here. Do not install or upgrade packages unless the user explicitly permits it.
 ```
 
-CPU 联网脚本骨架。把 `PROJECT_DIR`、`CONDA_ENV` 和最后的启动命令改成具体任务；不要安装或升级包。CPU worker 外网代理已实测成功；CPU rjob 外网代理本次返回 407，在 rjob 中使用外网前必须重新确认认证方案并测试。
+CPU 联网脚本骨架。把 `PROJECT_DIR`、`CONDA_ENV` 和最后的启动命令改成具体任务；不要安装或升级包。用 rjob 跑外网任务时，提交命令使用 `--host-network=false`，脚本内先 `sleep 5` 再配置代理。
 
 ```bash
 #!/usr/bin/env bash
 set -eo pipefail
 
 echo "[INFO] Start CPU network job."
+sleep 5
 
 PROJECT_DIR="/mnt/shared-storage-user/xuwanghan/projects/<project>"
 CONDA_ENV="agent"
@@ -923,7 +943,7 @@ cd "$PROJECT_DIR"
 
 ## 服务部署模式
 
-host-network 服务访问已用 CPU rjob 实测成功：job 内启动 HTTP 服务，开发机访问内网 IP 返回 `codex_service_ok`，随后 job 已删除。
+host-network 服务访问模式：job 内启动 HTTP 服务，开发机访问日志中的内网 IP 和端口。
 
 ```bash
 JOB=codex-skill-http-service-real-$(date +%s)
@@ -935,7 +955,7 @@ rjob submit --name "$JOB" \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
   --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
   --host-network=true \
-  -- bash -lc 'IP=$(hostname -I | awk "{print \$1}"); echo SERVICE_IP=$IP; mkdir -p /tmp/codex_http; echo codex_service_ok > /tmp/codex_http/index.html; cd /tmp/codex_http; python3 -m http.server 18081 --bind 0.0.0.0 & pid=$!; echo SERVICE_READY; sleep 180; kill $pid 2>/dev/null || true'
+  -- bash -lc 'IP=$(hostname -I | awk "{print \$1}"); echo SERVICE_IP=$IP; SERVE_DIR="/mnt/shared-storage-user/xuwanghan/projects/.tmp/$JOB-http"; mkdir -p "$SERVE_DIR"; echo codex_service_ok > "$SERVE_DIR/index.html"; cd "$SERVE_DIR"; python3 -m http.server 18081 --bind 0.0.0.0 & pid=$!; echo SERVICE_READY; sleep 180; kill $pid 2>/dev/null || true; cd /; rm -rf "$SERVE_DIR"'
 sleep 20
 rjob get "$JOB"
 rjob logs job "$JOB" --tail-lines 40
@@ -943,7 +963,48 @@ curl --max-time 10 http://<SERVICE_IP_FROM_LOGS>:18081/
 rjob delete "$JOB"
 ```
 
-GPU 模型服务使用同一原则：服务监听 `0.0.0.0`，`rjob` 加 `--host-network=true`，开发机访问日志中的内网 IP 和端口。由于本次 GPU job 未调度到运行态，模型服务命令不能标记为已完整实测。
+GPU 模型服务使用同一原则：服务监听 `0.0.0.0`，`rjob` 加 `--host-network=true`，开发机或 CPU 侧任务访问日志中的内网 IP 和端口。CPU 侧调用 GPU 内网 URL 时必须设置 `no_proxy`，不要让私网流量走外部代理。
+
+rjob 部署服务后的访问 IP 必须从 job 日志获取，不要猜。部署脚本里打印 IP 和端口：
+
+```bash
+PORT=8010
+IP=$(hostname -I | awk '{print $1}')
+echo "SERVICE_IP=$IP"
+echo "[INFO] ip=$IP"
+echo "[INFO] port=$PORT"
+
+# Start service with --host 0.0.0.0 and --port "$PORT".
+```
+
+rjob 启动日志里也可能出现 `SOCKET_IP=...`、`MASTER_ADDR=...`。优先使用服务脚本打印的 `SERVICE_IP` 或 `[INFO] ip=`；没有这些行时，再结合日志中的 `SOCKET_IP`、`MASTER_ADDR` 和实际监听端口判断。查看日志：
+
+```bash
+rjob logs job "$JOB" --tail-lines 200 | grep -E 'SERVICE_IP=|\[INFO\] ip=|\[INFO\] port=|SOCKET_IP=|MASTER_ADDR='
+```
+
+假设日志里出现：
+
+```text
+[INFO] ip=10.xxx.xxx.xxx
+[INFO] port=8010
+```
+
+访问地址就是：
+
+```bash
+BASE_URL="http://10.xxx.xxx.xxx:8010/v1"
+```
+
+从开发机或 CPU worker 验证 OpenAI-compatible 服务：
+
+```bash
+SERVICE_IP="10.xxx.xxx.xxx"
+PORT="8010"
+export no_proxy="$SERVICE_IP,${no_proxy:-10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,.pjlab.org.cn}"
+export NO_PROXY="$no_proxy"
+curl --max-time 20 "http://$SERVICE_IP:$PORT/v1/models"
+```
 
 rlaunch worker 的 KAPI 访问需要 worker id、分区和端口，并从环境变量读取 KAPI AK/SK：
 
@@ -1021,7 +1082,7 @@ add_no_proxy_if_private(url)
 - `unknown charged-group` 或 namespace 相关错误：核对分区矩阵；scieval 必须带 `--namespace=ailab-scieval`，ai4sdata 通常不带 namespace。
 - GPU 节点下载失败：预期行为。改用 CPU worker 下载到共享存储，或提前准备镜像/环境。
 - 外部 API 调用失败：确认任务是否在 CPU 节点；GPU 节点不可联网。
-- CPU rjob 外网返回 407：不要继续硬试；先和用户确认代理认证方案。
+- CPU rjob 外网返回 407：先检查提交命令是否误用了 `--host-network=true`；外网任务改用 `--host-network=false`，job 内 `sleep 5` 后再配置代理。
 - 私网服务访问失败：检查服务是否监听 `0.0.0.0`、端口是否开放、URL 是否用了正确 worker id 或私网 IP、私网地址是否在 `no_proxy`。
 - 训练 OOM：先降低 batch、sequence length、并发生成数或改用更多 GPU；再按资源公式调整 CPU/memory。
 - worker 被释放：`rlaunch` 不适合长期运行；改用 `rjob submit`。
