@@ -12,7 +12,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 - 远端文件编辑：本地编辑工具边界、后台持久 SSH、git patch、远端编辑器、`sed`、`scp` 传输替换和清理。
 - 网络代理：开发机、CPU worker、CPU rjob、GPU 节点、私网服务和 OpenAI 相关代理边界。
 - 模型权重：公共 HuggingFace 目录、大模型保存目录、查找和迁移前检查。
-- 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 分区、`rlaunch`、`rjob`、日志和清理。
+- 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 分区、CPU rjob 只用 ai4sdata、GPU rjob 可用两个分区、`rlaunch`、`rjob`、日志和清理。
 - 服务协作：host-network、KAPI、GPU 服务 + CPU 评测、多 worker 协作和排错。
 
 ## 核心原则
@@ -57,10 +57,10 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 - `rlaunch --help`、`rjob submit --help`。`rjob` 在非交互 shell 中需要先执行 `source /etc/profile.d/ssh-init.sh 2>/dev/null || true`。
 - `rlaunch` CPU worker：ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU；worker 自动退出，挂载检查通过。
 - `rlaunch` CPU worker 外网代理：`source /jobutils/scripts/worker_init.sh`、`source <(curl ...setup_proxy.sh)`、`curl -I https://www.google.com` 返回 HTTP 200。
-- `rjob` CPU 短任务：ai4sdata CPU 和 scieval CPU 均提交成功、任务 `Succeeded`、日志可读、job 可删除。
+- `rjob` CPU 短任务：ai4sdata CPU 提交成功、任务 `Succeeded`、日志可读、job 可删除。CPU rjob 固定使用 ai4sdata，不提交 scieval CPU rjob。
 - `rjob` CPU 外网代理：`--host-network=false`，job 启动后 `sleep 5`，再执行 `setup_proxy.sh`，`curl -I https://www.google.com` 返回 `HTTP/1.0 200 OK` 和 `HTTP/2 200`，`wget --spider` 返回 `200 OK`。测试 job `codex-skill-cpu-net-nohost-1779424506` 保留给运维排查。
 - `rjob` GPU 短任务：ai4sdata/scieval 均已真实提交并运行到 `nvidia-smi`，日志可读，测试后 job 已删除。
-- `rjob submit --dry-run true`：ai4sdata/scieval 的 CPU/GPU 常规模板均可生成 YAML；1 GPU 模板也已 dry-run 通过，资源为 `--gpu=1 --cpu=22 --memory=230000`。
+- `rjob submit --dry-run true`：ai4sdata CPU 模板、ai4sdata/scieval GPU 常规模板均可生成 YAML；1 GPU 模板也已 dry-run 通过，资源为 `--gpu=1 --cpu=22 --memory=230000`。
 - `rjob` host-network 服务访问：ai4sdata CPU rjob 内启动 `python3 -m http.server`，开发机通过内网 IP 访问成功，返回 `codex_service_ok`，job 已删除。
 - GPU 模型服务和 GPU+CPU 协作部署：GPU 服务、CPU 侧调用 GPU 内网 URL、host-network/no_proxy 协作链路已跑通。
 - 模型与软件公共路径只读检查：`huggingface/hub`、`huggingface/zskj-hub`、`soft`、`soft-pkg`、大模型目标目录和 `rclone v1.68.2` 均存在；`find ... "*Qwen3-VL-4B*"` 可找到公共模型目录。
@@ -72,6 +72,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流�
 关键边界：
 
 - CPU rjob 外网任务使用 `--host-network=false`。`--host-network=true` 下代理访问外网返回 `407 Proxy Authentication Required`，不要用于 CPU rjob 外网任务。
+- CPU rjob 只能使用 ai4sdata；GPU rjob 可使用 ai4sdata 或 scieval。
 
 ## 固定信息、登录与路径
 
@@ -454,10 +455,13 @@ memory  = 4000 * C
 
 | 场景 | 分区 | charged group | namespace | private machine |
 | --- | --- | --- | --- | --- |
-| GPU 常规 | ai4sdata | `ai4sdata_gpu` | 不加 | `group` |
-| GPU 常规 | scieval | `scieval_gpu` | `ailab-scieval` | `group` |
-| CPU 常规 | ai4sdata | `ai4sdata_cpu_task` | 不加 | 不加 |
-| CPU 常规 | scieval | `scieval_cpu_task` | `ailab-scieval` | 不加 |
+| rlaunch GPU / rjob GPU | ai4sdata | `ai4sdata_gpu` | 不加 | `group` |
+| rlaunch GPU / rjob GPU | scieval | `scieval_gpu` | `ailab-scieval` | `group` |
+| rlaunch CPU worker | ai4sdata | `ai4sdata_cpu_task` | 不加 | 不加 |
+| rlaunch CPU worker | scieval | `scieval_cpu_task` | `ailab-scieval` | 不加 |
+| rjob CPU | ai4sdata | `ai4sdata_cpu_task` | 不加 | 不加 |
+
+CPU rjob 固定使用 ai4sdata。不要提交 scieval CPU rjob；需要 scieval 分区时只用于 GPU rjob 或 rlaunch worker。
 
 ## rlaunch 资源检查
 
@@ -618,7 +622,7 @@ GPU worker 不可联网。不要在 GPU worker 中运行 `pip install`、`git cl
 5. 先用 `rjob submit --dry-run true ...` 做语法和资源字段检查；确认无误后去掉 `--dry-run true` 正式提交。
 6. 用 `rjob submit ... -- bash command.sh` 提交。
 7. 提交后记录 job name、job id、worker id 或服务 IP；只摘录必要日志，不复制 secret。
-8. scieval job 的查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
+8. CPU rjob 固定使用 ai4sdata。GPU rjob 可使用 ai4sdata 或 scieval；scieval GPU job 的查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
 
 最小 dry-run，用于生成并检查 YAML：
 
@@ -636,6 +640,8 @@ rjob submit --dry-run true \
 ```
 
 ## rjob CPU 任务
+
+CPU rjob 只能使用 ai4sdata。不要提交 scieval CPU rjob；如果任务需要 CPU 且要联网、下载、评测或做中转，统一按本节 ai4sdata 模板提交。
 
 ai4sdata CPU rjob 最小任务：
 
@@ -656,29 +662,7 @@ rjob logs job "$JOB" --tail-lines 50
 rjob delete "$JOB"
 ```
 
-scieval CPU rjob 最小任务：
-
-```bash
-JOB=codex-skill-cpu-scieval-real-$(date +%s)
-rjob submit --name "$JOB" \
-  -P 1 \
-  --cpu=1 \
-  --memory=4000 \
-  --charged-group=scieval_cpu_task \
-  --namespace=ailab-scieval \
-  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
-  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
-  --host-network=true \
-  -- bash -lc 'echo real_rjob_start; hostname; test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok; echo real_rjob_done'
-sleep 20
-KUBEBRAIN_NAMESPACE=ailab-scieval rjob get "$JOB"
-KUBEBRAIN_NAMESPACE=ailab-scieval rjob logs job "$JOB" --tail-lines 50
-KUBEBRAIN_NAMESPACE=ailab-scieval rjob delete "$JOB"
-```
-
-8 CPU 常规模板。正式使用前替换 `--name` 和启动命令；需要检查语法时保留 `--dry-run true`。
-
-ai4sdata CPU 模板：
+ai4sdata 8 CPU rjob 常规模板。正式使用前替换 `--name` 和启动命令；需要检查语法时保留 `--dry-run true`。
 
 ```bash
 rjob submit --dry-run true \
@@ -687,25 +671,6 @@ rjob submit --dry-run true \
   --cpu=8 \
   --memory=32000 \
   --charged-group=ai4sdata_cpu_task \
-  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
-  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
-  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
-  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
-  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
-  --host-network=true \
-  -- bash command.sh
-```
-
-scieval CPU 模板：
-
-```bash
-rjob submit --dry-run true \
-  --name=xxxxx \
-  -P 1 \
-  --cpu=8 \
-  --memory=32000 \
-  --charged-group=scieval_cpu_task \
-  --namespace=ailab-scieval \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
   --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
   --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
@@ -1060,7 +1025,7 @@ add_no_proxy_if_private(url)
 - 任务是否真的需要 GPU；能用 CPU 解决的联网任务不要占 GPU。
 - 是短测试还是正式任务；短测试用 `rlaunch`，正式任务用 `rjob submit`。
 - GPU 数是否和 CPU/memory 匹配。
-- 分区是否正确：ai4sdata 不加 namespace，scieval 加 `--namespace=ailab-scieval`。
+- 分区是否正确：CPU rjob 只能用 ai4sdata 且不加 namespace；GPU rjob 可用 ai4sdata 或 scieval，scieval 加 `--namespace=ailab-scieval`。
 - GPU 任务是否完全不依赖外网。
 - `command.sh` 是否位于共享存储，且没有硬编码 secret。
 - 代码、脚本和普通项目数据是否位于 `/mnt/shared-storage-user/xuwanghan/projects/<project>`。
@@ -1079,7 +1044,7 @@ add_no_proxy_if_private(url)
 - `gpu: command not found` 或 `cpu: command not found`：不要修 `.bashrc`，直接使用本 skill 中的原始 `rlaunch` 命令。
 - 非交互 SSH 没加载 alias/function：这是正常现象。`.bashrc` 常见写法会在非交互 shell 中提前 return。
 - `rlaunch` 申请失败：先跑对应资源的 `rlaunch --predict-only`，再降低 CPU/memory/GPU 或换分区。
-- `unknown charged-group` 或 namespace 相关错误：核对分区矩阵；scieval 必须带 `--namespace=ailab-scieval`，ai4sdata 通常不带 namespace。
+- `unknown charged-group` 或 namespace 相关错误：核对分区矩阵；CPU rjob 只用 ai4sdata，scieval 只用于 GPU rjob 或 rlaunch worker；scieval 必须带 `--namespace=ailab-scieval`，ai4sdata 通常不带 namespace。
 - GPU 节点下载失败：预期行为。改用 CPU worker 下载到共享存储，或提前准备镜像/环境。
 - 外部 API 调用失败：确认任务是否在 CPU 节点；GPU 节点不可联网。
 - CPU rjob 外网返回 407：先检查提交命令是否误用了 `--host-network=true`；外网任务改用 `--host-network=false`，job 内 `sleep 5` 后再配置代理。
