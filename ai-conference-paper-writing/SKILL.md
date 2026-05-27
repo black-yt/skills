@@ -22,7 +22,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 2. 核心挑战：提炼 3-4 个带限定词的能力关键词。
 3. 贡献列表：3-5 点，使用并列结构。
 4. 图表计划：teaser、method pipeline、组件/算法图、主表、消融表、分析图表、case 展示。
-5. 方法结构：模块、输入输出、约束、质量控制。
+5. 方法结构：形式化输入输出、模块、约束、质量控制。
 6. 实验表格：指标、模型、设置、主要发现。
 7. Introduction：按六段结构写。
 8. Abstract：最后压缩全文，且必须是一段。
@@ -223,6 +223,7 @@ Method 第一节先给总框架，不要直接进入实现细节。总览要说�
 - 系统有几个模块。
 - 每个模块解决哪个 challenge。
 - 输入、输出和模块连接关系是什么。
+- 是否需要用轻量公式形式化模型、benchmark、数据集、任务或指标的输入输出。
 - 哪些约束防止错误或退化。
 - 这些设计如何支撑中心命题。
 
@@ -238,6 +239,14 @@ Method 第一节先给总框架，不要直接进入实现细节。总览要说�
 6. Evaluation Protocol
 
 Method 开头应有 pipeline 图，标清输入、生成/推理/训练、验证、评测、反馈和输出闭环。Method 后半部分最好再加一张核心组件或算法图，例如 generator、state tracker、parser/evaluator、reward function、agent loop、training loop 或 dependency graph。Benchmark/data 工作还可以在 Method 中加入数据分布表，并解释分布如何支撑 challenge。完整图表模板见 `references/visual-experiment-layout.md`。
+
+在合适位置加入形式化定义有助于读者理解。常见写法是先用一句话给直觉，再给公式：
+
+```text
+We formalize each instance as x = (q, I, C), where q is the user query, I is a set of images, and C denotes structured constraints. A model f_\theta produces y = f_\theta(x), which is evaluated by E(y, y^*) over [criterion].
+```
+
+形式化定义应覆盖输入、输出、约束、标签或评测函数，尤其适用于 benchmark/data、agent/system、programmatic evaluation 和 training loop。公式要服务导航，不要引入后文不用的符号。
 
 每个方法段落使用微结构：
 
@@ -460,9 +469,10 @@ We studied [problem] by introducing [method/data/system] for [core capability]. 
 3. Evidence：每个 claim 是否有数据、实验、分析或 case 支撑。
 4. Reproducibility：评测设置、数据构造、invalid、split、prompt、decoding 是否可复现。
 5. Terminology：关键词是否统一、具体、有边界。
-6. Section Logic：每节是否服务主线，是否像 README 或实验流水账。
-7. Paragraph Logic：段首主题句、段尾收束、列表并列和图表解读是否到位。
-8. Language：最后再润色句子，不要先做表层 polish。
+6. Formalization：输入、输出、数据实例、模型函数、指标或 benchmark 任务是否有必要的形式化定义，且符号后文确实使用。
+7. Section Logic：每节是否服务主线，是否像 README 或实验流水账。
+8. Paragraph Logic：段首主题句、段尾收束、列表并列和图表解读是否到位。
+9. Language：最后再润色句子，不要先做表层 polish。
 
 Reviewer-risk 快速检查：
 
