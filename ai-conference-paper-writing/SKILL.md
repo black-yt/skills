@@ -229,22 +229,18 @@ Method 第一节先给总框架，不要直接进入实现细节。总览要说�
 
 方法小节按设计逻辑组织，不按开发顺序组织。
 
-推荐顺序示例：
-
-1. Task Formulation
-2. Data Source Construction
-3. Instance Generation
-4. Difficulty Control
-5. Quality Validation
-6. Evaluation Protocol
+推荐顺序示例：Task Formulation -> Data Source Construction -> Instance Generation -> Difficulty Control -> Quality Validation -> Evaluation Protocol。
 
 Method 开头应有 pipeline 图，标清输入、生成/推理/训练、验证、评测、反馈和输出闭环。Method 后半部分最好再加一张核心组件或算法图，例如 generator、state tracker、parser/evaluator、reward function、agent loop、training loop 或 dependency graph。Benchmark/data 工作还可以在 Method 中加入数据分布表，并解释分布如何支撑 challenge。完整图表模板见 `references/visual-experiment-layout.md`。
 
-在合适位置加入形式化定义有助于读者理解。常见写法是先用一句话给直觉，再给公式：
+在合适位置加入形式化定义有助于读者理解。常见写法是先用一句话给直觉，再给 Markdown 可渲染的分行公式：
 
-```text
-We formalize each instance as x = (q, I, C), where q is the user query, I is a set of images, and C denotes structured constraints. A model f_\theta produces y = f_\theta(x), which is evaluated by E(y, y^*) over [criterion].
-```
+$$
+\begin{aligned}
+R, A &= \mathrm{Model}(Q),\\
+R &= \text{reasoning process},\quad A=\text{final answer}.
+\end{aligned}
+$$
 
 形式化定义应覆盖输入、输出、约束、标签或评测函数，尤其适用于 benchmark/data、agent/system、programmatic evaluation 和 training loop。公式要服务导航，不要引入后文不用的符号。
 
