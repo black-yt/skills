@@ -846,15 +846,25 @@ rjob submit --dry-run true \
 
 GPU 脚本不要依赖外网。下面是正式脚本应遵循的局部环境设置；LLM 训练/部署默认使用 `llmv2`，`<project>` 和启动命令必须由具体任务决定，不能盲目照抄执行。
 
+GPU rjob runner 里不要继承 submit host 的 CUDA 路径。submit host 上 `/usr/local/cuda-12.8` 存在，不代表 rjob container 内也存在。脚本内应在 `source /jobutils/scripts/worker_init.sh` 之后显式恢复 wrapper 传入的 CUDA 和 conda 环境变量；`worker_init.sh` 可能覆盖 `PATH`、`CUDA_HOME` 或相关环境。除了 `CUDA_HOME`，还要同步设置 `CUDA_PATH=$CUDA_HOME` 和 `CUDACXX=$CUDA_HOME/bin/nvcc`，因为 `flashinfer`、`ninja` 或 CUDA extension build 可能直接读取这些变量。
+
 ```bash
 #!/usr/bin/env bash
 set -eo pipefail
 
 echo "[INFO] Start."
 
+JOB_CUDA_HOME="${JOB_CUDA_HOME:-/mnt/shared-storage-gpfs2/gpfs2-shared-public/soft/cuda/12.8}"
+JOB_CONDA_ENV="${JOB_CONDA_ENV:-llmv2}"
+
 source /jobutils/scripts/worker_init.sh
 export PATH="/root/miniconda3/bin:$PATH"
 export CUDA_HOME="/mnt/shared-storage-gpfs2/gpfs2-shared-public/soft/cuda/12.8"
+# The line above records the known cluster CUDA path. The effective rjob CUDA path below
+# follows JOB_CUDA_HOME, which defaults to the same shared-storage CUDA path.
+export CUDA_HOME="$JOB_CUDA_HOME"
+export CUDA_PATH="$CUDA_HOME"
+export CUDACXX="$CUDA_HOME/bin/nvcc"
 export PATH="$CUDA_HOME/bin:$PATH"
 export LD_LIBRARY_PATH="$CUDA_HOME/lib64:${LD_LIBRARY_PATH:-}"
 
@@ -863,6 +873,9 @@ echo "[INFO] Proxy disabled."
 
 conda config --append envs_dirs /mnt/shared-storage-user/xuwanghan/conda_env
 source /root/miniconda3/bin/activate llmv2
+if [ "$JOB_CONDA_ENV" != "llmv2" ]; then
+  source /root/miniconda3/bin/activate "$JOB_CONDA_ENV"
+fi
 cd /mnt/shared-storage-user/xuwanghan/projects/<project>
 
 export NPROC_PER_NODE=<num_gpus>
@@ -871,6 +884,12 @@ export MASTER_PORT=29504
 
 hostname
 nvidia-smi
+echo "[INFO] CUDA_HOME=$CUDA_HOME"
+echo "[INFO] CUDA_PATH=$CUDA_PATH"
+echo "[INFO] CUDACXX=$CUDACXX"
+test -x "$CUDACXX" || { echo "[ERROR] CUDACXX not executable: $CUDACXX"; exit 1; }
+which nvcc
+nvcc --version
 
 # Start training or deployment command here. Do not install or upgrade packages unless the user explicitly permits it.
 ```
@@ -1046,6 +1065,7 @@ add_no_proxy_if_private(url)
 - `rlaunch` 申请失败：先跑对应资源的 `rlaunch --predict-only`，再降低 CPU/memory/GPU 或换分区。
 - `unknown charged-group` 或 namespace 相关错误：核对分区矩阵；CPU rjob 只用 ai4sdata，scieval 只用于 GPU rjob 或 rlaunch worker；scieval 必须带 `--namespace=ailab-scieval`，ai4sdata 通常不带 namespace。
 - GPU 节点下载失败：预期行为。改用 CPU worker 下载到共享存储，或提前准备镜像/环境。
+- GPU rjob 里 `flashinfer`、`ninja`、CUDA extension build、`nvcc not found`、`CUDA_HOME not set` 报错：不要只看开发机或 submit host 的 CUDA 路径。进入 rjob 日志或 worker 内检查 `echo "$CUDA_HOME"`、`echo "$CUDA_PATH"`、`echo "$CUDACXX"`、`test -x "$CUDACXX"`、`which nvcc`、`nvcc --version`。如果脚本 source 了 `/jobutils/scripts/worker_init.sh`，确认之后又恢复了 `CUDA_HOME`、`CUDA_PATH`、`CUDACXX`、`PATH` 和 conda env。
 - 外部 API 调用失败：确认任务是否在 CPU 节点；GPU 节点不可联网。
 - CPU rjob 外网返回 407：先检查提交命令是否误用了 `--host-network=true`；外网任务改用 `--host-network=false`，job 内 `sleep 5` 后再配置代理。
 - 私网服务访问失败：检查服务是否监听 `0.0.0.0`、端口是否开放、URL 是否用了正确 worker id 或私网 IP、私网地址是否在 `no_proxy`。
