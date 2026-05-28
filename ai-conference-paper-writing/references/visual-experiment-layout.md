@@ -91,6 +91,92 @@ Main table columns should include the main metric, key sub-metrics, and invalid/
 
 Analysis figures/tables can include error breakdown, performance by difficulty, scaling trend, metric correlation, invalid distribution, category distribution, or human/model agreement.
 
+## LaTeX Table Coloring
+
+Use table coloring for main results, ablations, and analysis tables when it helps readers scan numeric patterns. Color must support the claim, not decorate the table. Always pair color with typography such as bold for best and underline for second-best, so the table remains readable in grayscale.
+
+Common palette and packages:
+
+```latex
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{graphicx}
+
+\definecolor{DeepPurple}{HTML}{5C3A96}
+\definecolor{LighterGray}{HTML}{F7F7FA}
+\definecolor{White}{HTML}{FFFFFF}
+\definecolor{RcbRowShade}{HTML}{F7F7FA}
+\definecolor{RcbAppendixRowShade}{HTML}{EFEFEF}
+\definecolor{RcbHighlightPurple}{RGB}{236,229,250}
+\definecolor{rcbScorePurple}{HTML}{5C3A96}
+```
+
+Score heatmap macros. The first argument is color intensity, usually a normalized integer from 0 to 100; the second argument is the displayed value.
+
+```latex
+\newcommand{\ScoreCell}[2]{\cellcolor{rcbScorePurple!#1!white}#2}
+\newcommand{\BestScore}[2]{\ScoreCell{#1}{\textbf{#2}}}
+\newcommand{\SecondScore}[2]{\ScoreCell{#1}{\underline{#2}}}
+\newcommand{\DimCell}[2]{\cellcolor{rcbScorePurple!#1!white}#2}
+```
+
+Optional model or system icons. Use only when the logo files exist and icons improve readability; otherwise keep plain text model names. Rename the project prefix if the paper is not using RCB-style assets.
+
+```latex
+\newcommand{\RcbIcon}[1]{\raisebox{-0.12em}{\includegraphics[height=0.9em]{imgs/logos/#1.png}}\hspace{0.25em}}
+\newcommand{\ClaudeIcon}{\RcbIcon{anthropic}}
+\newcommand{\OpenAIIcon}{\RcbIcon{openai}}
+\newcommand{\ArisIcon}{\RcbIcon{asx}}
+\newcommand{\OpenClawIcon}{\RcbIcon{openclaw}}
+\newcommand{\NanobotIcon}{\RcbIcon{nanobot}}
+\newcommand{\EvoIcon}{\RcbIcon{evo}}
+\newcommand{\ResearchClawIcon}{\RcbIcon{researchclaw}}
+\newcommand{\GlmIcon}{\RcbIcon{glm}}
+\newcommand{\GeminiIcon}{\RcbIcon{gemini}}
+\newcommand{\DeepSeekIcon}{\RcbIcon{deepseek}}
+\newcommand{\GrokIcon}{\RcbIcon{grok}}
+\newcommand{\KimiIcon}{\RcbIcon{kimi}}
+\newcommand{\MimoIcon}{\RcbIcon{mimo}}
+\newcommand{\QwenIcon}{\RcbIcon{qwen}}
+```
+
+Compact colored result table skeleton:
+
+```latex
+\begin{table}[t]
+\centering
+\caption{\textbf{Main results on [Benchmark].} Higher is better.}
+\label{tab:main-results}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.08}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+System & Overall & Dimension 1 & Dimension 2 & Dimension 3 \\
+\midrule
+\multicolumn{5}{l}{\textbf{Autonomous agents}} \\
+\ClaudeIcon System A & \BestScore{82}{82.1} & \ScoreCell{70}{70.4} & \SecondScore{76}{75.8} & \ScoreCell{68}{67.9} \\
+\OpenAIIcon System B & \SecondScore{79}{78.6} & \BestScore{83}{83.2} & \ScoreCell{60}{60.1} & \BestScore{80}{80.0} \\
+\midrule
+\multicolumn{5}{l}{\textbf{LLMs}} \\
+\QwenIcon Model C & \ScoreCell{72}{72.3} & \SecondScore{79}{79.1} & \BestScore{84}{84.0} & \SecondScore{77}{77.2} \\
+\bottomrule
+\end{tabular}%
+}
+\endgroup
+\end{table}
+```
+
+Practical rules:
+
+- Keep the intensity scale consistent within a table. If scores are 0-100, the score itself can often be the intensity; otherwise normalize first.
+- Do not over-saturate every cell. If the table becomes visually heavy, color only key metric columns or use lower intensity.
+- Use `\rowcolor{RcbRowShade}` sparingly for section separators or alternating rows; do not fight with score heatmaps.
+- In captions, state whether higher or lower is better and what the score range means.
+- If using icons, ensure paths are valid and the PDF build includes `imgs/logos/*.png`.
+
 Use paragraph-level insights:
 
 ```latex

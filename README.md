@@ -16,9 +16,13 @@ skill-name/
 
 | Skill | 入口文档 | 用途 |
 | --- | --- | --- |
+| `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和审阅 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
 | `docx-splitting` | [`docx-splitting/SKILL.md`](docx-splitting/SKILL.md) | 在 Windows + Microsoft Word 环境中，通过 [`scripts/split_docx.py`](docx-splitting/scripts/split_docx.py) 按页无损拆分 `.docx` 文档。 |
+| `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、目录结构、quick start、联系方式、citation 和 star history。 |
+| `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
+| `ms-swift-training` | [`ms-swift-training/SKILL.md`](ms-swift-training/SKILL.md) | 使用 ms-swift 进行 SFT/DPO/GRPO 训练，覆盖 9B full training、bf16、DeepSpeed zero3、数据校验、显存排错、dry-run、训练后检查和 rjob 资源建议。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `lab-cluster-1` | [`lab-cluster-1/SKILL.md`](lab-cluster-1/SKILL.md) | 在 lab cluster 1 / PJLAB 上处理开发机登录、路径和环境、网络代理、模型权重、`rlaunch`/`rjob`、服务部署和排错等集群工作流。 |

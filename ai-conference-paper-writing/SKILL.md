@@ -19,14 +19,15 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 优先按这个顺序推进：
 
 1. 中心命题：一句话说明本文认为领域缺少什么关键能力/视角/资源，以及本文如何补上。
-2. 核心挑战：提炼 3-4 个带限定词的能力关键词。
-3. 贡献列表：3-5 点，使用并列结构。
-4. 图表计划：teaser、method pipeline、组件/算法图、主表、消融表、分析图表、case 展示。
-5. 方法结构：形式化输入输出、模块、约束、质量控制。
-6. 实验表格：指标、模型、设置、主要发现。
-7. Introduction：按六段结构写。
-8. Abstract：最后压缩全文，且必须是一段。
-9. Conclusion：回扣问题、方法、结果和未来方向，通常一段或两段。
+2. 核心包装关键词：为题目确定 2-3 词的高层新组合词。
+3. 核心挑战：提炼 3-4 个学术化、带限定词的 challenge 词。
+4. 贡献列表：3-5 点，使用并列结构。
+5. 图表计划：teaser、method pipeline、组件/算法图、主表、消融表、分析图表、case 展示。
+6. 方法结构：形式化输入输出、模块、约束、质量控制。
+7. 实验表格：指标、模型、设置、主要发现。
+8. Introduction：按六段结构写。
+9. Abstract：最后压缩全文，且必须是一段。
+10. Conclusion：回扣问题、方法、结果和未来方向，通常一段或两段。
 
 如果用户直接要求改某一节，仍先快速判断该节是否服务中心命题；必要时先指出主线问题再改文。
 
@@ -45,17 +46,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 
 论文不能只是“我们做了一个东西”。先把对象提升成问题。
 
-弱命题：
-
-```text
-We introduce a new benchmark.
-```
-
-强命题：
-
-```text
-Current models perform well on X, but still lack Y, a capability required for Z. We propose a framework that covers A, B, and C to systematically evaluate and improve Y.
-```
+弱命题是 `We introduce a new benchmark`；强命题是 `Current models perform well on X, but still lack Y, a capability required for Z. We propose a framework that covers A, B, and C to systematically evaluate and improve Y.`
 
 通用模板：
 
@@ -71,6 +62,8 @@ This paper argues that, to achieve [long-term goal], models must possess [core c
 
 如果这句话说不清，先不要细写 Abstract、Method 或 Experiments。
 
+中心命题确定后，先为题目确定一个核心包装关键词。它通常是 2-3 个词组成的高层新组合词，理解顺畅但有新鲜感，例如 `Protocol-Conditioned Action Prediction`，既有 next-token prediction 的影子，又定义了新的任务视角。这个词应出现在 title，并在 Abstract、Introduction、Method 形式化定义、Experiments/Analysis 和 Conclusion 中适度点名；如果是新造术语，至少需要在论文中两处出现并前后呼应，避免成为孤立包装词。
+
 ## Research Story 矩阵
 
 写作前建立对应矩阵。每个核心问题至少要有方法、指标/实验和分析/case 支撑。
@@ -85,7 +78,7 @@ This paper argues that, to achieve [long-term goal], models must possess [core c
 
 ## 图表叙事布局
 
-AI 会议论文的图表要承担导航功能，不只是装饰。只要任务涉及完整论文结构、teaser、pipeline、Related Work 数据集表、实验图表、case study 或 appendix 展示，必须读取 `references/visual-experiment-layout.md`。
+AI 会议论文的图表要承担导航功能，不只是装饰。只要任务涉及完整论文结构、teaser、pipeline、Related Work 数据集表、实验图表、表格配色、case study 或 appendix 展示，必须读取 `references/visual-experiment-layout.md`。
 
 主文默认顺序：Abstract 前放 teaser 图；Method 开头放 pipeline 图，后半部分再放一个组件/算法图；Experiments 放主表、1-2 个消融表、2-3 个分析图表；Case Study 主文放 2 个压缩 case，完整 case 放 Appendix。Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本文方案和一句主要发现。
 
@@ -95,7 +88,7 @@ Challenge 要写成研究问题，不写成工程需求。
 
 例如不要只写 `The output must be JSON`；要上升为 `How can model outputs be represented so that long-horizon decisions, parameters, and dependencies can be systematically evaluated?`
 
-关键词建议使用“限定词 + 能力名”：
+关键词建议使用“限定词 + 能力名”，并服务题目中的核心包装关键词：
 
 - `Long-Horizon Planning under Constraints`
 - `Structured State Tracking`
@@ -116,8 +109,10 @@ First, **Structured State Tracking** asks whether models can preserve intermedia
 Challenge 段最后加总括句：
 
 ```text
-In short, achieving [goal] requires a pipeline that connects [challenge 1], [challenge 2], [challenge 3], and [challenge 4], rather than treating them as isolated subtasks.
+In short, [core packaging term] requires a pipeline that connects [challenge 1], [challenge 2], [challenge 3], and [challenge 4], rather than treating them as isolated subtasks.
 ```
+
+Challenge 词也可以包装，但要学术化和 high-level，例如 `Protocol-Grounded State Tracking`、`Constraint-Aware Action Selection`、`Evidence-Calibrated Verification`。避免 low-level 词，如 `JSON Output`、`Image Upload`、`Prompt Format`。
 
 ## Introduction
 
@@ -446,7 +441,7 @@ We studied [problem] by introducing [method/data/system] for [core capability]. 
 
 好术语必须能映射到数据、方法、指标、实验或 case。无法映射的 fancy 术语要删掉。
 
-同一个核心术语应在不同章节承担不同功能：
+题目里的核心包装关键词必须成为全文主线。新造术语至少出现两处，并且每次出现应承担不同功能；只在标题、摘要或贡献列表出现一次的词要删掉、改名或补足后文对应设计。同一个核心术语应在不同章节承担不同功能：
 
 - Introduction：提出能力缺口。
 - Method：对应设计。
