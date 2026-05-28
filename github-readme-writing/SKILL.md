@@ -10,6 +10,7 @@ description: "当需要为 GitHub 项目创建、重构或审阅 README.md 时�
 - README 要像项目主页：第一屏让读者知道项目名、定位、入口、亮点和视觉印象。
 - 严格采用 ResearchClawBench 风格：居中标题、居中 badge、短 tagline、导航链接、teaser 图、highlights 表格、news 前置、Mermaid、项目结构、quick start、community、citation、star history。
 - 不要写成纯文档清单。README 应该有视觉层次、表格、图、流程图、结构树、可复制命令和明确入口。
+- 可以适度使用 emoji 让 README 更活泼，但 emoji 应服务导航和语义，不要让每行都变成装饰。
 - 不编造 badge、指标、论文、license、star、dataset、demo、leaderboard 或 citation。信息未知时使用占位符。
 - 对外 README 不写 secret、内部路径、私有 token、未公开服务地址或不可访问链接。
 
@@ -21,18 +22,19 @@ description: "当需要为 GitHub 项目创建、重构或审阅 README.md 时�
 2. Centered badge block。
 3. One-line tagline。
 4. Centered navigation。
-5. Teaser image or demo media。
-6. One-paragraph project definition。
-7. Overview：highlights table、demo、why this project、news。
-8. Understanding / How It Works：Mermaid pipeline、stage explanation、rubric or workflow。
-9. Results / Domains / Features：多元表格、leaderboard 或 capability matrix。
-10. Project Structure：文件夹树。
-11. Using The Project：quick start、install、download/configure/run/score。
-12. Extension：add your own agent/task/model/plugin。
-13. Community：contributing、contact、community images or links。
-14. Citation。
-15. Star History。
-16. Back to top。
+5. Optional Table of Contents for long README。
+6. Teaser image or demo media。
+7. One-paragraph project definition。
+8. Overview：highlights table、demo、why this project、news。
+9. Understanding / How It Works：Mermaid pipeline、stage explanation、rubric or workflow。
+10. Results / Domains / Features：多元表格、leaderboard 或 capability matrix。
+11. Project Structure：文件夹树。
+12. Using The Project：quick start、install、download/configure/run/score。
+13. Extension：add your own agent/task/model/plugin。
+14. Community：contributing、contact、community images or links。
+15. Citation。
+16. Star History。
+17. Back to top。
 
 ## Header 模板
 
@@ -68,6 +70,21 @@ README 顶部优先用 HTML 控制居中布局。
 ```
 
 Badge 数量控制在 5-9 个。优先放 Official Site、GitHub、Hugging Face/Dataset、License、Python、版本/任务数/领域数、GitHub stars。
+
+如果 README 很长，在导航后或 Overview 前加入目录。长章节末尾可加 `[Back to Table of Contents](#table-of-contents)`，主要 section 末尾可加右对齐回顶：
+
+```markdown
+## Table of Contents
+
+- [Overview](#overview)
+- [How It Works](#%EF%B8%8F-how-it-works)
+- [Quick Start](#-quick-start)
+- [Citation](#-citation)
+
+[Back to Table of Contents](#table-of-contents)
+
+<p align="right"><a href="#top">🔝Back to top</a></p>
+```
 
 ## 开场定义
 
@@ -118,7 +135,18 @@ News 放在 Overview 前半部分，位置要靠前。每条 news 用日期开�
 - **2026-03-19** 🎉 Initial release.
 ```
 
-News 保持倒序。不要堆太多，主 README 保留 5-10 条，旧 news 可折叠或移到网站。
+News 保持倒序。不要堆太多，主 README 保留 5-10 条；如果 news 过多，用 `<details>` 折叠旧消息：
+
+```markdown
+<details>
+<summary>👉 More News (Click to expand)</summary>
+
+🚩 **Update** (2026-05-13) [Longer update text with links and impact.]
+
+🚩 **Update** (2026-05-12) [Another historical update.]
+
+</details>
+```
 
 ## 多元图表
 
