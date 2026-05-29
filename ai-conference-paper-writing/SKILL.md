@@ -111,6 +111,8 @@ AI 会议论文的图表承担导航功能，不只是装饰。主文默认顺�
 
 Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本文方案和一句主要发现。
 
+所有 figure、table 和 appendix section 都必须在正文中显式引用，不能只放图表或附录内容而不在正文导航。常见写法包括：`Detailed training hyperparameters are provided in Appendix A.2.`、`Additional case studies are shown in Appendix C.`、`Table 3 summarizes the ablation results.`、`Figure 4 illustrates the reward pipeline.` 主文如果提到“更多细节”“完整 case”“训练参数”“补充实验”，必须给出具体 appendix/table/figure 编号或 section 名；写完后检查是否存在未被正文引用的 orphan figure、orphan table 或 orphan appendix section。
+
 当用户需要先梳理论文结构时，可以先写中文 Markdown 大纲，并把所有图和表放在它们最终应出现的位置。这里要区分两类技巧：
 
 - **Markdown 大纲技巧。** 用于规划结构、给出可画图说明、普通 Markdown 表格、GitHub fenced math block。图表说明用 `>` 引用块；图必须包含详细绘图说明、图内英文文本和 `Figure x. caption`；表格 caption 用 `>`，数据表用普通 Markdown 表格。
