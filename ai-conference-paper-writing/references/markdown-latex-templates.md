@@ -653,6 +653,16 @@ As shown in Figure X, ...
 This suggests that ...
 ```
 
+### Appendix 组织顺序
+
+Appendix 可以比主文长，目标是可复现和可审计。不要把 appendix 当成继续压缩主文的地方。常见顺序：
+
+1. **Training and experimental settings.** 训练设置、数据 split、模型版本、prompt、decoding、invalid handling、解析规则、硬件、超参数等表格。
+2. **Supplementary results.** 补充实验结果、额外 ablation、error breakdown、更多 category/difficulty 分析。
+3. **Full cases and logs.** 完整 case、完整 agent report、完整 judge reasoning、完整 run log 或完整 scoring log。
+
+完整 case 不要只放截取版。主文可以放压缩 case，Appendix 应展示 full input、full output、full rubrics、full score items 和 full log。附录长一点是可以接受的；如果一个 case 或 log 太长，拆成多个 `tcolorbox`、多个 subsection 或 continuation pages，而不是删掉中间内容。
+
 ### Appendix tcolorbox 完整 case
 
 ```latex
@@ -733,8 +743,8 @@ This suggests that ...
 
 \CaseSection{Generated Report}
 \medskip\noindent\textbf{\normalsize [Report Title]}\par
-\medskip\noindent\textbf{\small Abstract}\par
-\noindent [Short report excerpt. Keep only representative paragraphs in the main appendix box if the report is very long.]\par
+\medskip\noindent\textbf{\small Full Report / Log}\par
+\noindent [Paste the full generated report or full log here. If it is too long for one box, continue in the next box or subsection; do not silently truncate.]\par
 
 \CaseSection{Figures}
 \begin{center}
@@ -765,7 +775,7 @@ This suggests that ...
 - `Task` 用短段落，按 `Input / Output / Scientific Goal` 或 `Question / Gold / Prediction` 组织。
 - `Data` 用 `itemize`，每个文件一项；长文件名可以在下划线或路径分隔处手动加入 `\allowbreak{}`。
 - `Rubrics` 和 `Score Items` 用 `enumerate`，保持 criterion、weight、score、reasoning 对齐。
-- `Generated Report` 不必塞入完整报告。主 appendix box 可以放摘要、关键方法、关键结果和代表性段落；完整报告可以另附文件或后续 box。
+- `Generated Report` / `Full Report / Log` 应保留完整内容。不要只放 representative excerpt；如果很长，拆成多个 box、多个 subsection 或 continuation pages。
 - 图片放在 `center` 环境中，使用 `\includegraphics[width=0.92\linewidth]{...}`。路径中有下划线、空格或特殊字符时，用 `\detokenize{...}` 包住路径。
 - 图片下面先放短标题，例如 `\par\footnotesize Dataset Overview`，再用正文 caption 解释图像证据。
 - 每个 section 之间用 `\CaseSection{...}` 的 DeepPurple 分隔线，避免长 box 中块边界不清。

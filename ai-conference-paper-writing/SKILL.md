@@ -262,6 +262,8 @@ Analysis 不重复结果，要解释错误类型。可按能力维度、错误�
 
 Case Study 要真实、完整、可验证，至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。主文放 2 个压缩 case 最稳，优先做对照：correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。不要把完整长输出塞进主文；完整 case 放 Appendix。Appendix 的 `tcolorbox` 可以结构化展示 meta info、task、data、rubrics、generated report、figures 和 score items，模板见 `references/markdown-latex-templates.md`。
 
+Appendix 可以长一些，目标是可复现和可审计，不是继续压缩主文。常见顺序是先放训练、实验 setting、超参数、prompt、解析规则等表格；随后放补充实验结果、额外 ablation 或 error breakdown；最后放完整 case 和完整 log。Appendix 的 case 不要只放截取版，必须展示完整输入、完整输出、完整评分或完整运行日志；如果太长，拆成多个 box、多个 subsection 或 continuation pages。
+
 ## Abstract And Conclusion
 
 Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。
