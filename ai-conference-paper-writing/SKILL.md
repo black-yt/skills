@@ -14,7 +14,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
 
-具体可复制的 Markdown 与 LaTeX 图表/公式/表格/case 模板放在 `references/markdown-latex-templates.md`。当任务涉及中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、Related Work 对比表、LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、紧凑贡献列表或 Appendix `tcolorbox` 时，必须读取该 reference。
+具体可复制的 Markdown 与 LaTeX 图表/公式/表格/case 模板放在 `references/markdown-latex-templates.md`。当任务涉及中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、Related Work 对比表、LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、紧凑贡献列表或 Appendix `tcolorbox` 时，必须读取该 reference。
 
 ## 工作顺序
 
@@ -262,11 +262,13 @@ Analysis 不重复结果，要解释错误类型。可按能力维度、错误�
 
 Case Study 要真实、完整、可验证，至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。主文放 2 个压缩 case 最稳，优先做对照：correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。不要把完整长输出塞进主文；完整 case 放 Appendix。Appendix 的 `tcolorbox` 可以结构化展示 meta info、task、data、rubrics、generated report、figures 和 score items，模板见 `references/markdown-latex-templates.md`。
 
-Appendix 可以长一些，目标是可复现和可审计，不是继续压缩主文。常见顺序是先放训练、实验 setting、超参数、prompt、解析规则等表格；随后放补充实验结果、额外 ablation 或 error breakdown；最后放完整 case 和完整 log。Appendix 的 case 不要只放截取版，必须展示完整输入、完整输出、完整评分或完整运行日志；如果太长，拆成多个 box、多个 subsection 或 continuation pages。
+Appendix 可以长一些，目标是可复现和可审计，不是继续压缩主文。常见顺序是先放训练、实验 setting、超参数、prompt、解析规则等表格；随后放补充实验结果、额外 ablation 或 error breakdown；最后放完整 case study 记录。这里的 log 指完整 case study 展示，不是训练日志。Appendix 的 case 不要只放截取版，必须展示完整输入、完整输出、完整评分和完整评审记录；如果太长，拆成多个 box、多个 subsection 或 continuation pages。
 
 ## Abstract And Conclusion
 
 Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。
+
+如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/markdown-latex-templates.md`。
 
 Conclusion 可以一段，也可以两段。短会议论文通常一段；如果需要同时写 limitations/future work，可以两段。Conclusion 只回扣已有主线：重申问题、方法、结果和未来方向。不要在 Conclusion 引入新概念、新实验或新贡献。
 

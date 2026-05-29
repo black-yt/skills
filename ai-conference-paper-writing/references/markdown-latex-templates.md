@@ -481,6 +481,53 @@ We studied [problem] by introducing [method/data/system] for [core capability]. 
 
 这部分用于最终 `.tex` 论文排版和视觉强化，不是中文版 Markdown 大纲的必需格式。典型做法是：用 `xcolor` 给数值表上色；用 `\ScoreCell`、`\BestScore`、`\SecondScore` 标记结果；用 `\paragraph{Insight ...}` 写分析段首；用 `tcolorbox` 在 Appendix 展示完整 case。这些命令不应强加到中文 Markdown 大纲里，只在写 LaTeX 正文或附录时使用。
 
+### 摘要资源链接图标
+
+如果论文有公开 homepage、code 或 dataset，可以在 abstract 正文之后加入一小段资源入口。正文 abstract 仍保持一段式；资源入口是附加块，不要把它写成新的摘要段落或贡献列表。Page、GitHub 与 Hugging Face 的 PDF logo 已随 skill 保存：
+
+- `assets/logos/page-logo.pdf`
+- `assets/logos/github-logo.pdf`
+- `assets/logos/hf-logo.pdf`
+
+在论文项目中使用时，把这些 PDF 放到论文的图片目录，例如 `imgs/page-logo.pdf`、`imgs/github-logo.pdf` 和 `imgs/hf-logo.pdf`，或把下面命令里的路径改成实际路径。
+
+Preamble / command definitions:
+
+```latex
+\newcommand{\homepage}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/page-logo.pdf}}}
+\newcommand{\github}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/github-logo.pdf}}}
+\newcommand{\huggingface}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/hf-logo.pdf}}}
+```
+
+Abstract 末尾资源链接块：
+
+```latex
+\vspace{\baselineskip}
+
+\homepage\ \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
+
+\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+
+\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
+```
+
+如果没有 homepage，可以只保留 Code/Data 两行；如果模板不适合放图标，也可以退回纯文本：
+
+```latex
+\textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
+
+\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+
+\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
+```
+
+使用规则：
+
+- 需要 `graphicx` 和支持 `\url` 的包或模板；如果模板没有加载，补充 `\usepackage{graphicx}` 和 `\usepackage{hyperref}`。
+- 图标高度通常用 `height=1em`，并用 `\raisebox{-1.5pt}{...}` 做基线对齐。
+- 链接标签保持短：`Code`、`Data`、`Page`。不要在 abstract 资源块里解释项目细节。
+- 如果会议模板禁止 abstract 内放链接，把同样的资源块移到 abstract 后、first-page footnote 或 camera-ready artifact section。
+
 ### 紧凑贡献列表
 
 当会议页数非常紧，Introduction 最后一段贡献列表需要压缩时，可以使用 `paralist` 的 `compactitem`。贡献仍然保持 3-5 点、名词开头、语法并列；不要因为压缩版式而把多个贡献塞进一个过长 bullet。
@@ -659,9 +706,9 @@ Appendix 可以比主文长，目标是可复现和可审计。不要把 appendi
 
 1. **Training and experimental settings.** 训练设置、数据 split、模型版本、prompt、decoding、invalid handling、解析规则、硬件、超参数等表格。
 2. **Supplementary results.** 补充实验结果、额外 ablation、error breakdown、更多 category/difficulty 分析。
-3. **Full cases and logs.** 完整 case、完整 agent report、完整 judge reasoning、完整 run log 或完整 scoring log。
+3. **Full case studies.** 完整 case、完整 agent report、完整 judge reasoning、完整 score items 和完整评审记录。
 
-完整 case 不要只放截取版。主文可以放压缩 case，Appendix 应展示 full input、full output、full rubrics、full score items 和 full log。附录长一点是可以接受的；如果一个 case 或 log 太长，拆成多个 `tcolorbox`、多个 subsection 或 continuation pages，而不是删掉中间内容。
+完整 case 不要只放截取版。主文可以放压缩 case，Appendix 应展示 full input、full output、full rubrics、full score items 和完整 case study 记录。这里的 log 指完整 case study 展示，不是训练日志。附录长一点是可以接受的；如果一个 case study 太长，拆成多个 `tcolorbox`、多个 subsection 或 continuation pages，而不是删掉中间内容。
 
 ### Appendix tcolorbox 完整 case
 
@@ -743,8 +790,8 @@ Appendix 可以比主文长，目标是可复现和可审计。不要把 appendi
 
 \CaseSection{Generated Report}
 \medskip\noindent\textbf{\normalsize [Report Title]}\par
-\medskip\noindent\textbf{\small Full Report / Log}\par
-\noindent [Paste the full generated report or full log here. If it is too long for one box, continue in the next box or subsection; do not silently truncate.]\par
+\medskip\noindent\textbf{\small Full Report / Case Study Record}\par
+\noindent [Paste the full generated report and full case-study record here. If it is too long for one box, continue in the next box or subsection; do not silently truncate.]\par
 
 \CaseSection{Figures}
 \begin{center}
@@ -775,7 +822,7 @@ Appendix 可以比主文长，目标是可复现和可审计。不要把 appendi
 - `Task` 用短段落，按 `Input / Output / Scientific Goal` 或 `Question / Gold / Prediction` 组织。
 - `Data` 用 `itemize`，每个文件一项；长文件名可以在下划线或路径分隔处手动加入 `\allowbreak{}`。
 - `Rubrics` 和 `Score Items` 用 `enumerate`，保持 criterion、weight、score、reasoning 对齐。
-- `Generated Report` / `Full Report / Log` 应保留完整内容。不要只放 representative excerpt；如果很长，拆成多个 box、多个 subsection 或 continuation pages。
+- `Generated Report` / `Full Report / Case Study Record` 应保留完整内容。不要只放 representative excerpt；如果很长，拆成多个 box、多个 subsection 或 continuation pages。
 - 图片放在 `center` 环境中，使用 `\includegraphics[width=0.92\linewidth]{...}`。路径中有下划线、空格或特殊字符时，用 `\detokenize{...}` 包住路径。
 - 图片下面先放短标题，例如 `\par\footnotesize Dataset Overview`，再用正文 caption 解释图像证据。
 - 每个 section 之间用 `\CaseSection{...}` 的 DeepPurple 分隔线，避免长 box 中块边界不清。
