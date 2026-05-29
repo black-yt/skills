@@ -21,6 +21,7 @@ skill-name/
 | `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、目录结构、quick start、联系方式、citation 和 star history。 |
 | `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
+| `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
 | `ms-swift-training` | [`ms-swift-training/SKILL.md`](ms-swift-training/SKILL.md) | 使用 ms-swift 进行 SFT/DPO/GRPO 训练，覆盖 9B full training、bf16、DeepSpeed zero3、数据校验、显存排错、dry-run、训练后检查和 rjob 资源建议。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。 |
