@@ -211,7 +211,7 @@ Related Work 的组织检查：
 - Introduction 第二段可以压缩 Related Work 的分类；Related Work 正文则展开证据和区别。
 - 不要把实现细节写成相关工作差异；差异应是任务目标、评测对象、能力边界、数据分布或监督形式。
 
-如果是 benchmark 或 data paper，Related Work 中最好加入数据集对比表。我们的数据集放最后一行；列名要和 Introduction 的 challenge 对齐，而不是只列规模。`Ours` 最好在 challenge 对应列上最完整。表后解释：哪些能力过去被分散覆盖，本文如何把它们放到同一个评测/训练框架里。完整模板见 `references/visual-experiment-layout.md`。
+如果是 benchmark 或 data paper，Related Work 中最好加入数据集对比表。我们的数据集放最后一行；列名要和 Introduction 的 challenge 对齐，而不是只列规模。`Ours` 最好在 challenge 对应列上最完整。对于 yes/no/partial 属性列，LaTeX 成稿时可以使用 `\cmark`、`\xmark`、`\pmark` 提高可读性，并在 caption 或表下注明符号含义。表后解释：哪些能力过去被分散覆盖，本文如何把它们放到同一个评测/训练框架里。完整模板见 `references/visual-experiment-layout.md`。
 
 ## Method
 

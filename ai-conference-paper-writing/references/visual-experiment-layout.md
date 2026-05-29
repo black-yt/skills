@@ -295,6 +295,8 @@ Figure 1. [Paper Name] studies [core capability] by connecting [challenge 1], [c
 
 这个表要证明论文的 gap claim。不要只因为 `Ours` 更大就显得更好；最好让 `Ours` 在 challenge 对应列上最完整。表后解释：哪些能力过去被分散覆盖，本文如何把它们统一到同一个评测、训练或诊断框架里。
 
+中文版 Markdown 大纲阶段可以先用 `yes`、`partial`、`no` 表示属性覆盖情况，保持表格容易编辑。最终 LaTeX 成稿时，适合把这些属性列换成 `\cmark`、`\pmark`、`\xmark`：`\cmark` 表示完整支持，`\pmark` 表示部分支持，`\xmark` 表示不支持。不要用这些符号替代数值指标；它们主要适合 Related Work 中对比不同 dataset、benchmark、method 或 system 的离散属性。
+
 ## Method 图与数据分布
 
 Method pipeline 图要标清：
@@ -372,6 +374,7 @@ Analysis 图表可以包括 error breakdown、performance by difficulty、scalin
 \usepackage[table]{xcolor}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{amssymb}
 
 \definecolor{DeepPurple}{HTML}{5C3A96}
 \definecolor{LighterGray}{HTML}{F7F7FA}
@@ -380,6 +383,9 @@ Analysis 图表可以包括 error breakdown、performance by difficulty、scalin
 \definecolor{RcbAppendixRowShade}{HTML}{EFEFEF}
 \definecolor{RcbHighlightPurple}{RGB}{236,229,250}
 \definecolor{rcbScorePurple}{HTML}{5C3A96}
+\definecolor{rcbCheckGreen}{HTML}{2E7D32}
+\definecolor{rcbCrossRed}{HTML}{C62828}
+\definecolor{rcbPartialYellow}{HTML}{B8860B}
 ```
 
 Score heatmap macros。第一个参数是颜色强度，通常是 0-100 的归一化整数；第二个参数是展示值。
@@ -390,6 +396,46 @@ Score heatmap macros。第一个参数是颜色强度，通常是 0-100 的归�
 \newcommand{\SecondScore}[2]{\ScoreCell{#1}{\underline{#2}}}
 \newcommand{\DimCell}[2]{\cellcolor{rcbScorePurple!#1!white}#2}
 ```
+
+Related Work 属性对比表的符号宏。适用于 dataset、benchmark、method、system 的 yes/no/partial 属性列；不适合替代主结果表中的数值指标。三种符号形状不同，即使灰度打印也能区分；颜色只是辅助。
+
+```latex
+\newcommand{\cmark}{\textcolor{rcbCheckGreen}{\(\checkmark\)}}
+\newcommand{\xmark}{\textcolor{rcbCrossRed}{\(\times\)}}
+\newcommand{\pmark}{\textcolor{rcbPartialYellow}{\(\triangle\)}}
+```
+
+对比表模板：
+
+```latex
+\begin{table}[t]
+\centering
+\caption{\textbf{Comparison with related datasets.} \cmark indicates full support, \pmark indicates partial support, and \xmark indicates no support.}
+\label{tab:related-datasets}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Dataset & [Challenge 1] & [Challenge 2] & [Challenge 3] & Programmatic Eval \\
+\midrule
+Prior A & \pmark & \xmark & \cmark & \xmark \\
+Prior B & \cmark & \pmark & \xmark & \cmark \\
+\textbf{Ours} & \cmark & \cmark & \cmark & \cmark \\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+```
+
+使用规则：
+
+- 每一列必须对应 Introduction 中的 challenge、能力边界或关键设计，不要列无关特性。
+- `\pmark` 必须有明确含义，例如 only synthetic data、limited modalities、no train split、partial programmatic validation；不要把模糊优势都标成 partial。
+- Caption 或表下注明三种符号含义，避免读者误解。
+- `Ours` 放最后一行，并只在真实满足的列上用 `\cmark`；不要为了让表看起来更强而夸大覆盖。
+- 符号表和数值主表分开。Related Work 对比表用 `\cmark/\pmark/\xmark`，Main Results 表用数值、bold/underline 和必要的 heatmap。
 
 可选模型或系统图标。只有 logo 文件确实存在且图标能提升可读性时才用；否则保持纯文本模型名。如果论文不是 RCB 风格资源，重命名项目 prefix。
 
