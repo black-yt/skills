@@ -82,7 +82,7 @@ AI 会议论文的图表要承担导航功能，不只是装饰。只要任务�
 
 主文默认顺序：Abstract 前放 teaser 图；Method 开头放 pipeline 图，后半部分再放一个组件/算法图；Experiments 放主表、1-2 个消融表、2-3 个分析图表；Case Study 主文放 2 个压缩 case，完整 case 放 Appendix。Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本文方案和一句主要发现。
 
-当用户需要先梳理论文结构时，可以先写中文 Markdown 大纲，并把所有图和表放在它们最终应出现的位置。这里要区分两类技巧：中文版 Markdown 大纲技巧用于规划结构和给出可画图说明，例如用引用块 `>` 区分图表说明、用普通 Markdown 表格放数据；LaTeX 技巧用于最终论文排版，例如表格配色、`\paragraph{Insight ...}` 和 Appendix `tcolorbox`。Case 图不能展示完整长 case 时，必须给出图中要放的压缩英文文本；完整 case 留到 Appendix。详细格式见 `references/visual-experiment-layout.md`。
+当用户需要先梳理论文结构时，可以先写中文 Markdown 大纲，并把所有图和表放在它们最终应出现的位置。这里要区分两类技巧：中文版 Markdown 大纲技巧用于规划结构和给出可画图说明，例如用引用块 `>` 区分图表说明、用普通 Markdown 表格放数据、用 GitHub fenced math block 写公式；LaTeX 技巧用于最终论文排版，例如表格配色、`\paragraph{Insight ...}` 和 Appendix `tcolorbox`。Case 图不能展示完整长 case 时，必须给出图中要放的压缩英文文本；完整 case 留到 Appendix。详细格式见 `references/visual-experiment-layout.md`。
 
 ## Challenge 命名
 

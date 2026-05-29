@@ -8,7 +8,7 @@
 
 这个 reference 里有两类技巧，使用时不要混在一起。
 
-- **中文版 Markdown 大纲技巧。** 用于讨论论文 story、章节顺序、图表位置和绘图需求。典型做法是：用中文写段落目的；用 `>` 引用块写图表说明和 caption；用普通 Markdown 表格承载数据；用占位符标记未知数值；为每张图写清楚 panel、箭头、图内英文文本和 caption。这一阶段的目标是让人可以准确画图和补表，不是生成最终 LaTeX。
+- **中文版 Markdown 大纲技巧。** 用于讨论论文 story、章节顺序、图表位置、绘图需求和 GitHub Markdown 公式展示。典型做法是：用中文写段落目的；用 `>` 引用块写图表说明和 caption；用普通 Markdown 表格承载数据；用 fenced math block 写公式；用占位符标记未知数值；为每张图写清楚 panel、箭头、图内英文文本和 caption。这一阶段的目标是让人可以准确画图、补表和预览公式，不是生成最终 LaTeX。
 - **LaTeX 成稿技巧。** 用于最终 `.tex` 论文排版和视觉强化。典型做法是：用 `xcolor` 给数值表上色；用 `\ScoreCell`、`\BestScore`、`\SecondScore` 标记结果；用 `\paragraph{Insight ...}` 写分析段首；用 `tcolorbox` 在 Appendix 展示完整 case。这些命令不应强加到中文 Markdown 大纲里，只在写 LaTeX 正文或附录时使用。
 
 ## 主文图表顺序
@@ -35,6 +35,159 @@
 - 每个表都在表格上方放一个引用块 caption，格式为 `Table x. ...`；表格数据本身使用普通 Markdown 表格，不放进引用块。
 - Case 图不要尝试展示完整长 case。图中只放压缩文本：sample ID、input summary、gold answer、model output excerpt、score、failure mode、takeaway。完整 case 放 Appendix。
 - 数字未知时使用 `[N]`、`[MODEL]`、`[SCORE]`、`[FAILURE_MODE]` 等占位符，不要编造。
+
+## GitHub Markdown 公式写法
+
+这部分属于中文版 Markdown 大纲和 GitHub 论文笔记的技巧，不属于最终 `.tex` 论文排版。GitHub 可以渲染数学公式，但它不是完整 LaTeX 环境，而是 GitHub Markdown 加 KaTeX/MathJax 子集。很多论文 `.tex` 中能编译的写法，在 GitHub Markdown 里会失败或被 HTML/Markdown 预处理干扰。
+
+核心原则：
+
+- 块级公式优先使用 fenced math block，也就是 ```` ```math ````，比 `$$ ... $$` 更稳。
+- 复杂多行公式、`<details>` 折叠块、表格附近的公式，必须优先用 fenced math block。
+- 不要在中文长句里塞复杂行内 LaTeX。行内变量更推荐用普通 Markdown code，例如 `x_t`、`mu_S`、`bar_sigma_j`。
+- GitHub Markdown 中不要使用自定义宏或论文 LaTeX preamble 里的宏，直接写展开后的公式。
+- 复杂公式拆成多个短块，不要写成一个超长公式。
+
+最稳的块级公式写法：
+
+````markdown
+```math
+\mathcal{L}(\theta)
+=
+\mathbb{E}_{x\sim p_\theta}
+\left[
+\mathrm{KL}\left(
+p_\theta(\cdot \mid x)
+\,\|\,
+p_T(\cdot \mid x)
+\right)
+\right].
+```
+````
+
+复杂公式应拆块，例如：
+
+````markdown
+```math
+\sigma_t
+=
+a\sqrt{\frac{t}{1-t}}.
+```
+
+```math
+\bar{\sigma}_j^2
+=
+\sigma_{t_j}^2(-\Delta t_j).
+```
+````
+
+常见坑和替代写法：
+
+| 高风险写法 | 问题 | 推荐写法 |
+| --- | --- | --- |
+| `\operatorname{KL}` | GitHub 可能报 `The following macros are not allowed: operatorname` | `\mathrm{KL}` |
+| `x_{<t}` | `<t` 在 Markdown/HTML 语境里可能被预处理干扰 | `x_{1:t-1}`；正文中可写成 `` `x_<t` `` |
+| `\Vert` | GitHub 数学渲染中更容易不稳定 | KL 分隔符写 `\,\|\,` |
+| `\| ... \|` | norm 语义不如成对符号清楚 | `\left\lVert ... \right\rVert_2^2` |
+| `\newcommand` | GitHub 不支持完整宏定义环境 | 直接写展开后的公式 |
+| `\DeclareMathOperator` | GitHub 不支持完整宏定义环境 | 直接用 `\mathrm{...}` |
+| `\overset{^}{y}` | 渲染风险高且可读性差 | `\hat{y}` 或 `\hat{y}_{j,k}` |
+
+KL 示例：
+
+````markdown
+```math
+\mathrm{KL}\left(
+p_S(\cdot \mid x)
+\,\|\,
+p_T(\cdot \mid x)
+\right)
+```
+````
+
+norm 示例：
+
+````markdown
+```math
+\left\lVert
+\mu_S-\mu_T
+\right\rVert_2^2
+```
+````
+
+行内内容处理：
+
+- 普通变量、文件名、符号名优先写 Markdown code：`x_t`、`mu_S`、`bar_sigma_j`。
+- 如果必须写行内数学，保持非常短，只放单个变量或简单表达式。
+- 不要在中文标点、尖括号、下划线密集的句子里混用复杂行内公式。
+- 如果一行公式超过 1 个短表达式，改成 fenced math block。
+
+安全宏清单。GitHub Markdown 中通常可以使用：
+
+```latex
+\mathcal
+\mathrm
+\mathbb
+\theta
+\pi
+\mu
+\sigma
+\epsilon
+\Delta
+\sum
+\frac
+\sqrt
+\left
+\right
+\mid
+\cdot
+\sim
+\nabla
+\top
+```
+
+更推荐的稳定写法：
+
+```latex
+\mathrm{KL}
+\mathcal{L}
+\mathbb{E}
+\mathcal{N}
+\left[
+\right]
+\left(
+\right)
+\,\|\,
+\lVert
+\rVert
+```
+
+不推荐或高风险写法：
+
+```latex
+\operatorname{KL}
+x_{<t}
+\Vert
+\newcommand
+\DeclareMathOperator
+\overset{^}{y}
+```
+
+维护 GitHub Markdown 论文笔记时，修改公式后搜索高风险字符串：
+
+```bash
+grep -nE '\\operatorname|x_\\{<|\\Vert|\\newcommand|\\DeclareMathOperator|\\overset\\{\\^\\}' papers_*.md
+```
+
+如果公式在 GitHub 上不显示，优先按这个顺序修：
+
+1. 把 `$$ ... $$` 改成 fenced math block。
+2. 把 `\operatorname{...}` 改成 `\mathrm{...}`。
+3. 把 `x_{<t}` 改成 `x_{1:t-1}`。
+4. 把 KL 分隔符改成 `\,\|\,`。
+5. 把 norm 改成 `\left\lVert ... \right\rVert`。
+6. 删除自定义宏，写成完整展开公式。
+7. 将超长公式拆成多个短块。
 
 推荐大纲骨架：
 
