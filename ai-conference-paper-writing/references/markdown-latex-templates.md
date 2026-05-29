@@ -481,6 +481,36 @@ We studied [problem] by introducing [method/data/system] for [core capability]. 
 
 这部分用于最终 `.tex` 论文排版和视觉强化，不是中文版 Markdown 大纲的必需格式。典型做法是：用 `xcolor` 给数值表上色；用 `\ScoreCell`、`\BestScore`、`\SecondScore` 标记结果；用 `\paragraph{Insight ...}` 写分析段首；用 `tcolorbox` 在 Appendix 展示完整 case。这些命令不应强加到中文 Markdown 大纲里，只在写 LaTeX 正文或附录时使用。
 
+### 紧凑贡献列表
+
+当会议页数非常紧，Introduction 最后一段贡献列表需要压缩时，可以使用 `paralist` 的 `compactitem`。贡献仍然保持 3-5 点、名词开头、语法并列；不要因为压缩版式而把多个贡献塞进一个过长 bullet。
+
+Preamble:
+
+```latex
+\usepackage{paralist}       % compactitem
+```
+
+正文模板：
+
+```latex
+\begin{compactitem}
+\item \textbf{[Contribution 1 Name]}: [one-sentence contribution, focusing on task/data/method/evaluation rather than implementation details].
+\item \textbf{[Contribution 2 Name]}: [one-sentence contribution with parallel grammar].
+\item \textbf{[Contribution 3 Name]}: [one-sentence contribution that states the empirical finding or released resource].
+\end{compactitem}
+```
+
+示例：
+
+```latex
+\begin{compactitem}
+\item \textbf{ResearchClawBench}: 40 real scientific discovery tasks with expert-annotated rubrics across 10 domains and diverse scenarios.
+\item \textbf{ResearchHarness}: a unified lightweight tool-use evaluation harness for LLM baselines.
+\item \textbf{Unified evaluation}: a systematic assessment of seven autonomous research agents and eleven native LLM baselines, quantifying the gap between current AI research systems and target-paper-level re-discovery.
+\end{compactitem}
+```
+
 ### 常用 packages 与颜色
 
 ```latex

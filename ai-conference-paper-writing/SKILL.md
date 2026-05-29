@@ -14,7 +14,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
 
-具体可复制的 Markdown 与 LaTeX 图表/公式/表格/case 模板放在 `references/markdown-latex-templates.md`。当任务涉及中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、Related Work 对比表、LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}` 或 Appendix `tcolorbox` 时，必须读取该 reference。
+具体可复制的 Markdown 与 LaTeX 图表/公式/表格/case 模板放在 `references/markdown-latex-templates.md`。当任务涉及中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、Related Work 对比表、LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、紧凑贡献列表或 Appendix `tcolorbox` 时，必须读取该 reference。
 
 ## 工作顺序
 
@@ -130,6 +130,8 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 6. **贡献列表。** 3-5 点，每点以名词开头，避免实现细节。
 
 Introduction 第二段不要罗列论文笔记，要写成分类；第三段不要只列抽象名词或应用需求；第四段顺序必须和 challenge 段一致；第五段要说明结果揭示了什么能力瓶颈。
+
+Introduction 最后一段的贡献列表仍保持 3-5 点、名词开头、语法并列。篇幅很紧时，LaTeX 成稿可以用 `paralist` 的 `compactitem` 写紧凑贡献列表；模板见 `references/markdown-latex-templates.md`。
 
 ## Related Work
 
