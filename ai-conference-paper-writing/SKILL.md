@@ -14,7 +14,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
 
-具体可复制的 Markdown 与 LaTeX 图表/公式/表格/case 模板放在 `references/markdown-latex-templates.md`。当任务涉及中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、Related Work 对比表、LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、紧凑贡献列表或 Appendix `tcolorbox` 时，必须读取该 reference。
+具体可复制的模板分开维护：中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明和表格占位写法放在 `references/markdown-writing-templates.md`；LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、紧凑贡献列表和 Appendix `tcolorbox` 放在 `references/latex-paper-templates.md`。任务涉及其中任何模板时，必须读取对应 reference。
 
 ## 工作顺序
 
@@ -64,7 +64,7 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 - 如果是新造术语，至少在论文中两处出现并前后呼应；只出现一次的包装词要删掉、改名或补足后文设计。
 - 每次出现应承担不同功能：Intro 提出能力缺口，Method 对应设计，Experiment 对应指标，Analysis 对应失败模式，Conclusion 回扣主线。
 
-写作前建立 story 矩阵。每个核心问题至少要有方法、指标/实验和 analysis/case 支撑。模板见 `references/markdown-latex-templates.md`。
+写作前建立 story 矩阵。每个核心问题至少要有方法、指标/实验和 analysis/case 支撑。Markdown 模板见 `references/markdown-writing-templates.md`。
 如果某个 challenge 只在 Introduction 出现，后文没有证据，删掉它或补实验证据。
 
 ## Challenge 命名
@@ -116,7 +116,7 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 - **Markdown 大纲技巧。** 用于规划结构、给出可画图说明、普通 Markdown 表格、GitHub fenced math block。图表说明用 `>` 引用块；图必须包含详细绘图说明、图内英文文本和 `Figure x. caption`；表格 caption 用 `>`，数据表用普通 Markdown 表格。
 - **LaTeX 成稿技巧。** 用于最终 `.tex` 排版，例如表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}` 和 Appendix `tcolorbox`。
 
-具体代码模板见 `references/markdown-latex-templates.md`。
+具体 Markdown 代码模板见 `references/markdown-writing-templates.md`。
 
 ## Introduction
 
@@ -131,7 +131,7 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 
 Introduction 第二段不要罗列论文笔记，要写成分类；第三段不要只列抽象名词或应用需求；第四段顺序必须和 challenge 段一致；第五段要说明结果揭示了什么能力瓶颈。
 
-Introduction 最后一段的贡献列表仍保持 3-5 点、名词开头、语法并列。篇幅很紧时，LaTeX 成稿可以用 `paralist` 的 `compactitem` 写紧凑贡献列表；模板见 `references/markdown-latex-templates.md`。
+Introduction 最后一段的贡献列表仍保持 3-5 点、名词开头、语法并列。篇幅很紧时，LaTeX 成稿可以用 `paralist` 的 `compactitem` 写紧凑贡献列表；模板见 `references/latex-paper-templates.md`。
 
 ## Related Work
 
@@ -157,7 +157,7 @@ Related Work 要和贡献对应，不要写与主线无关的名论文。整体�
 - Introduction 第二段可以压缩 Related Work 的分类；Related Work 正文则展开证据和区别。
 - 差异应是任务目标、评测对象、能力边界、数据分布或监督形式，不是实现细节。
 
-Benchmark/data paper 应加入数据集对比表。`Ours` 放最后一行；列名要和 Introduction 的 challenge 对齐，而不是只列规模。这个表要证明论文的 gap claim：不要只因为 `Ours` 更大就显得更好，最好让 `Ours` 在 challenge 对应列上最完整。对于 yes/no/partial 属性列，LaTeX 成稿可用 `\cmark/\pmark/\xmark`，并在 caption 或表下注明符号含义。表后解释哪些能力过去被分散覆盖，本文如何把它们放到同一个评测、训练或诊断框架里。模板见 `references/markdown-latex-templates.md`。
+Benchmark/data paper 应加入数据集对比表。`Ours` 放最后一行；列名要和 Introduction 的 challenge 对齐，而不是只列规模。这个表要证明论文的 gap claim：不要只因为 `Ours` 更大就显得更好，最好让 `Ours` 在 challenge 对应列上最完整。对于 yes/no/partial 属性列，LaTeX 成稿可用 `\cmark/\pmark/\xmark`，并在 caption 或表下注明符号含义。表后解释哪些能力过去被分散覆盖，本文如何把它们放到同一个评测、训练或诊断框架里。Markdown 草稿模板见 `references/markdown-writing-templates.md`，LaTeX 成稿模板见 `references/latex-paper-templates.md`。
 
 ## Method
 
@@ -260,7 +260,7 @@ Analysis 不重复结果，要解释错误类型。可按能力维度、错误�
 - default-value bias
 - stage confusion
 
-Case Study 要真实、完整、可验证，至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。主文放 2 个压缩 case 最稳，优先做对照：correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。不要把完整长输出塞进主文；完整 case 放 Appendix。Appendix 的 `tcolorbox` 可以结构化展示 meta info、task、data、rubrics、generated report、figures 和 score items，模板见 `references/markdown-latex-templates.md`。
+Case Study 要真实、完整、可验证，至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。主文放 2 个压缩 case 最稳，优先做对照：correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。不要把完整长输出塞进主文；完整 case 放 Appendix。Appendix 的 `tcolorbox` 可以结构化展示 meta info、task、data、rubrics、generated report、figures 和 score items，模板见 `references/latex-paper-templates.md`。
 
 Appendix 可以长一些，目标是可复现和可审计，不是继续压缩主文。常见顺序是先放训练、实验 setting、超参数、prompt、解析规则等表格；随后放补充实验结果、额外 ablation 或 error breakdown；最后放完整 case study 记录。这里的 log 指完整 case study 展示，不是训练日志。Appendix 的 case 不要只放截取版，必须展示完整输入、完整输出、完整评分和完整评审记录；如果太长，拆成多个 box、多个 subsection 或 continuation pages。
 
@@ -268,7 +268,7 @@ Appendix 可以长一些，目标是可复现和可审计，不是继续压缩�
 
 Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。
 
-如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/markdown-latex-templates.md`。
+如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/latex-paper-templates.md`。
 
 Conclusion 可以一段，也可以两段。短会议论文通常一段；如果需要同时写 limitations/future work，可以两段。Conclusion 只回扣已有主线：重申问题、方法、结果和未来方向。不要在 Conclusion 引入新概念、新实验或新贡献。
 
