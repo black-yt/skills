@@ -1,6 +1,6 @@
 ---
 name: lab-cluster-1
-description: "当需要在 lab cluster 1 / PJLAB 上处理完整集群工作流时使用：优先通过后台持久交互 SSH 终端登录开发机并连续操作，处理安全边界、项目/数据/模型路径、conda 环境选择、网络代理、CPU/GPU 资源与分区、rlaunch 交互 worker、rjob 训练/评测/部署任务、模型权重复用或迁移、host-network/KAPI 服务访问、GPU+CPU 协作和排错；只有单次简单检查才使用一次性 ssh 命令；必须使用原始 rlaunch/rjob 命令，不依赖 .bashrc 快捷函数，不擅自改环境或泄露密钥。"
+description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch worker 或 rjob 任务时使用；覆盖交互 SSH、安全边界、路径规范、代理、CPU/GPU 分区、训练/部署、服务访问和排错，并要求使用原始 rlaunch/rjob 命令。"
 ---
 
 # Lab Cluster 1
@@ -846,7 +846,13 @@ rjob submit --dry-run true \
 
 GPU 脚本不要依赖外网。下面是正式脚本应遵循的局部环境设置；LLM 训练/部署默认使用 `llmv2`，`<project>` 和启动命令必须由具体任务决定，不能盲目照抄执行。
 
-GPU rjob runner 里不要继承 submit host 的 CUDA 路径。submit host 上 `/usr/local/cuda-12.8` 存在，不代表 rjob container 内也存在。脚本内应在 `source /jobutils/scripts/worker_init.sh` 之后显式恢复 wrapper 传入的 CUDA 和 conda 环境变量；`worker_init.sh` 可能覆盖 `PATH`、`CUDA_HOME` 或相关环境。除了 `CUDA_HOME`，还要同步设置 `CUDA_PATH=$CUDA_HOME` 和 `CUDACXX=$CUDA_HOME/bin/nvcc`，因为 `flashinfer`、`ninja` 或 CUDA extension build 可能直接读取这些变量。
+GPU rjob runner 的 CUDA 规则：
+
+- **不要继承 submit host 路径。** submit host 上 `/usr/local/cuda-12.8` 存在，不代表 rjob container 内也存在。
+- **恢复时机。** 在 `source /jobutils/scripts/worker_init.sh` 之后显式恢复 wrapper 传入的 CUDA 和 conda 环境变量。
+- **覆盖风险。** `worker_init.sh` 可能覆盖 `PATH`、`CUDA_HOME` 或相关环境。
+- **变量完整性。** 除了 `CUDA_HOME`，还要同步设置 `CUDA_PATH=$CUDA_HOME` 和 `CUDACXX=$CUDA_HOME/bin/nvcc`。
+- **原因。** `flashinfer`、`ninja` 或 CUDA extension build 可能直接读取这些变量。
 
 ```bash
 #!/usr/bin/env bash

@@ -1,6 +1,6 @@
 ---
 name: ai-conference-paper-writing
-description: "当需要撰写、重构或审阅 AI conference paper 时使用，包括 NeurIPS/ICLR/ICML/ACL/CVPR 等会议论文的 research story、中心命题、teaser 图、Introduction、Related Work、Method pipeline、Experiments 图表布局、Analysis、Case Study、Abstract、Conclusion、贡献列表、术语体系、claim-evidence 对齐和可复现评测写法；重点是把工作从数据集/系统/方法对象包装成清晰的问题、能力缺口和论证闭环。"
+description: "当需要撰写、重构或审阅 AI conference paper 时使用；覆盖 research story、章节结构、图表实验布局、引用、case study、术语体系和可复现评测，重点把工作包装成清晰的问题、能力缺口和论证闭环。"
 ---
 
 # AI Conference Paper Writing
@@ -12,9 +12,14 @@ description: "当需要撰写、重构或审阅 AI conference paper 时使用，
 - 所有章节服务同一条主线：问题为什么重要、已有工作为什么没覆盖、本文如何系统补上、证据说明什么。
 - 不编造实验结果、数据规模、引用或模型表现；缺数据时写成待填占位或建议补实验。
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
+- 避免 overclaim，但用正向限定包装：在总结性术语或 claim 中加入 1-2 个定语约束适用范围，不要反着说“我们不是 X”。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
 
-具体可复制的模板分开维护：中文 Markdown 大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明和表格占位写法放在 `references/markdown-writing-templates.md`；LaTeX 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、紧凑贡献列表和 Appendix `tcolorbox` 放在 `references/latex-paper-templates.md`。任务涉及其中任何模板时，必须读取对应 reference。
+具体模板分开维护：
+
+- **Markdown reference.** 中文大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、表格占位写法：`references/markdown-writing-templates.md`。
+- **LaTeX reference.** 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、紧凑贡献列表、Appendix `tcolorbox`：`references/latex-paper-templates.md`。
+- **使用规则。** 任务涉及上述模板时，必须读取对应 reference。
 
 ## 工作顺序
 
@@ -111,7 +116,12 @@ AI 会议论文的图表承担导航功能，不只是装饰。主文默认顺�
 
 Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本文方案和一句主要发现。
 
-所有 figure、table 和 appendix section 都必须在正文中显式引用，不能只放图表或附录内容而不在正文导航。常见写法包括：`Detailed training hyperparameters are provided in Appendix A.2.`、`Additional case studies are shown in Appendix C.`、`Table 3 summarizes the ablation results.`、`Figure 4 illustrates the reward pipeline.` 主文如果提到“更多细节”“完整 case”“训练参数”“补充实验”，必须给出具体 appendix/table/figure 编号或 section 名；写完后检查是否存在未被正文引用的 orphan figure、orphan table 或 orphan appendix section。
+图表与附录必须可导航：
+
+- **正文引用。** 所有 figure、table 和 appendix section 都必须在正文中显式引用，不能只放内容而不导航。
+- **常见写法。** `Detailed training hyperparameters are provided in Appendix A.2.`、`Additional case studies are shown in Appendix C.`、`Table 3 summarizes the ablation results.`、`Figure 4 illustrates the reward pipeline.`
+- **触发词。** 主文提到“更多细节”“完整 case”“训练参数”“补充实验”时，必须给出具体 appendix/table/figure 编号或 section 名。
+- **完稿检查。** 检查是否存在未被正文引用的 orphan figure、orphan table 或 orphan appendix section。
 
 当用户需要先梳理论文结构时，可以先写中文 Markdown 大纲，并把所有图和表放在它们最终应出现的位置。这里要区分两类技巧：
 
@@ -159,7 +169,22 @@ Related Work 要和贡献对应，不要写与主线无关的名论文。整体�
 - Introduction 第二段可以压缩 Related Work 的分类；Related Work 正文则展开证据和区别。
 - 差异应是任务目标、评测对象、能力边界、数据分布或监督形式，不是实现细节。
 
-Benchmark/data paper 应加入数据集对比表。`Ours` 放最后一行；列名要和 Introduction 的 challenge 对齐，而不是只列规模。这个表要证明论文的 gap claim：不要只因为 `Ours` 更大就显得更好，最好让 `Ours` 在 challenge 对应列上最完整。对于 yes/no/partial 属性列，LaTeX 成稿可用 `\cmark/\pmark/\xmark`，并在 caption 或表下注明符号含义。表后解释哪些能力过去被分散覆盖，本文如何把它们放到同一个评测、训练或诊断框架里。Markdown 草稿模板见 `references/markdown-writing-templates.md`，LaTeX 成稿模板见 `references/latex-paper-templates.md`。
+引用必须严谨：
+
+- **引用位置。** 引用应紧跟被支持的词语、方法名、数据集名、模型名或具体 claim 后面，不要一句话或一段话写完后堆一串泛泛引用。
+- **引用数量。** AI conference paper 的参考文献数量通常不应少于 40 篇，正常情况下约 50 篇；survey 或 benchmark 可以更多。
+- **真实性检查。** 所有引用论文必须通过搜索或原始来源确认真实存在，严禁虚假引用、编造标题、编造作者或编造 venue。
+- **版本选择。** 若同一工作既有 arXiv/preprint 又有已中稿或正式发表版本，优先引用已中稿/正式发表版本；只有没有正式版本或需要引用 preprint 特定内容时才引用 arXiv。
+- **LaTeX 管理。** 编辑 LaTeX 时使用 `.bib` / BibTeX 形式管理引用，不要手写裸文本参考文献；LaTeX citation 模板见 `references/latex-paper-templates.md`。
+
+Benchmark/data 对比表要求：
+
+- **位置。** Benchmark/data paper 应加入数据集对比表，`Ours` 放最后一行。
+- **列名。** 列名要和 Introduction 的 challenge 对齐，而不是只列规模。
+- **论证。** 表格要证明 gap claim；不要只因为 `Ours` 更大就显得更好。
+- **符号。** yes/no/partial 属性列可用 `\cmark/\pmark/\xmark`，并在 caption 或表下注明含义。
+- **表后解释。** 说明哪些能力过去被分散覆盖，本文如何放到同一个评测、训练或诊断框架里。
+- **模板。** Markdown 草稿见 `references/markdown-writing-templates.md`；LaTeX 成稿见 `references/latex-paper-templates.md`。
 
 ## Method
 
@@ -174,7 +199,11 @@ Method 第一节先给总框架，不要直接进入实现细节。总览要说�
 
 方法小节按设计逻辑组织，不按开发顺序组织。推荐顺序：Task Formulation -> Data Source Construction -> Instance Generation -> Difficulty Control -> Quality Validation -> Evaluation Protocol。
 
-Method 开头应有 pipeline 图，标清输入数据或任务来源、instance/data generation、validation/filtering、model inference/training、programmatic evaluation 或 reward、analysis/error feedback、final output 或 learning loop。Method 后半部分最好再加一张核心组件或算法图，例如 generator、state tracker、parser/evaluator、reward function、agent loop、training loop 或 dependency graph；组件图应解释一个技术核心，不要重复 pipeline。
+Method 图表要求：
+
+- **Pipeline 图。** Method 开头应放 pipeline 图，标清输入数据或任务来源、generation、validation/filtering、inference/training、programmatic evaluation 或 reward、analysis/error feedback、final output 或 learning loop。
+- **组件图。** Method 后半部分最好再加一张核心组件或算法图，例如 generator、state tracker、parser/evaluator、reward function、agent loop、training loop 或 dependency graph。
+- **避免重复。** 组件图应解释一个技术核心，不要重复 pipeline。
 
 形式化定义有助于读者理解，尤其适用于 benchmark/data、agent/system、programmatic evaluation 和 training loop。公式应覆盖输入、输出、约束、标签或评测函数；符号必须后文使用，不能为形式化而形式化。Markdown 和 LaTeX 公式模板见 reference。
 
@@ -262,9 +291,21 @@ Analysis 不重复结果，要解释错误类型。可按能力维度、错误�
 - default-value bias
 - stage confusion
 
-Case Study 要真实、完整、可验证，至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。主文放 2 个压缩 case 最稳，优先做对照：correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。不要把完整长输出塞进主文；完整 case 放 Appendix。Appendix 的 `tcolorbox` 可以结构化展示 meta info、task、data、rubrics、generated report、figures 和 score items，模板见 `references/latex-paper-templates.md`。
+Case Study 要真实、完整、可验证：
 
-Appendix 可以长一些，目标是可复现和可审计，不是继续压缩主文。常见顺序是先放训练、实验 setting、超参数、prompt、解析规则等表格；随后放补充实验结果、额外 ablation 或 error breakdown；最后放完整 case study 记录。这里的 log 指完整 case study 展示，不是训练日志。Appendix 的 case 不要只放截取版，必须展示完整输入、完整输出、完整评分和完整评审记录；如果太长，拆成多个 box、多个 subsection 或 continuation pages。
+- **必要信息。** 至少包含 sample ID、input summary、task/question、gold answer、model output、score、error explanation。
+- **主文数量。** 主文放 2 个压缩 case 最稳。
+- **对照优先。** correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。
+- **完整输出。** 不要把完整长输出塞进主文；完整 case 放 Appendix。
+- **Appendix 模板。** `tcolorbox` 可结构化展示 meta info、task、data、rubrics、generated report、figures、score items；模板见 `references/latex-paper-templates.md`。
+
+Appendix 目标是可复现和可审计：
+
+- **长度。** Appendix 可以长一些，不要继续按主文尺度压缩。
+- **顺序。** 先放训练、实验 setting、超参数、prompt、解析规则等表格；再放补充实验、额外 ablation 或 error breakdown；最后放完整 case study 记录。
+- **log 含义。** 这里的 log 指完整 case study 展示，不是训练日志。
+- **完整性。** Appendix case 不要只放截取版；必须展示完整输入、完整输出、完整评分和完整评审记录。
+- **过长处理。** 拆成多个 box、多个 subsection 或 continuation pages。
 
 ## Abstract And Conclusion
 
@@ -286,7 +327,14 @@ Conclusion 可以一段，也可以两段。短会议论文通常一段；如果
 
 列表前要有总领句，列表后最好有总结句，bullet 语法结构保持并列。删除或改写空泛弱句，例如 `This is important`、`This is challenging`、`Existing methods are limited`、`Our method is effective`；必须说明重要在哪里、难点在哪里、已有工作缺口在哪里、效果体现在哪个指标或现象。
 
-避免过度声称：少用 `solve`、`fully address`、`human-level`、`comprehensive in all aspects`；多用 `study`、`characterize`、`systematically evaluate`、`provide evidence`、`make a step toward`、`reveal limitations`。
+Overclaim 控制采用正向限定包装：
+
+- **限定方式。** 在总结性词汇或句子中加入最多 1-2 个定语，例如场景、数据分布、任务形式、评测协议或监督条件；不要堆太多定义。
+- **正面表达。** 写“我们是 X 条件下的 Y”，不要写“我们不是 Z”；除非在 Limitations 章节，不要反着定义自己的工作。
+- **不要此地无银三百两。** 不要主动用否定句暴露读者本来未必会质疑的边界；把边界包装成正向限定，而不是自我否定。
+- **防卫边界。** 面对恶意质疑时，应能用范围、设置或约束反驳：本文是在 `[setting]` 下做 `[capability]`，不是无边界泛化。
+- **包装态度。** 面对正常读者时，语言应积极包装贡献，而不是收缩或道歉式声明。
+- **词汇选择。** 少用 `solve`、`fully address`、`human-level`、`comprehensive in all aspects`；多用 `study`、`characterize`、`systematically evaluate`、`provide evidence`、`make a step toward`。
 
 术语必须统一。好术语必须能映射到数据、方法、指标、实验或 case。无法映射的 fancy 术语要删掉。可以用 `grep` 检查核心术语出现次数：只出现 1-2 次通常没有成为主线；出现很多但没有新信息则是在堆词。
 

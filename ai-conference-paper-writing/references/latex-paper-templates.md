@@ -8,6 +8,66 @@
 
 这部分用于最终 `.tex` 论文排版和视觉强化，不是中文版 Markdown 大纲的必需格式。典型做法是：用 `xcolor` 给数值表上色；用 `\ScoreCell`、`\BestScore`、`\SecondScore` 标记结果；用 `\paragraph{Insight ...}` 写分析段首；用 `tcolorbox` 在 Appendix 展示完整 case。这些命令不应强加到中文 Markdown 大纲里，只在写 LaTeX 正文或附录时使用。
 
+### BibTeX 与 Citation 写法
+
+LaTeX 论文中使用 `.bib` / BibTeX 管理引用，不要在 `References` 里手写裸文本条目。所有论文条目都必须先通过搜索或原始页面确认真实存在；如果同一工作有 arXiv 和已接收/正式发表版本，优先使用已接收/正式发表版本对应的 BibTeX。
+
+引用位置要贴近被支持的对象：
+
+```latex
+Vision-language models have been widely used for scientific figure understanding~\citep{li2024scifig,wang2025chartvlm}.
+
+Programmatic evaluation~\citep{chen2021codex,hendrycks2021apps} reduces ambiguity by checking executable outputs rather than relying only on text overlap.
+
+\citet{vaswani2017attention} introduced the Transformer architecture, which later became the backbone of many language-model-based agents.
+```
+
+避免把一整段写完后堆引用：
+
+```latex
+% Avoid.
+Recent work studies multimodal reasoning, tool use, long-horizon planning, and programmatic evaluation. Several benchmarks and agents have been proposed for these problems~\citep{paperA,paperB,paperC,paperD,paperE,paperF}.
+```
+
+更稳的写法是把引用分配到对应术语后：
+
+```latex
+Recent multimodal benchmarks evaluate chart and figure understanding~\citep{paperA,paperB}, while tool-use agents study external API or code execution~\citep{paperC,paperD}. Long-horizon planning benchmarks focus on multi-step state tracking~\citep{paperE}, and programmatic evaluation checks executable outputs directly~\citep{paperF}.
+```
+
+BibTeX 条目示例：
+
+```bibtex
+@inproceedings{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year = {2017}
+}
+
+@article{trinh2024alphageometry,
+  title = {Solving Olympiad Geometry without Human Demonstrations},
+  author = {Trinh, Trieu H. and Wu, Yuhuai and Le, Quoc V. and He, He and Luong, Thang},
+  journal = {Nature},
+  year = {2024}
+}
+```
+
+主文件参考文献写法：
+
+```latex
+\bibliographystyle{plainnat}
+\bibliography{main}
+```
+
+检查项：
+
+- 引用数量：AI conference paper 通常不少于 40 篇，正常约 50 篇；benchmark/survey 可以更多。
+- 引用真实性：每个 BibTeX entry 都要能在论文官网、ACL Anthology、OpenReview、IEEE/ACM、PMLR、NeurIPS proceedings、CVF、Springer、Nature、arXiv 等来源中找到。
+- 版本选择：有正式中稿/发表版时优先引用正式版；不要在正式版已存在时继续引用旧 arXiv，除非正文明确讨论 arXiv 版本特有内容。
+- 位置贴近：citation 放在对应方法、数据集、模型、任务或 claim 后面，不要段末堆引用。
+- Key 稳定：BibTeX key 使用 `surnameYearShortTitle` 风格，避免 `paper1`、`refA`、`unknown2024`。
+
 ### 摘要资源链接图标
 
 如果论文有公开 homepage、code 或 dataset，可以在 abstract 正文之后加入一小段资源入口。正文 abstract 仍保持一段式；资源入口是附加块，不要把它写成新的摘要段落或贡献列表。Page、GitHub 与 Hugging Face 的 PDF logo 已随 skill 保存：

@@ -1,6 +1,6 @@
 ---
 name: github-readme-writing
-description: "当需要为 GitHub 项目创建、重构或审阅 README.md 时使用，尤其是科研项目、benchmark、agent/tool、dataset、开源系统的高质量主页式 README；严格参考 ResearchClawBench 风格，包含居中标题、徽章、导航、teaser 图、表格化 highlights、前置 news、Mermaid 图、多元图表、文件夹结构、quick start、配置和使用说明、联系方式、citation、star history 和 back-to-top。"
+description: "当需要为 GitHub 项目创建、重构或审阅高质量 README.md 时使用；参考 ResearchClawBench 风格，覆盖居中标题、徽章、导航、teaser、highlights、news、Mermaid、quick start、citation 和 star history。"
 ---
 
 # GitHub README Writing
