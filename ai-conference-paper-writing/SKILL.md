@@ -336,6 +336,14 @@ Overclaim 控制采用正向限定包装：
 - **包装态度。** 面对正常读者时，语言应积极包装贡献，而不是收缩或道歉式声明。
 - **词汇选择。** 少用 `solve`、`fully address`、`human-level`、`comprehensive in all aspects`；多用 `study`、`characterize`、`systematically evaluate`、`provide evidence`、`make a step toward`。
 
+专有名词和缩写第一次出现要控制粒度：
+
+- **一般规则。** 重要概念第一次出现时写全称，并在括号中给出缩写，例如 `large language models (LLMs)`；后文再使用缩写。
+- **引用规则。** 如果该术语对应具体论文、方法或基准来源，第一次出现时在术语后给必要引用。
+- **粒度把控。** 不是所有大写词都要展开；常见数据集、benchmark、模型或产品名通常直接用原名。
+- **不必展开。** `GPT`、`MMLU` 这类已作为名称使用的模型、数据集或 benchmark，不需要强行写全称。
+- **必须展开。** `LLMs` 这类类别缩写，第一次出现应写成 `large language models (LLMs)`。
+
 术语必须统一。好术语必须能映射到数据、方法、指标、实验或 case。无法映射的 fancy 术语要删掉。可以用 `grep` 检查核心术语出现次数：只出现 1-2 次通常没有成为主线；出现很多但没有新信息则是在堆词。
 
 ## 审阅与改稿检查
