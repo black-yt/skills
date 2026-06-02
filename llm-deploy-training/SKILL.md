@@ -16,7 +16,9 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 - 失败、skip、OOM 或 dry-run 不应标记数据已消费；只有训练成功后才归档或标记 consumed。
 - 如必须补包，先询问；确需安装单包时优先 `pip install --no-deps <pkg>`。
 
-## vLLM 部署核心经验
+## 部署：vLLM OpenAI-compatible 服务
+
+### 核心经验
 
 多模态输入必须显式设置：
 
@@ -61,7 +63,7 @@ SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'
 - https://docs.vllm.ai/projects/recipes/en/latest/Qwen/Qwen3.5.html
 - https://docs.vllm.ai/en/stable/api/vllm/config/compilation.html
 
-## vLLM 服务脚本模板
+### 服务脚本模板
 
 `scripts/serve_model.sh` 的通用结构：
 
@@ -139,7 +141,7 @@ printf '\n'
 exec "${args[@]}"
 ```
 
-## vLLM 部署验证
+### 部署验证
 
 最少验证：
 
@@ -242,13 +244,15 @@ PY
 - **CUDA Graph 失败。** 先试 `ENFORCE_EAGER=1`；若想保留 graph，试 `SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'`。
 - **OOM。** 先降 `MAX_NUM_SEQS`、`MAX_NUM_BATCHED_TOKENS` 或 `GPU_MEMORY_UTILIZATION`，再考虑降低 `MAX_MODEL_LEN` 或增加 GPU。
 
-## ms-swift 训练核心原则
+## 训练：ms-swift SFT / DPO / GRPO
+
+### 训练核心原则
 
 - 9B 级 full training 默认使用 `bf16 + DeepSpeed zero3 + save_only_model`。
 - 不要把 LoRA 参数混进 full training；full training 不写 LoRA rank/alpha/target modules。
 - 版本参数以当前环境的 `swift sft --help`、`swift rlhf --help` 和项目已跑通脚本为准。旧版本不支持 `--train_type full` 时再确认是否应使用 `--tuner_type full`，不要盲目同时写两个。
 
-## 训练类型选择
+### 训练类型选择
 
 - **SFT**：普通 chat messages 训练，例如 solver trace、judge trace、direct LLM stage trace。
 - **DPO**：preference pairs 训练，例如 chosen/rejected challenger behavior。DPO 显存压力大于 SFT。
@@ -262,7 +266,7 @@ SFT 和 DPO 不要共用完全相同超参。默认参考：
 | DPO | `5e-7` | `8` | `4096` 起步 | 9B full DPO 必须 zero3 |
 | GRPO | `5e-7` 起步 | `8` 起步 | 先短 | 重点控 generation 和 reward 成本 |
 
-## 通用环境模板
+### 通用环境模板
 
 训练脚本开头：
 
@@ -299,7 +303,7 @@ OUTPUT_ROOT="${OUTPUT_ROOT:-/abs/path/to/models/Qwen3.5-9B-my-run}"
 - `--dataset_num_proc 1`，数据大时可用 `4`
 - `--split_dataset_ratio 0.0`，没有单独验证集时不从训练集切分
 
-## SFT 模板
+### SFT 模板
 
 ```bash
 swift sft \
@@ -328,7 +332,7 @@ swift sft \
 
 SFT 默认 `learning_rate=1e-5`、`gradient_accumulation_steps=16`、`max_length=8192` 到 `10240`、`warmup_ratio=0.03` 到 `0.05`。
 
-## DPO 模板
+### DPO 模板
 
 ```bash
 swift rlhf \
@@ -358,7 +362,7 @@ swift rlhf \
 
 DPO 比 SFT 更容易 OOM，因为 chosen/rejected/ref/logprob 路径更重。9B full DPO 不开 zero3 很容易爆显存。默认 `learning_rate=5e-7`、`gradient_accumulation_steps=8`、`max_length=4096` 起步、`warmup_ratio=0.05`。
 
-## GRPO 模板
+### GRPO 模板
 
 GRPO 参数随 ms-swift 版本和项目插件变化大，优先参考项目已有 GRPO 脚本。不要凭空添加 reward functions、vLLM server、temperature、top_p、loss_scale 或 `gradient_checkpointing_kwargs`。
 
@@ -391,7 +395,7 @@ swift rlhf \
 
 GRPO 先小 batch smoke test。`max_completion_length`、`num_generations`、rollout batch 会显著影响显存和速度。如果 reward model、judge 或 vLLM rollout 同节点运行，要单独预留显存。训练失败时先缩短 generation length 和样本数，再考虑改模型、环境或算法。
 
-## 数据格式
+### 数据格式
 
 SFT JSONL 通常每行：
 
@@ -413,7 +417,7 @@ DPO JSONL 常见格式二：
 
 实际字段以当前 ms-swift 文档和已跑通脚本为准。关键是训练前写 validator，不要等训练跑起来才发现格式错。
 
-## 数据校验与过滤
+### 数据校验与过滤
 
 至少校验：
 
@@ -448,7 +452,7 @@ if bad:
 print("jsonl ok")
 ```
 
-## 训练前检查
+### 训练前检查
 
 提交真实训练前运行：
 
@@ -478,7 +482,7 @@ dry-run 输出必须能看到：
 - `NPROC_PER_NODE`、`CUDA_VISIBLE_DEVICES`、rjob `--gpu` 数一致。
 - 脚本不含代理、API key、LoRA 参数或环境修改命令。
 
-## 训练后检查
+### 训练后检查
 
 - 日志里 trainable params 应显示 full training 的大量参数，而不是 LoRA 的极低 trainable 百分比。
 - 输出目录不应塞满 optimizer state；应使用 `save_only_model true`。
@@ -487,7 +491,7 @@ dry-run 输出必须能看到：
 - 训练成功后再标记数据 consumed。
 - 训练失败不要标记 consumed；失败输出目录清理或隔离。
 
-## 显存排错顺序
+### 显存排错顺序
 
 1. 确认 `--torch_dtype bfloat16`。
 2. 确认 full training：`--train_type full`。
@@ -499,7 +503,7 @@ dry-run 输出必须能看到：
 8. 设置 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`。
 9. 仍 OOM 时再考虑更多 GPU、降低模型规模、缩短数据或换训练算法。
 
-## rjob 资源建议
+### rjob 资源建议
 
 9B full SFT/DPO 起步用 2 GPU、44 CPU、460000 memory。GPU 任务通常不联网，依赖、模型和数据提前放到共享存储。
 
@@ -523,7 +527,7 @@ rjob submit \
 
 如果对应集群不需要 namespace 或 private-machine 参数，删除相应行。训练任务和服务部署对 host-network 的要求不同，按集群规则和访问方式选择。CPU 辅助循环、数据处理或联网任务另走 CPU rjob，不要和 GPU training runner 混在一起。集群分区、挂载、CPU/GPU rjob 限制和代理细节使用 `lab-cluster-1` skill。
 
-## 最终检查清单
+### 最终检查清单
 
 - SFT 和 DPO 超参不同：SFT 参考 `1e-5 / grad_acc=16 / max_length 8k-10k`，DPO 参考 `5e-7 / grad_acc=8 / max_length 4k`。
 - 9B full DPO 必须 zero3。
