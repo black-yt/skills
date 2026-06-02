@@ -514,22 +514,22 @@ Preamble:
 \definecolor{DeepPurple}{HTML}{5C3A96}
 \definecolor{LighterGray}{HTML}{F7F7FA}
 \definecolor{White}{HTML}{FFFFFF}
-\definecolor{RcbRowShade}{HTML}{F7F7FA}
-\definecolor{RcbAppendixRowShade}{HTML}{EFEFEF}
-\definecolor{RcbHighlightPurple}{RGB}{236,229,250}
-\definecolor{rcbScorePurple}{HTML}{5C3A96}
-\definecolor{rcbCheckGreen}{HTML}{2E7D32}
-\definecolor{rcbCrossRed}{HTML}{C62828}
-\definecolor{rcbPartialYellow}{HTML}{B8860B}
+\definecolor{CustomRowShade}{HTML}{F7F7FA}
+\definecolor{CustomAppendixRowShade}{HTML}{EFEFEF}
+\definecolor{CustomHighlightPurple}{RGB}{236,229,250}
+\definecolor{CustomScorePurple}{HTML}{5C3A96}
+\definecolor{CustomCheckGreen}{HTML}{2E7D32}
+\definecolor{CustomCrossRed}{HTML}{C62828}
+\definecolor{CustomPartialYellow}{HTML}{B8860B}
 ```
 
 ### Score heatmap 宏
 
 ```latex
-\newcommand{\ScoreCell}[2]{\cellcolor{rcbScorePurple!#1!white}#2}
+\newcommand{\ScoreCell}[2]{\cellcolor{CustomScorePurple!#1!white}#2}
 \newcommand{\BestScore}[2]{\ScoreCell{#1}{\textbf{#2}}}
 \newcommand{\SecondScore}[2]{\ScoreCell{#1}{\underline{#2}}}
-\newcommand{\DimCell}[2]{\cellcolor{rcbScorePurple!#1!white}#2}
+\newcommand{\DimCell}[2]{\cellcolor{CustomScorePurple!#1!white}#2}
 ```
 
 第一个参数是颜色强度，通常是 0-100 的归一化整数；第二个参数是展示值。同一个表内保持颜色强度尺度一致。如果表格太花，只给关键指标列上色或降低强度。
@@ -539,9 +539,9 @@ Preamble:
 适用于 dataset、benchmark、method、system 的 yes/no/partial 属性列；不适合替代主结果表中的数值指标。三种符号形状不同，即使灰度打印也能区分；颜色只是辅助。
 
 ```latex
-\newcommand{\cmark}{\textcolor{rcbCheckGreen}{\(\checkmark\)}}
-\newcommand{\xmark}{\textcolor{rcbCrossRed}{\(\times\)}}
-\newcommand{\pmark}{\textcolor{rcbPartialYellow}{\(\triangle\)}}
+\newcommand{\cmark}{\textcolor{CustomCheckGreen}{\(\checkmark\)}}
+\newcommand{\xmark}{\textcolor{CustomCrossRed}{\(\times\)}}
+\newcommand{\pmark}{\textcolor{CustomPartialYellow}{\(\triangle\)}}
 ```
 
 对比表模板：
@@ -578,24 +578,24 @@ Prior B & \cmark & \pmark & \xmark & \cmark \\
 
 ### 模型或系统图标
 
-只有 logo 文件确实存在且图标能提升可读性时才用；否则保持纯文本模型名。如果论文不是 RCB 风格资源，重命名项目 prefix。
+只有 logo 文件确实存在且图标能提升可读性时才用；否则保持纯文本模型名。复制到新论文时，请把示例宏名和 logo 路径改成当前项目自己的命名。
 
 ```latex
-\newcommand{\RcbIcon}[1]{\raisebox{-0.12em}{\includegraphics[height=0.9em]{imgs/logos/#1.png}}\hspace{0.25em}}
-\newcommand{\ClaudeIcon}{\RcbIcon{anthropic}}
-\newcommand{\OpenAIIcon}{\RcbIcon{openai}}
-\newcommand{\ArisIcon}{\RcbIcon{asx}}
-\newcommand{\OpenClawIcon}{\RcbIcon{openclaw}}
-\newcommand{\NanobotIcon}{\RcbIcon{nanobot}}
-\newcommand{\EvoIcon}{\RcbIcon{evo}}
-\newcommand{\ResearchClawIcon}{\RcbIcon{researchclaw}}
-\newcommand{\GlmIcon}{\RcbIcon{glm}}
-\newcommand{\GeminiIcon}{\RcbIcon{gemini}}
-\newcommand{\DeepSeekIcon}{\RcbIcon{deepseek}}
-\newcommand{\GrokIcon}{\RcbIcon{grok}}
-\newcommand{\KimiIcon}{\RcbIcon{kimi}}
-\newcommand{\MimoIcon}{\RcbIcon{mimo}}
-\newcommand{\QwenIcon}{\RcbIcon{qwen}}
+\newcommand{\CustomIcon}[1]{\raisebox{-0.12em}{\includegraphics[height=0.9em]{imgs/logos/#1.png}}\hspace{0.25em}}
+\newcommand{\ClaudeIcon}{\CustomIcon{anthropic}}
+\newcommand{\OpenAIIcon}{\CustomIcon{openai}}
+\newcommand{\ArisIcon}{\CustomIcon{asx}}
+\newcommand{\OpenClawIcon}{\CustomIcon{openclaw}}
+\newcommand{\NanobotIcon}{\CustomIcon{nanobot}}
+\newcommand{\EvoIcon}{\CustomIcon{evo}}
+\newcommand{\ResearchClawIcon}{\CustomIcon{researchclaw}}
+\newcommand{\GlmIcon}{\CustomIcon{glm}}
+\newcommand{\GeminiIcon}{\CustomIcon{gemini}}
+\newcommand{\DeepSeekIcon}{\CustomIcon{deepseek}}
+\newcommand{\GrokIcon}{\CustomIcon{grok}}
+\newcommand{\KimiIcon}{\CustomIcon{kimi}}
+\newcommand{\MimoIcon}{\CustomIcon{mimo}}
+\newcommand{\QwenIcon}{\CustomIcon{qwen}}
 ```
 
 ### 紧凑彩色主结果表
@@ -631,7 +631,7 @@ System & Overall & Dimension 1 & Dimension 2 & Dimension 3 \\
 
 - 同一个表内保持颜色强度尺度一致。如果分数是 0-100，分数本身通常可以直接作为强度；否则先归一化。
 - 不要把每个 cell 都染得过重。表格太花时，只给关键指标列上色，或者降低强度。
-- `\rowcolor{RcbRowShade}` 只少量用于分组行或隔行，不要和 score heatmap 冲突。
+- `\rowcolor{CustomRowShade}` 只少量用于分组行或隔行，不要和 score heatmap 冲突。
 - Caption 中说明 higher/lower is better，以及分数范围含义。
 - 如果使用 icon，确保路径有效，PDF build 能找到 `imgs/logos/*.png`。
 
