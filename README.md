@@ -23,7 +23,7 @@ skill-name/
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
-| `ms-swift-training` | [`ms-swift-training/SKILL.md`](ms-swift-training/SKILL.md) | 使用 ms-swift 进行 SFT/DPO/GRPO 训练，覆盖 9B full training、bf16、DeepSpeed zero3、数据校验、显存排错、dry-run、训练后检查和 rjob 资源建议。 |
+| `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `lab-cluster-1` | [`lab-cluster-1/SKILL.md`](lab-cluster-1/SKILL.md) | 在 lab cluster 1 / PJLAB 上处理开发机登录、路径和环境、网络代理、模型权重、`rlaunch`/`rjob`、服务部署和排错等集群工作流。 |
