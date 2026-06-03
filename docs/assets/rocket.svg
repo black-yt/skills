@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="body" x1="28" y1="110" x2="104" y2="10" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5e8ec8"/>
+      <stop offset="0.52" stop-color="#f6f4ef"/>
+      <stop offset="1" stop-color="#e8d5a0"/>
+    </linearGradient>
+    <linearGradient id="flame" x1="38" y1="122" x2="70" y2="76" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff4d4d"/>
+      <stop offset="0.45" stop-color="#ff9b32"/>
+      <stop offset="1" stop-color="#ffe08a"/>
+    </linearGradient>
+  </defs>
+  <path d="M39 89c-8 4-15 12-18 25 13-3 21-10 25-18l-7-7z" fill="url(#flame)"/>
+  <path d="M82 76l20 7c4 1 8-1 9-5 3-12 2-26-2-39L82 76z" fill="#5e8ec8"/>
+  <path d="M52 46l-7-20c-1-4 1-8 5-9 12-3 26-2 39 2L52 46z" fill="#c4a060"/>
+  <path d="M36 82c-5-17 0-37 14-51C66 15 91 8 111 10c2 20-5 45-21 61-14 14-34 19-51 14l-3-3z" fill="url(#body)" stroke="#252520" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="77" cy="43" r="12" fill="#a8c4e8" stroke="#252520" stroke-width="5"/>
+  <path d="M42 88l-10 10" stroke="#252520" stroke-width="7" stroke-linecap="round"/>
+</svg>

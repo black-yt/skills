@@ -1,6 +1,6 @@
 ---
 name: ai-conference-paper-writing
-description: "当需要撰写、重构或审阅 AI conference paper 时使用；覆盖 research story、章节结构、图表实验布局、引用、case study、术语体系和可复现评测，重点把工作包装成清晰的问题、能力缺口和论证闭环。"
+description: "当需要撰写、重构或打磨 AI conference paper 时使用；覆盖 research story、章节结构、图表实验布局、引用、case study、术语体系和可复现评测，重点把工作包装成清晰的问题、能力缺口和论证闭环。"
 ---
 
 # AI Conference Paper Writing
@@ -346,9 +346,9 @@ Overclaim 控制采用正向限定包装：
 
 术语必须统一。好术语必须能映射到数据、方法、指标、实验或 case。无法映射的 fancy 术语要删掉。可以用 `grep` 检查核心术语出现次数：只出现 1-2 次通常没有成为主线；出现很多但没有新信息则是在堆词。
 
-## 审阅与改稿检查
+## 自查与改稿检查
 
-审阅论文草稿时按严重程度指出问题：
+自查或打磨论文草稿时按严重程度指出问题：
 
 1. Story：中心命题是否清楚，工作是否从对象提升到问题。
 2. Alignment：challenge、method、metric、experiment、case、conclusion 是否一一对应。

@@ -1,0 +1,1364 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Skills from Wanghan</title>
+  <meta name="description" content="从真实工作流中蒸馏得到的一组可复用 Agent Skills。">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/svg+xml" href="assets/rocket.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap"></noscript>
+  <style>
+    :root {
+      --bg:              #ffffff;
+      --masthead-bg:     #f5f5f5;
+      --masthead-border: #e8e8e8;
+      --paper-border:    #efefef;
+      --paper-hover:     #f7f7f7;
+      --h1-border:       #e8e8e8;
+      --c-bg-start:      #ffffff;
+      --c-bg-end:        #f5f5f5;
+      --c-border:        rgba(0, 0, 0, 0.12);
+      --c-text:          #1a1a1a;
+      --c-hover-start:   #f0f0f0;
+      --c-hover-end:     #e8e8e8;
+      --c-hover-border:  rgba(0, 0, 0, 0.28);
+      --c-hover-text:    #000000;
+      --seg-start:       #1a1a1a;
+      --seg-end:         #333333;
+      --seg-shadow:      rgba(0, 0, 0, 0.22);
+      --seg-inactive:    #888888;
+      --seg-active-text: #ffffff;
+      --glow-rgb:        0, 0, 0;
+    }
+
+    [data-theme="yellow"] {
+      --bg:              #faf8f4;
+      --masthead-bg:     #f0ebe1;
+      --masthead-border: #e5ddd0;
+      --paper-border:    #e8e0d5;
+      --paper-hover:     #f0ece4;
+      --h1-border:       #ddd6c8;
+      --c-bg-start:      #ffffff;
+      --c-bg-end:        #faf4ea;
+      --c-border:        rgba(140, 95, 35, 0.22);
+      --c-text:          #3d2810;
+      --c-hover-start:   #f5ede0;
+      --c-hover-end:     #ede0cc;
+      --c-hover-border:  rgba(140, 95, 35, 0.5);
+      --c-hover-text:    #1c1208;
+      --seg-start:       #1c1208;
+      --seg-end:         #3a2410;
+      --seg-shadow:      rgba(28, 18, 8, 0.28);
+      --seg-inactive:    #8a7055;
+      --seg-active-text: #ffffff;
+      --glow-rgb:        180, 128, 40;
+    }
+
+    [data-theme="blue"] {
+      --bg:              #f3f5f8;
+      --masthead-bg:     #e3e8ef;
+      --masthead-border: #d3dae3;
+      --paper-border:    #dde4ed;
+      --paper-hover:     #e8eef5;
+      --h1-border:       #ccd4de;
+      --c-bg-start:      #ffffff;
+      --c-bg-end:        #edf2fa;
+      --c-border:        rgba(38, 88, 155, 0.22);
+      --c-text:          #1a3654;
+      --c-hover-start:   #e8f0fb;
+      --c-hover-end:     #d8e8f8;
+      --c-hover-border:  rgba(38, 88, 155, 0.5);
+      --c-hover-text:    #102847;
+      --seg-start:       #1a3654;
+      --seg-end:         #1e4a7a;
+      --seg-shadow:      rgba(26, 54, 84, 0.3);
+      --seg-inactive:    #6a8aaa;
+      --seg-active-text: #ffffff;
+      --glow-rgb:        38, 88, 155;
+    }
+
+    [data-theme="dark"] {
+      --bg:              #111110;
+      --masthead-bg:     #1c1c1a;
+      --masthead-border: #2e2e2b;
+      --paper-border:    #252522;
+      --paper-hover:     #1a1a18;
+      --h1-border:       #2e2e2b;
+      --c-bg-start:      #1e1e1c;
+      --c-bg-end:        #252520;
+      --c-border:        rgba(255, 255, 255, 0.1);
+      --c-text:          #e8e6df;
+      --c-hover-start:   #2a2a26;
+      --c-hover-end:     #303028;
+      --c-hover-border:  rgba(255, 255, 255, 0.22);
+      --c-hover-text:    #ffffff;
+      --seg-start:       #e8e6df;
+      --seg-end:         #d0cec7;
+      --seg-shadow:      rgba(232, 230, 223, 0.12);
+      --seg-inactive:    #666660;
+      --seg-active-text: #111110;
+      --glow-rgb:        220, 210, 180;
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+      min-height: 100%;
+      background: transparent;
+      color: var(--c-text);
+      font-family: "Space Grotesk", "Noto Sans SC", Inter, ui-sans-serif, system-ui, sans-serif;
+      font-size: 15px;
+    }
+
+    body {
+      height: 100vh;
+      min-height: 100vh;
+      margin: 0;
+      background: transparent;
+      font-weight: 600;
+      line-height: 1.55;
+      overflow: hidden;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      height: 100vh;
+      min-height: 0;
+      flex-direction: column;
+      width: min(1180px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 32px 0 24px;
+    }
+
+    .mast {
+      display: grid;
+      flex: 0 0 auto;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 18px;
+      padding: 30px;
+      border: 1px solid var(--c-border);
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--c-bg-start) 0%, var(--c-bg-end) 100%);
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.08);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      color: var(--seg-inactive);
+      font-size: 0.86rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--c-hover-text);
+      font-size: clamp(2.5rem, 7vw, 5.8rem);
+      line-height: 0.95;
+      letter-spacing: -0.055em;
+    }
+
+    .title-small {
+      display: inline-block;
+      margin-left: 0.12em;
+      font-size: 0.42em;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      vertical-align: baseline;
+    }
+
+    .lead {
+      max-width: 760px;
+      margin: 18px 0 0;
+      color: var(--c-text);
+      opacity: 0.76;
+      font-size: clamp(1rem, 2vw, 1.18rem);
+      font-weight: 500;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: minmax(120px, 1fr);
+      gap: 12px;
+      min-width: 150px;
+      align-self: stretch;
+    }
+
+    .stat {
+      display: flex;
+      min-height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px 20px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--c-hover-text);
+      font-size: clamp(3rem, 5vw, 4.6rem);
+      letter-spacing: -0.04em;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--seg-inactive);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .toolbar {
+      display: flex;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      gap: 14px;
+      align-items: center;
+      margin: 0 0 -2px;
+    }
+
+    .search {
+      flex: 1 1 320px;
+      min-width: 0;
+      height: 44px;
+      padding: 0 16px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--c-text);
+      font: inherit;
+      outline: none;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    .search:focus {
+      border-color: var(--c-hover-border);
+      box-shadow: 0 0 0 5px rgba(var(--glow-rgb), 0.07);
+    }
+
+    .repo-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      padding: 0 18px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--c-text);
+      text-decoration: none;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .repo-link:hover {
+      transform: translateY(-1px);
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--c-hover-start), var(--c-hover-end));
+      box-shadow: 0 8px 22px rgba(var(--glow-rgb), 0.12);
+    }
+
+    .tag-filter {
+      display: inline-flex;
+      position: relative;
+      flex: 0 1 390px;
+      align-items: center;
+      min-width: 320px;
+      max-width: 100%;
+      height: 44px;
+    }
+
+    .tag-toggle {
+      display: inline-flex;
+      align-items: center;
+      width: 100%;
+      height: 44px;
+      padding: 0;
+      border: 1.5px solid var(--c-border);
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--c-text);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+      cursor: pointer;
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .tag-toggle:hover,
+    .tag-toggle:focus {
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--c-hover-start), var(--c-hover-end));
+      box-shadow: 0 0 0 5px rgba(var(--glow-rgb), 0.07);
+      outline: none;
+    }
+
+    .tag-filter__label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 0 12px;
+      border-right: 1px solid var(--c-border);
+      background: rgba(var(--glow-rgb), 0.05);
+      color: var(--seg-inactive);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tag-summary {
+      flex: 1 1 auto;
+      min-width: 0;
+      padding: 0 10px 0 12px;
+      overflow: hidden;
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-align: left;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .tag-caret {
+      width: 8px;
+      height: 8px;
+      margin-right: 16px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .tag-filter.open .tag-caret {
+      transform: translateY(2px) rotate(225deg);
+    }
+
+    .tag-menu {
+      position: absolute;
+      top: calc(100% + 9px);
+      right: 0;
+      z-index: 30;
+      display: grid;
+      width: min(720px, calc(100vw - 36px));
+      gap: 4px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      max-height: 0;
+      overflow-y: auto;
+      padding: 8px;
+      border: 1.5px solid var(--c-hover-border);
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+      opacity: 0;
+      overscroll-behavior: contain;
+      pointer-events: none;
+      scrollbar-color: var(--c-border) transparent;
+      scrollbar-width: thin;
+      transform: translateY(-6px) scale(0.985);
+      transform-origin: top right;
+      transition: opacity 0.18s ease, transform 0.18s ease, max-height 0.22s ease;
+    }
+
+    .tag-menu::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .tag-menu::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .tag-menu::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: var(--c-border);
+    }
+
+    .tag-filter.open .tag-menu {
+      max-height: min(420px, calc(100vh - 220px));
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .tag-bulk {
+      grid-column: 1 / -1;
+      min-height: 34px;
+      padding: 0 10px;
+      border: 1px solid var(--c-border);
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--c-text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-align: left;
+      transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+    }
+
+    .tag-bulk:hover {
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--c-hover-start), var(--c-hover-end));
+      color: var(--c-hover-text);
+    }
+
+    .tag-option {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 9px;
+      color: var(--c-text);
+      cursor: pointer;
+      font-size: 0.86rem;
+      font-weight: 600;
+      position: relative;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .tag-option:hover {
+      background: rgba(var(--glow-rgb), 0.08);
+      color: var(--c-hover-text);
+    }
+
+    .tag-option input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tag-option span {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      width: 100%;
+    }
+
+    .tag-option span::before {
+      display: inline-flex;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid var(--c-border);
+      border-radius: 5px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--seg-active-text);
+      content: "";
+      font-size: 0.72rem;
+      font-weight: 800;
+      line-height: 1;
+      transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .tag-option input:checked + span {
+      color: var(--c-hover-text);
+    }
+
+    .tag-option input:checked + span::before {
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--seg-start), var(--seg-end));
+      box-shadow: 0 4px 12px rgba(var(--glow-rgb), 0.18);
+      content: "✓";
+    }
+
+    .skill-list-frame {
+      flex: 1 1 auto;
+      min-height: 0;
+      position: relative;
+    }
+
+    .skill-list-shell {
+      height: 100%;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 24px 4px 22px 0;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+      mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+      scrollbar-color: var(--c-border) transparent;
+      scrollbar-width: thin;
+    }
+
+    .skill-list-shell::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .skill-list-shell::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .skill-list-shell::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background: var(--c-border);
+    }
+
+    .skill-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 10px;
+    }
+
+    .skill-row {
+      cursor: pointer;
+    }
+
+    .skill-row td {
+      padding: 18px;
+      border-top: 1.5px solid var(--c-border);
+      border-bottom: 1.5px solid var(--c-border);
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .skill-row td:first-child {
+      border-left: 1.5px solid var(--c-border);
+      border-radius: 14px 0 0 14px;
+      width: 28%;
+    }
+
+    .skill-row td:last-child {
+      border-right: 1.5px solid var(--c-border);
+      border-radius: 0 14px 14px 0;
+      width: 56px;
+      text-align: center;
+    }
+
+    .skill-row:hover td,
+    .skill-row.active td {
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--c-hover-start), var(--c-hover-end));
+      box-shadow: 0 8px 26px rgba(var(--glow-rgb), 0.10);
+    }
+
+    .skill-name {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .skill-name code {
+      color: var(--c-hover-text);
+      font-family: "Space Grotesk", "Noto Sans SC", ui-sans-serif, system-ui, sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .skill-path {
+      color: var(--seg-inactive);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 5px;
+    }
+
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 0 8px;
+      border: 1px solid var(--c-border);
+      border-radius: 999px;
+      color: var(--seg-inactive);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .skill-desc {
+      color: var(--c-text);
+      font-size: 0.94rem;
+      font-weight: 500;
+      opacity: 0.78;
+    }
+
+    .chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--c-border);
+      border-radius: 999px;
+      color: var(--seg-inactive);
+      font-size: 0;
+      line-height: 1;
+      vertical-align: middle;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    .chevron::before {
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      content: "";
+      transform: translateY(-2px) rotate(45deg);
+      transition: transform 0.2s ease;
+    }
+
+    .skill-row.active .chevron {
+      color: var(--c-hover-text);
+      border-color: var(--c-hover-border);
+    }
+
+    .skill-row.active .chevron::before {
+      transform: translateY(2px) rotate(225deg);
+    }
+
+    .detail-row {
+      display: none;
+    }
+
+    .detail-row.open {
+      display: table-row;
+    }
+
+    .detail-cell {
+      padding: 0 0 10px !important;
+      border: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+
+    .detail-panel {
+      margin: -2px 0 6px;
+      padding: 22px;
+      border: 1px solid var(--c-border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.06);
+    }
+
+    .markdown-preview {
+      display: grid;
+      gap: 8px;
+      color: var(--c-text);
+      font-weight: 500;
+    }
+
+    .markdown-preview h3 {
+      margin: 0 0 4px;
+      color: var(--c-hover-text);
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    .markdown-preview p {
+      margin: 0;
+      opacity: 0.82;
+    }
+
+    .markdown-preview ul {
+      margin: 4px 0 0;
+      padding-left: 1.2em;
+      opacity: 0.84;
+    }
+
+    .markdown-preview li {
+      margin: 0.25em 0;
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .detail-link {
+      appearance: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      color: var(--c-text);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      line-height: 1;
+      text-decoration: none;
+    }
+
+    .detail-link:hover {
+      border-color: var(--c-hover-border);
+      color: var(--c-hover-text);
+    }
+
+    .detail-link.copied {
+      border-color: var(--c-hover-border);
+      background: linear-gradient(135deg, var(--c-hover-start), var(--c-hover-end));
+      color: var(--c-hover-text);
+    }
+
+    .empty {
+      display: none;
+      padding: 38px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--c-bg-start), var(--c-bg-end));
+      text-align: center;
+    }
+
+    #theme-switcher {
+      position: fixed;
+      right: 1.5em;
+      bottom: 1.5em;
+      z-index: 1000;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 9px 16px;
+      border: 1px solid var(--masthead-border);
+      border-radius: 9999px;
+      background: var(--masthead-bg);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+      transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .theme-dot {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .theme-dot[data-theme="white"]  { background: #ffffff; border-color: #c8c8c8; }
+    .theme-dot[data-theme="yellow"] { background: #e8d5a0; border-color: #c4a060; }
+    .theme-dot[data-theme="blue"]   { background: #a8c4e8; border-color: #5e8ec8; }
+    .theme-dot[data-theme="dark"]   { background: #2a2a26; border-color: #585852; }
+
+    .theme-dot.active {
+      transform: scale(1.35);
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 3.5px var(--masthead-border);
+    }
+
+    .theme-dot:hover:not(.active) {
+      transform: scale(1.18);
+    }
+
+    [data-theme="dark"] .detail-panel {
+      background: rgba(28, 28, 26, 0.82);
+    }
+
+    @media (max-width: 780px) {
+      .page {
+        height: 100svh;
+        width: min(100% - 22px, 1180px);
+        padding-top: 18px;
+        padding-bottom: 14px;
+      }
+
+      .mast {
+        grid-template-columns: 1fr;
+        padding: 22px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr;
+        min-width: 0;
+      }
+
+      .skill-table,
+      .skill-table tbody,
+      .skill-table tr,
+      .skill-table td {
+        display: block;
+        width: 100% !important;
+      }
+
+      .tag-filter.open .tag-menu {
+        grid-template-columns: 1fr;
+      }
+
+      .skill-row {
+        display: grid !important;
+        margin: 0 0 10px;
+      }
+
+      .skill-row td {
+        border-left: 1.5px solid var(--c-border);
+        border-right: 1.5px solid var(--c-border);
+        border-radius: 0 !important;
+      }
+
+      .skill-row td:first-child {
+        border-radius: 14px 14px 0 0 !important;
+      }
+
+      .skill-row td:last-child {
+        border-radius: 0 0 14px 14px !important;
+        text-align: left;
+      }
+
+      .detail-cell {
+        display: block !important;
+      }
+
+      #theme-switcher {
+        right: 1em;
+        bottom: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="mast" aria-labelledby="page-title">
+      <div>
+        <div class="eyebrow">可复用 Agent Skills</div>
+        <h1 id="page-title">Skills <span class="title-small">from Wanghan</span></h1>
+        <p class="lead">从 <a href="https://black-yt.github.io/" target="_blank" rel="noreferrer">Wanghan Xu</a> 的真实工作流中蒸馏得到的一组可复用 Agent Skills。<br>点击对应 Skill 查看详情，支持一键复制安装 Prompt，也可以跳转到 GitHub 查看完整内容。</p>
+      </div>
+      <div class="stats" aria-label="仓库统计">
+        <div class="stat"><strong id="skill-count">0</strong><span>skills</span></div>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="Skill 控件">
+      <input id="search" class="search" type="search" placeholder="搜索 Skills..." autocomplete="off">
+      <div id="tag-filter" class="tag-filter" aria-label="标签筛选">
+        <button id="tag-toggle" class="tag-toggle" type="button" aria-expanded="false" aria-haspopup="true">
+          <span class="tag-filter__label">标签</span>
+          <span id="tag-summary" class="tag-summary">全部标签</span>
+          <span class="tag-caret" aria-hidden="true"></span>
+        </button>
+        <div id="tag-menu" class="tag-menu" role="group" aria-label="标签选项"></div>
+      </div>
+      <a class="repo-link" href="https://github.com/black-yt/skills" target="_blank" rel="noreferrer">GitHub 仓库</a>
+    </section>
+
+    <div id="skill-list-frame" class="skill-list-frame">
+      <section id="skill-list-shell" class="skill-list-shell" aria-label="Skill 列表滚动区">
+        <table class="skill-table" aria-label="Skill 列表">
+          <tbody id="skill-body"></tbody>
+        </table>
+        <div id="empty" class="empty">没有匹配的 Skills。</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    var SKILLS = [
+      {
+        name: 'ai-conference-paper-writing',
+        path: 'ai-conference-paper-writing/SKILL.md',
+        tags: ['写作', '论文', 'LaTeX', '科研'],
+        desc: '撰写、重构和打磨 AI 会议论文，覆盖研究故事、章节结构、图表实验布局、引用、case study、术语体系和可复现评测。',
+        content: '### AI 会议论文写作\n- 用于把 AI 论文组织成清晰的中心命题、能力缺口和论证闭环。\n- 覆盖 Abstract、Introduction、Related Work、Method、Data/Benchmark、Experiments、Analysis、Case Study 和 Appendix。\n- 强调 citation 严谨性、避免 overclaim、图表位置规划、中文大纲与 LaTeX 模板分工。'
+      },
+      {
+        name: 'docx-splitting',
+        path: 'docx-splitting/SKILL.md',
+        tags: ['DOCX', '办公', 'Windows'],
+        desc: '在 Windows + Microsoft Word 环境中，按页拆分 .docx 文件并尽量保留原始格式、图片、表格和分页效果。',
+        content: '### DOCX 按页拆分\n- 适用于必须保留 Word 原始版式的分页拆分任务。\n- 使用 Microsoft Word 自动化流程，而不是简单文本切割。\n- 包含依赖、命令行用法、Python 调用、注意事项和验证方法。'
+      },
+      {
+        name: 'github-readme-writing',
+        path: 'github-readme-writing/SKILL.md',
+        tags: ['GitHub', 'README', '写作'],
+        desc: '创建或优化 GitHub 项目 README，包含居中标题、badges、teaser 图、highlights 表格、news、Mermaid、Quick Start、citation 和 star history。',
+        content: '### GitHub README 写作\n- 用于生成结构完整、视觉丰富、可导航的 GitHub README。\n- 支持居中标题、badges、teaser 图、highlights 表格、news 折叠区、Mermaid、项目结构、Quick Start 和 citation。\n- 强调充足 Markdown 示例和适当 emoji，让 README 清晰但不杂乱。'
+      },
+      {
+        name: 'huggingface-dataset-publishing',
+        path: 'huggingface-dataset-publishing/SKILL.md',
+        tags: ['数据集', 'Hugging Face', '图片'],
+        desc: '创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、push_to_hub 和 dataset card。',
+        content: '### Hugging Face Dataset 发布\n- 适合发布包含图片、多图、文本步骤、答案和 metadata 的数据集。\n- 重点使用 datasets 的 Features、Image、Sequence，确保 Dataset Viewer 可以正常浏览图片。\n- 上传后需要 clone dataset repo，用 git 维护 README 和 dataset card。'
+      },
+      {
+        name: 'lab-cluster-1',
+        path: 'lab-cluster-1/SKILL.md',
+        tags: ['集群', 'CPU/GPU', '远程'],
+        desc: '处理 CPU/GPU 集群上的开发机登录、路径和环境、网络代理、模型权重、rlaunch/rjob、服务部署和排错等工作流。',
+        content: '### CPU/GPU 集群\n- 覆盖开发机、worker、rjob 任务、代理、路径规范、模型权重和服务部署。\n- 强调环境安全边界：不要擅自修改长期配置、安装软件或污染共享存储。\n- 复杂远程工作优先交互式 SSH，会话中持续操作，而不是反复单次 SSH 命令。'
+      },
+      {
+        name: 'latex-compiling',
+        path: 'latex-compiling/SKILL.md',
+        tags: ['LaTeX', 'PDF', '编译'],
+        desc: '使用系统级 latexmk + pdflatex 编译 LaTeX，并隔离 build 目录与 TeX 缓存。',
+        content: '### LaTeX 编译\n- 用于稳定编译 LaTeX，避免中间文件和缓存污染源码目录。\n- 推荐独立 build 目录、明确清理策略和常见问题检查。\n- 适合论文、报告和技术文档的本地编译验证。'
+      },
+      {
+        name: 'llm-deploy-training',
+        path: 'llm-deploy-training/SKILL.md',
+        tags: ['LLM', '部署', '训练', 'GPU'],
+        desc: '部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO 全参数训练。',
+        content: '### LLM 部署与训练\n- 部署部分覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用和 CUDA Graph 策略。\n- 训练部分覆盖 ms-swift SFT/DPO/GRPO、bf16、DeepSpeed zero3、save_only_model、数据校验和显存排错。\n- 强调复用已有环境，不擅自升级共享 conda 或核心包。'
+      },
+      {
+        name: 'llm-image-generation',
+        path: 'llm-image-generation/SKILL.md',
+        tags: ['LLM', '图像', 'API'],
+        desc: '通过 OpenAI-compatible LLM 网关生成图片，优先读取 LLM_API_KEY/LLM_BASE_URL，覆盖模型选择、长等待时间、base64/URL 保存和排错。',
+        content: '### LLM 图像生成\n- 用于调用 OpenAI-compatible 图像生成模型。\n- 优先从环境变量读取 API key 和 base URL，缺失时提示用户配置。\n- 明确图像生成可能需要较长等待时间，避免误判为无响应。'
+      },
+      {
+        name: 'markdown-to-pdf',
+        path: 'markdown-to-pdf/SKILL.md',
+        tags: ['Markdown', 'PDF', 'Python'],
+        desc: '使用 Python 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。',
+        content: '### Markdown 转 PDF\n- 使用本仓库脚本将 Markdown 转换为 PDF。\n- 覆盖命令行用法、Python 调用、图片路径、表格和基础 CSS。\n- 适合把 Markdown 报告、说明和实验记录转成可分享 PDF。'
+      },
+      {
+        name: 'pdf-parsing',
+        path: 'pdf-parsing/SKILL.md',
+        tags: ['PDF', '解析', 'Markdown'],
+        desc: '使用 structai.read_pdf 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。',
+        content: '### PDF 解析\n- 用于把 PDF 文档解析成 Markdown，并抽取图片资源。\n- 覆盖 MinerU token、代理重试、本地解析结果和返回值结构。\n- 适合论文阅读、资料整理和后续结构化处理。'
+      },
+      {
+        name: 'pdf-to-images',
+        path: 'pdf-to-images/SKILL.md',
+        tags: ['PDF', '图片', 'Ghostscript'],
+        desc: '使用系统级 Ghostscript 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。',
+        content: '### PDF 转图片\n- 用 Ghostscript 将 PDF 页面导出成 PNG。\n- 支持单页、页码范围和整篇导出。\n- 包含参数要点、常见问题和验证步骤。'
+      },
+      {
+        name: 'wave-mosaic-web-theme',
+        path: 'wave-mosaic-web-theme/SKILL.md',
+        tags: ['前端', '主题', 'Canvas'],
+        desc: '复刻 black-yt 风格前端主题，覆盖 Canvas wave-mosaic 动态方块背景、4 种背景颜色切换、Space Grotesk 字体和高级卡片/表格视觉。',
+        content: '### Wave Mosaic 网页主题\n- 用于复刻当前页面的动态方块背景和 4 种背景颜色切换。\n- 背景是固定全屏 Canvas，使用交叉 sine wave 控制方块透明度。\n- 背景颜色通过 CSS custom properties 和右下角 floating dots 切换。'
+      }
+    ];
+
+    var GITHUB_REPO = 'https://github.com/black-yt/skills';
+    var GITHUB_BASE = GITHUB_REPO + '/blob/main/';
+    var GITHUB_TREE_BASE = GITHUB_REPO + '/tree/main/';
+    var body = document.getElementById('skill-body');
+    var empty = document.getElementById('empty');
+    var search = document.getElementById('search');
+    var tagFilter = document.getElementById('tag-filter');
+    var tagToggle = document.getElementById('tag-toggle');
+    var tagSummary = document.getElementById('tag-summary');
+    var tagMenu = document.getElementById('tag-menu');
+    document.getElementById('skill-count').textContent = SKILLS.length;
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, function (ch) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[ch];
+      });
+    }
+
+    function renderInline(text) {
+      return escapeHtml(text)
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+    }
+
+    function renderMarkdown(md) {
+      var lines = md.trim().split(/\n/);
+      var html = [];
+      var inList = false;
+
+      lines.forEach(function (line) {
+        if (/^###\s+/.test(line)) {
+          if (inList) { html.push('</ul>'); inList = false; }
+          html.push('<h3>' + renderInline(line.replace(/^###\s+/, '')) + '</h3>');
+        } else if (/^-\s+/.test(line)) {
+          if (!inList) { html.push('<ul>'); inList = true; }
+          html.push('<li>' + renderInline(line.replace(/^-\s+/, '')) + '</li>');
+        } else if (line.trim()) {
+          if (inList) { html.push('</ul>'); inList = false; }
+          html.push('<p>' + renderInline(line) + '</p>');
+        }
+      });
+      if (inList) html.push('</ul>');
+      return html.join('');
+    }
+
+    function copyToClipboard(text, button) {
+      var original = button.textContent;
+      function markCopied() {
+        button.textContent = '已复制';
+        button.classList.add('copied');
+        window.setTimeout(function () {
+          button.textContent = original;
+          button.classList.remove('copied');
+        }, 1400);
+      }
+      function fallbackCopy() {
+        var textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try { document.execCommand('copy'); markCopied(); } catch (error) {}
+        document.body.removeChild(textarea);
+      }
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(markCopied).catch(fallbackCopy);
+      } else {
+        fallbackCopy();
+      }
+    }
+
+    function buildInstallPrompt(skill) {
+      var folderUrl = GITHUB_TREE_BASE + encodeURI(skill.name);
+      var skillUrl = GITHUB_BASE + encodeURI(skill.path);
+      var reviewDir = './skills-download/' + skill.name;
+      return [
+        '请帮我安装下面这个 agent skill。',
+        '',
+        'Skill 名称：' + skill.name,
+        'Skill 目录：' + folderUrl,
+        'SKILL.md：' + skillUrl,
+        '',
+        '请先使用这个仓库提供的下载工具下载整个 skill 文件夹，不要只下载 `SKILL.md`：',
+        '',
+        '```bash',
+        'curl -L -o download_skill.py https://raw.githubusercontent.com/black-yt/skills/main/download_skill.py',
+        'python download_skill.py ' + skill.name + ' -o ' + reviewDir,
+        '```',
+        '',
+        '安装流程：',
+        '1. 先把 skill 下载到本地检查目录 `' + reviewDir + '`，不要直接写入最终安装目录。',
+        '2. 检查目录结构是否符合 skill 格式：必须有 `SKILL.md`；如有 `references/`、`assets/`、`scripts/`，必须完整保留。',
+        '3. 读取并检查 `' + reviewDir + '/SKILL.md`：frontmatter 是否有效，description 是否清楚，引用的相对路径是否存在。',
+        '4. 简要浏览 references/assets/scripts，确认内容与该 skill 相关，没有明显损坏、空文件或不该公开的凭据。',
+        '5. 自动识别当前工具可用的 skills 安装目录；如果不能确定安装目录，先询问我，不要预设安装给某个 agent。',
+        '6. 如果安装目录已经存在同名 skill，先比较差异并征求确认，不要直接覆盖。',
+        '7. 确认无误后，把整个 `' + skill.name + '` 文件夹安装到 skills 目录，保持子目录结构不变。',
+        '8. 安装完成后读取已安装的 `SKILL.md`，再次检查 frontmatter、相对路径和引用文件是否有效。',
+        '9. 最后告诉我：本地下载检查目录、最终安装路径、是否覆盖已有内容、以及验证结果。',
+        '10. 安装完成后，询问我是否需要删除本地下载检查目录 `' + reviewDir + '`；未经确认不要删除。',
+        '',
+        '安全要求：如果过程中涉及任何潜在危险操作，必须先征得我的同意；包括但不限于覆盖已有文件、删除文件或目录、移动现有内容、修改全局配置、安装软件、修改 shell 配置、改权限或执行不可逆操作。',
+        '注意：不要安装额外软件，不要修改无关全局配置；如果使用其他临时目录，安装完成后也要询问我是否需要清理。'
+      ].join('\n');
+    }
+
+    function createRows(skill, index) {
+      var row = document.createElement('tr');
+      row.className = 'skill-row';
+      row.tabIndex = 0;
+      row.dataset.index = String(index);
+      var tags = skill.tags.map(function (tag) {
+        return '<span class="tag-chip">' + escapeHtml(tag) + '</span>';
+      }).join('');
+      row.innerHTML = [
+        '<td><div class="skill-name"><code>' + escapeHtml(skill.name) + '</code><span class="skill-path">' + escapeHtml(skill.path) + '</span><div class="tag-list">' + tags + '</div></div></td>',
+        '<td><div class="skill-desc">' + escapeHtml(skill.desc) + '</div></td>',
+        '<td><span class="chevron" aria-hidden="true"></span></td>'
+      ].join('');
+
+      var detail = document.createElement('tr');
+      detail.className = 'detail-row';
+      detail.dataset.index = String(index);
+      var skillUrl = GITHUB_BASE + encodeURI(skill.path);
+      detail.innerHTML = '<td class="detail-cell" colspan="3"><div class="detail-panel">' +
+        '<div class="markdown-preview">' + renderMarkdown(skill.content) + '</div>' +
+        '<div class="detail-actions">' +
+        '<button class="detail-link detail-install" type="button" data-index="' + index + '">复制安装 Prompt</button>' +
+        '<button class="detail-link detail-copy" type="button" data-url="' + skillUrl + '">复制 SKILL.md 链接</button>' +
+        '<a class="detail-link" href="' + skillUrl + '" target="_blank" rel="noreferrer">查看完整 SKILL.md</a>' +
+        '<a class="detail-link" href="' + GITHUB_TREE_BASE + encodeURI(skill.name) + '" target="_blank" rel="noreferrer">打开 Skill 文件夹</a>' +
+        '</div></div></td>';
+
+      detail.querySelector('.detail-install').addEventListener('click', function (event) {
+        event.stopPropagation();
+        copyToClipboard(buildInstallPrompt(SKILLS[Number(event.currentTarget.dataset.index)]), event.currentTarget);
+      });
+
+      detail.querySelector('.detail-copy').addEventListener('click', function (event) {
+        event.stopPropagation();
+        copyToClipboard(event.currentTarget.dataset.url, event.currentTarget);
+      });
+
+      function toggle() {
+        var isOpen = detail.classList.toggle('open');
+        row.classList.toggle('active', isOpen);
+      }
+      row.addEventListener('click', toggle);
+      row.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          toggle();
+        }
+      });
+
+      return [row, detail];
+    }
+
+    function tagInputs() {
+      return Array.prototype.slice.call(tagMenu.querySelectorAll('input[type="checkbox"]'));
+    }
+
+    function selectedTags() {
+      return tagInputs().filter(function (input) {
+        return input.checked;
+      }).map(function (input) {
+        return input.value;
+      });
+    }
+
+    function updateTagSummary() {
+      var tags = selectedTags();
+      var total = tagInputs().length;
+      if (!tags.length) {
+        tagSummary.textContent = '全部标签';
+      } else if (tags.length === total) {
+        tagSummary.textContent = '全部标签';
+      } else if (tags.length === 1) {
+        tagSummary.textContent = tags[0];
+      } else {
+        tagSummary.textContent = '已选 ' + tags.length + ' 个标签';
+      }
+    }
+
+    function updateBulkButton(button) {
+      var inputs = tagInputs();
+      var allSelected = inputs.length && inputs.every(function (input) { return input.checked; });
+      button.textContent = allSelected ? '取消全选' : '全选';
+    }
+
+    function createTagCheckbox(value, checked) {
+      var label = document.createElement('label');
+      label.className = 'tag-option';
+      label.innerHTML = '<input type="checkbox" value="' + escapeHtml(value) + '"' + (checked ? ' checked' : '') + '><span>' + escapeHtml(value) + '</span>';
+      return label;
+    }
+
+    function renderTagFilters() {
+      var allTags = [];
+      SKILLS.forEach(function (skill) {
+        skill.tags.forEach(function (tag) {
+          if (allTags.indexOf(tag) === -1) allTags.push(tag);
+        });
+      });
+      allTags.sort(function (a, b) { return a.localeCompare(b, 'zh-Hans'); });
+      var bulk = document.createElement('button');
+      bulk.className = 'tag-bulk';
+      bulk.type = 'button';
+      bulk.textContent = '全选';
+      tagMenu.appendChild(bulk);
+      allTags.forEach(function (tag) {
+        tagMenu.appendChild(createTagCheckbox(tag, true));
+      });
+      tagInputs().forEach(function (input) {
+        input.addEventListener('change', function () {
+          updateBulkButton(bulk);
+          updateTagSummary();
+          renderList(search.value);
+        });
+      });
+      bulk.addEventListener('click', function () {
+        var inputs = tagInputs();
+        var allSelected = inputs.length && inputs.every(function (input) { return input.checked; });
+        inputs.forEach(function (input) { input.checked = !allSelected; });
+        updateBulkButton(bulk);
+        updateTagSummary();
+        renderList(search.value);
+      });
+      updateBulkButton(bulk);
+      updateTagSummary();
+    }
+
+    function renderList(query) {
+      var q = (query || '').trim().toLowerCase();
+      var activeTags = selectedTags();
+      body.innerHTML = '';
+      var shown = 0;
+      SKILLS.forEach(function (skill, index) {
+        var haystack = [skill.name, skill.desc, skill.path, skill.content, skill.tags.join(' ')].join(' ').toLowerCase();
+        if (q && haystack.indexOf(q) === -1) return;
+        if (activeTags.length && !activeTags.some(function (tag) { return skill.tags.indexOf(tag) !== -1; })) return;
+        createRows(skill, index).forEach(function (row) { body.appendChild(row); });
+        shown++;
+      });
+      empty.style.display = shown ? 'none' : 'block';
+    }
+
+    search.addEventListener('input', function () { renderList(search.value); });
+    tagToggle.addEventListener('click', function () {
+      var open = !tagFilter.classList.contains('open');
+      tagFilter.classList.toggle('open', open);
+      tagToggle.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', function (event) {
+      if (tagFilter.contains(event.target)) return;
+      tagFilter.classList.remove('open');
+      tagToggle.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      tagFilter.classList.remove('open');
+      tagToggle.setAttribute('aria-expanded', 'false');
+    });
+    renderTagFilters();
+    renderList('');
+  </script>
+
+  <script>
+    (function () {
+      var canvas, ctx, t = 0;
+      var TILE = 26, GAP = 1;
+      var rafId = null;
+      var cachedRgb = '10,10,10';
+      var lastDraw = 0;
+      var FRAME_MS = 1000 / 24;
+
+      function rgb() {
+        var th = document.documentElement.getAttribute('data-theme') || 'white';
+        if (th === 'dark') return '220,210,175';
+        if (th === 'yellow') return '120,85,20';
+        if (th === 'blue') return '38,88,155';
+        return '10,10,10';
+      }
+
+      function frame(ts) {
+        rafId = requestAnimationFrame(frame);
+        if (ts - lastDraw < FRAME_MS) return;
+        lastDraw = ts;
+
+        var w = canvas.width, h = canvas.height;
+        var cols = Math.ceil(w / TILE) + 1;
+        var rows = Math.ceil(h / TILE) + 1;
+        var pre = 'rgba(' + cachedRgb + ',';
+
+        ctx.clearRect(0, 0, w, h);
+
+        for (var r = 0; r < rows; r++) {
+          for (var c = 0; c < cols; c++) {
+            var wave = 0.6 * Math.sin(c * 0.21 + t * 0.36) * Math.sin(r * 0.17 + t * 0.28)
+              + 0.4 * Math.sin(c * 0.11 - r * 0.13 + t * 0.19);
+            var norm = (wave + 1) * 0.5;
+            var v = norm * norm * norm;
+            var a = Math.round((0.004 + v * 0.186) * 100) / 100;
+            if (a < 0.02) continue;
+            ctx.fillStyle = pre + a + ')';
+            ctx.fillRect(c * TILE + GAP, r * TILE + GAP, TILE - GAP, TILE - GAP);
+          }
+        }
+
+        t += 0.007;
+      }
+
+      var resizeTimer;
+      function resize() {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function () {
+          var newW = window.innerWidth;
+          var newH = window.innerHeight;
+          if (newW === canvas.width && Math.abs(newH - canvas.height) <= 90) return;
+          canvas.width = newW;
+          canvas.height = newH;
+        }, 120);
+      }
+
+      function onVisibilityChange() {
+        if (document.hidden) {
+          if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+        } else if (!rafId) {
+          rafId = requestAnimationFrame(frame);
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;' +
+          'z-index:0;pointer-events:none;will-change:transform;' +
+          '-webkit-backface-visibility:hidden;backface-visibility:hidden;';
+        document.body.insertBefore(canvas, document.body.firstChild);
+        ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        cachedRgb = rgb();
+        window.addEventListener('resize', resize);
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        rafId = requestAnimationFrame(frame);
+      });
+
+      new MutationObserver(function () { cachedRgb = rgb(); })
+        .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    })();
+
+    (function () {
+      var THEMES = ['white', 'yellow', 'blue', 'dark'];
+      var LABELS = { white: '纯白背景', yellow: '暖黄背景', blue: '冷蓝背景', dark: '深色背景' };
+      var STORAGE_KEY = 'skills-theme';
+
+      function applyTheme(theme) {
+        if (theme === 'white') {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+        try { localStorage.setItem(STORAGE_KEY, theme); } catch(e) {}
+        document.querySelectorAll('.theme-dot').forEach(function (dot) {
+          dot.classList.toggle('active', dot.dataset.theme === theme);
+        });
+      }
+
+      var saved = 'white';
+      try { saved = localStorage.getItem(STORAGE_KEY) || 'white'; } catch(e) {}
+      applyTheme(saved);
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var switcher = document.createElement('div');
+        switcher.id = 'theme-switcher';
+        switcher.setAttribute('aria-label', '选择背景颜色');
+        THEMES.forEach(function (theme) {
+          var btn = document.createElement('button');
+          btn.className = 'theme-dot';
+          btn.dataset.theme = theme;
+          btn.title = LABELS[theme];
+          btn.setAttribute('aria-label', LABELS[theme]);
+          btn.addEventListener('click', function () { applyTheme(theme); });
+          switcher.appendChild(btn);
+        });
+        document.body.appendChild(switcher);
+        applyTheme(saved);
+      });
+    })();
+  </script>
+</body>
+</html>
