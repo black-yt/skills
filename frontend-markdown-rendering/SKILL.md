@@ -132,12 +132,20 @@ function renderAssistantMarkdown(text, options) {
 支持这些公式分隔符：
 
 ```md
-\(...\)
-\[...\]
-$$...$$
+$$...$$   # 段间 / block formula
+\[...\]   # 段间 / block formula
+\(...\)   # 句中 / inline formula
 ```
 
-不主动支持单 `$...$`，因为它容易和普通文本、金额、shell 变量冲突。
+默认句中公式优先使用 `\(...\)`。不主动支持单 `$...$`，因为它容易和普通文本、金额、shell 变量冲突。
+
+如果产品必须兼容用户输入的单 `$...$`，只能做受限支持：
+
+- 只在最终 assistant Markdown 中启用，工具日志和 JSON 不启用。
+- 只在内容明显像公式时渲染，例如包含 `\frac`、`\sum`、`\alpha`、`_`、`^`、`=`、`<`、`>`、`\cdot` 等数学信号。
+- 不渲染金额、shell 变量、普通英文缩写或只有纯文本的 `$...$`。
+- 必须忽略 `pre`、`code`、`textarea`、`script`、`style` 内的 `$...$`。
+- 如果误判率不可控，回退到只支持 `\(...\)`、`\[...\]` 和 `$$...$$`。
 
 公式要先从 Markdown 文本中临时替换成 token，等 `marked + DOMPurify` 后再恢复。否则 `marked` 可能改坏反斜杠或公式结构。
 
