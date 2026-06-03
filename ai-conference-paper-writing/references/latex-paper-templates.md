@@ -455,7 +455,7 @@ Title 上下横线、teaser/resource box、abstract box：
 \github\ \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}\quad
 \huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/[ORG]/[DATASET]}}
 \end{center}}
-\abstract{[One-paragraph abstract. Keep the abstract itself one paragraph even if resource links are shown separately.]}
+\abstract{[One-paragraph abstract. Keep the abstract itself one paragraph even if resource links are shown separately. Avoid citations in the abstract.]}
 
 \begin{document}
 \ReportMakeTitle

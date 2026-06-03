@@ -323,13 +323,13 @@ Appendix 目标是可复现和可审计：
 
 ## Abstract And Conclusion
 
-Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。
+Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。摘要中一般不要引用论文；如果某个背景必须有引用，应放到 Introduction，而不是塞进 Abstract。
 
 如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/latex-paper-templates.md`。
 
 技术报告型论文、project manuscript 或 internal report 可以使用统一主题色，把 title 横线、页眉、section 标题、链接、teaser、abstract box 和 case box 放进同一套视觉语言。正式会议模板中不要擅自重写 `\maketitle`、页眉或 section 样式，除非已经确认该 venue 和阶段允许自定义。
 
-Conclusion 可以一段，也可以两段。短会议论文通常一段；如果需要同时写 limitations/future work，可以两段。Conclusion 只回扣已有主线：重申问题、方法、结果和未来方向。不要在 Conclusion 引入新概念、新实验或新贡献。
+Conclusion 可以一段，也可以两段。短会议论文通常一段；如果需要同时写 limitations/future work，可以两段。Conclusion 只回扣已有主线：重申问题、方法、结果和未来方向。不要在 Conclusion 引入新概念、新实验或新贡献。Conclusion 通常也不放 citation；需要引用支撑的外部背景应在前文完成。
 
 ## 段落、语言与术语
 

@@ -58,7 +58,7 @@ This paper argues that, to achieve [long-term goal], models must possess [core c
 
 ## Abstract
 
-一段式英文摘要。
+一段式英文摘要。一般不要在 Abstract 中放 citation；背景引用放到 Introduction。
 
 ## 1 Introduction
 

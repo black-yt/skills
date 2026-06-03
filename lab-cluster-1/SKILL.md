@@ -9,7 +9,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 
 - 安全边界：开发机、worker、共享环境、conda、包管理、密钥和长期配置。
 - 固定信息、登录与路径：后台持久交互 SSH、单次 SSH 适用边界、公共挂载、镜像、CUDA、conda、项目根目录、大文件目录。
-- 远端文件编辑：本地编辑工具边界、后台持久 SSH、git patch、远端编辑器、`sed`、`scp` 传输替换和清理。
+- 远端文件编辑：本地编辑工具边界、后台持久 SSH、标准 unified diff + `git apply`、远端编辑器、`sed`/`perl` 小替换、`scp` 传输替换和清理。
 - 网络代理：开发机、CPU worker、CPU rjob、GPU 节点、私网服务和 OpenAI 相关代理边界。
 - 模型权重：公共 HuggingFace 目录、大模型保存目录、查找和迁移前检查。
 - 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 分区、CPU rjob 只用 ai4sdata、GPU rjob 可用两个分区、`rlaunch`、`rjob`、日志和清理。
@@ -51,7 +51,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 已完整跑通：
 
 - 交互式 SSH 登录开发机，开发机上 `rlaunch` 位于 `/kubebrain/rlaunch`，`rjob` 位于 `/usr/local/bin/rjob`。
-- 后台持久 SSH 远端编辑流程：在 `/mnt/shared-storage-user/xuwanghan/projects` 创建测试文件、备份、用 `sed -i` 编辑、`diff -u` 校验、内容验证、删除测试文件和备份，清理检查通过。
+- 后台持久 SSH 远端编辑流程：在 `/mnt/shared-storage-user/xuwanghan/projects` 创建测试文件、备份、用 `sed -i` 编辑、`diff -u` 校验、内容验证、删除测试文件和备份，清理检查通过。`perl` 与 `sed` 同属小范围机械替换工具，适用边界见下文。
 - 远端 git patch 流程：在项目根目录下创建临时 git repo，生成 `.tmp/change.patch`，执行 `git apply --check` 和 `git apply`，内容验证通过，随后删除 patch、`.tmp` 和整个临时测试目录，清理检查通过。
 - `scp` 传输流程：本地创建小测试文件，`scp` 到远端个人项目根目录，远端 `grep` 验证后删除远端测试文件，本地测试文件也已删除，清理检查通过。
 - `rlaunch --help`、`rjob submit --help`。`rjob` 在非交互 shell 中需要先执行 `source /etc/profile.d/ssh-init.sh 2>/dev/null || true`。
@@ -178,13 +178,15 @@ trap 'rm -rf "$RUN_TMP"' EXIT
 
 ## 远端文件编辑工作流
 
-本地编辑工具只能修改当前本地 workspace，不能直接修改开发机或 worker 上的文件。需要修改远端集群文件时，不要假装本地 `apply_patch` 已经改到了远端；先建立后台持久 SSH 终端，再按下面三种方式处理。
+本地编辑工具只能修改当前本地 workspace，不能直接修改开发机或 worker 上的文件。需要修改远端集群文件时，不要假装本地 `apply_patch` 已经改到了远端；先建立后台持久 SSH 终端，再按下面几种方式处理。
 
 远端目录不一定是 git repo。只有确认远端目录是 git repo 时，才使用 `git status`、`git diff`、`git apply --check`、`git apply`。非 git 目录不要套用 git 流程，改用远端编辑器或完整文件复制。
 
 所有远端临时文件都放到目标项目自己的 `.tmp` 子目录，文件名带任务名或时间戳；任务结束必须删除临时文件，避免 `.tmp` 被杂乱文件塞满。不要把临时编辑文件放到系统 `/tmp`、`/var/tmp` 或 worker 本地盘。
 
-方式一：远端项目是 git repo 时，优先用 patch。先在本地生成 patch，再传到远端项目 `.tmp`，在后台持久 SSH 终端中检查并应用，最后删除临时 patch 和空 `.tmp` 目录：
+方式一：远端项目是 git repo 时，优先用标准 unified diff + `git apply`。`git apply` 在远端完全可以用，而且比 `sed`/`perl` 更适合多文件或结构化改动。前提是 patch 必须是标准 unified diff，例如 `git diff` 生成的 `diff --git ...`、`---`、`+++`、`@@` 格式；不要把 Codex 本地 `apply_patch` 工具专用的 `*** Begin Patch` / `*** Update File` 格式传给远端 `git apply`，标准 `git apply` 不认识这种格式。
+
+先在本地生成 patch，再传到远端项目 `.tmp`，在后台持久 SSH 终端中检查并应用，最后删除临时 patch 和空 `.tmp` 目录：
 
 ```bash
 # 本地终端
@@ -208,10 +210,19 @@ test -d .git
 git status --short
 git apply --check ".tmp/$PATCH_NAME"
 git apply ".tmp/$PATCH_NAME"
+git diff
 rm -f ".tmp/$PATCH_NAME"
 rmdir .tmp 2>/dev/null || true
 git status --short
 ```
+
+`git apply` 使用边界：
+
+- 只在远端目录是 git repo，且 patch 与远端当前文件版本匹配时使用。
+- 必须先 `git apply --check`，通过后再 `git apply`。
+- 应用后必须看 `git diff`，确认改动范围、行数和语义符合预期。
+- patch 文件放项目 `.tmp`，应用后删除；不要把 patch 长期留在 `.tmp`。
+- 如果 `git apply --check` 失败，先看是否 patch 基于旧版本、路径不对、已有冲突或误用了 `apply_patch` 格式；不要改成强行覆盖。
 
 方式二：少量手工改动，直接在后台持久 SSH 终端中用远端已有编辑器修改。不要安装新编辑器，不要改全局配置。git repo 用 `git diff` 检查；非 git 目录用 `diff -u` 前后备份检查，检查后删除备份：
 
@@ -233,7 +244,42 @@ diff -u "$BACKUP_FILE" "$TARGET_FILE" || true
 rm -f "$BACKUP_FILE"
 ```
 
-方式三：本地编辑复杂文件后上传替换。这是传输/替换流程，不是远端编辑；命令叫 `scp`，用于通过 SSH 复制文件。适合一个文件太复杂、不适合在远端用 `sed` 或编辑器逐步修改时使用。先在本地编辑好完整文件，再复制到远端项目 `.tmp`，在远端校验后移动到目标路径，并清理临时文件：
+方式三：少量机械替换可用 `perl` 或 `sed`，但只适合非常小、确定、唯一匹配、可立即校验的文本替换。不要用它们做多文件复杂改动、代码重构、结构性编辑或有多处近似匹配的修改；这种情况回到方式一的 `git apply` 或方式四的完整文件替换。
+
+git repo 中的小替换：
+
+```bash
+cd /mnt/shared-storage-user/xuwanghan/projects/<project>
+TARGET_FILE="path/to/file"
+
+# 示例：跨行或整文件匹配时可用 perl -0pi；替换前后都要检查。
+grep -n "OLD_TEXT" "$TARGET_FILE"
+perl -0pi -e 's/OLD_TEXT/NEW_TEXT/g' "$TARGET_FILE"
+git diff -- "$TARGET_FILE"
+```
+
+非 git 目录中的小替换必须先备份，替换后 `diff -u`，最后清理备份：
+
+```bash
+cd /mnt/shared-storage-user/xuwanghan/projects/<project>
+TARGET_FILE="path/to/file"
+BACKUP_FILE="${TARGET_FILE}.bak.$(date +%Y%m%d-%H%M%S)"
+cp "$TARGET_FILE" "$BACKUP_FILE"
+
+grep -n "OLD_TEXT" "$TARGET_FILE"
+perl -0pi -e 's/OLD_TEXT/NEW_TEXT/g' "$TARGET_FILE"
+diff -u "$BACKUP_FILE" "$TARGET_FILE" || true
+rm -f "$BACKUP_FILE"
+```
+
+`perl`/`sed` 使用边界：
+
+- 替换前先 `grep` 或只读查看，确认匹配对象唯一或所有匹配都应修改。
+- 替换后立即 `git diff -- <file>` 或 `diff -u backup file`。
+- 不要在不理解正则转义、换行、贪婪匹配影响时使用 `perl -0pi`。
+- 不要把 `perl`/`sed` 当作绕过 review 的方式；能用标准 patch 表达的改动优先用 `git apply`。
+
+方式四：本地编辑复杂文件后上传替换。这是传输/替换流程，不是远端编辑；命令叫 `scp`，用于通过 SSH 复制文件。适合一个文件太复杂、不适合在远端用 `sed`、`perl` 或编辑器逐步修改时使用。先在本地编辑好完整文件，再复制到远端项目 `.tmp`，在远端校验后移动到目标路径，并清理临时文件：
 
 ```bash
 # 本地终端
