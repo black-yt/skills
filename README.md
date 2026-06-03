@@ -19,6 +19,7 @@ skill-name/
 | `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
 | `docx-splitting` | [`docx-splitting/SKILL.md`](docx-splitting/SKILL.md) | 在 Windows + Microsoft Word 环境中，通过 [`scripts/split_docx.py`](docx-splitting/scripts/split_docx.py) 按页无损拆分 `.docx` 文档。 |
+| `frontend-markdown-rendering` | [`frontend-markdown-rendering/SKILL.md`](frontend-markdown-rendering/SKILL.md) | 在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。 |
 | `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、目录结构、quick start、联系方式、citation 和 star history。 |
 | `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
 | `wave-mosaic-web-theme` | [`wave-mosaic-web-theme/SKILL.md`](wave-mosaic-web-theme/SKILL.md) | 复刻 black-yt 风格前端主题，覆盖 canvas wave-mosaic 动态方块背景、4 种背景颜色切换、Space Grotesk 字体和高级卡片/表格视觉。 |

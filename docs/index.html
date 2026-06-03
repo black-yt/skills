@@ -896,6 +896,13 @@
         content: '### 浏览器渲染可视化\n- 用真实 Chromium 渲染网页，而不是只检查 HTML 源码。\n- 覆盖本地 HTTP server、Playwright CLI 截图、桌面/移动端 viewport 和 console/pageerror 捕获。\n- 对 Canvas、Three.js、WebGL 页面额外检查截图是否非空白，避免页面打开但核心画面没渲染。'
       },
       {
+        name: 'frontend-markdown-rendering',
+        path: 'frontend-markdown-rendering/SKILL.md',
+        tags: ['前端', 'Markdown', 'KaTeX', 'Mermaid'],
+        desc: '在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。',
+        content: '### 前端 Markdown 渲染\n- 只把最终 assistant result 当 Markdown 渲染，工具调用、trace、错误日志仍按纯文本或 JSON 展示。\n- 使用 marked、DOMPurify、KaTeX 和 Mermaid 组合，不自己手写完整 Markdown parser。\n- 覆盖公式保护、workspace 图片安全路由、图片/表格/SVG 宽度约束和常见渲染错误。'
+      },
+      {
         name: 'docx-splitting',
         path: 'docx-splitting/SKILL.md',
         tags: ['DOCX', '办公', 'Windows'],
