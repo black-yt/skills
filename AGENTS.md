@@ -26,6 +26,20 @@
 - `assets/` 放会被输出复用的静态资源。
 - 不要随意增加额外说明文件；只有直接服务 skill 功能时才新增。
 
+## 新增或更新 Skill 的同步清单
+
+- 新增 skill 时，必须新建独立文件夹，并至少包含 `SKILL.md`。
+- `SKILL.md` 的 frontmatter 必须包含清晰的 `name` 和 `description`；`name` 要与文件夹名一致。
+- 如有详细模板、长示例、图片、脚本，分别放入 `references/`、`assets/`、`scripts/`，不要把所有内容塞进主文件。
+- 必须同步更新 `README.md` 的 Skill 列表，包含 skill 名称、入口链接和一句用途说明。
+- 必须同步更新 `docs/index.html` 中的网页展示数据，包含 `name`、`path`、`tags`、`desc` 和预览 `content`。
+- 新增网页 tag 时，优先复用已有 tag；确实需要新增时，保持中英文粒度一致，专有名词不要硬翻译。
+- 如仓库采用 UI metadata，例如 `agents/openai.yaml`，新增或大改 skill 后也要同步生成或更新。
+- 通常不需要修改 `download_skill.py`；只有下载逻辑、仓库结构或默认行为变化时才改。
+- 通常不需要修改 `docs/.nojekyll`、favicon 或网页资源；只有页面资源或路径变化时才改。
+- 新增 skill 后，用 `find . -maxdepth 2 -name SKILL.md`、`README.md` 和 `docs/index.html` 互相对照，确认没有漏展示、漏链接或路径写错。
+- 提交前运行 `git diff --check`；若改了 `docs/index.html` 内联脚本，提取脚本或用现有方式做 JS 语法检查。
+
 ## Skill 书写风格
 
 - 优先使用踩点式规则，不写大段多点描述。

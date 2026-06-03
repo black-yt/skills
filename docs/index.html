@@ -889,6 +889,13 @@
         content: '### AI 会议论文写作\n- 用于把 AI 论文组织成清晰的中心命题、能力缺口和论证闭环。\n- 覆盖 Abstract、Introduction、Related Work、Method、Data/Benchmark、Experiments、Analysis、Case Study 和 Appendix。\n- 强调 citation 严谨性、避免 overclaim、图表位置规划、中文大纲与 LaTeX 模板分工。'
       },
       {
+        name: 'browser-render-visualization',
+        path: 'browser-render-visualization/SKILL.md',
+        tags: ['前端', 'Playwright', '截图', 'Canvas'],
+        desc: '使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。',
+        content: '### 浏览器渲染可视化\n- 用真实 Chromium 渲染网页，而不是只检查 HTML 源码。\n- 覆盖本地 HTTP server、Playwright CLI 截图、桌面/移动端 viewport 和 console/pageerror 捕获。\n- 对 Canvas、Three.js、WebGL 页面额外检查截图是否非空白，避免页面打开但核心画面没渲染。'
+      },
+      {
         name: 'docx-splitting',
         path: 'docx-splitting/SKILL.md',
         tags: ['DOCX', '办公', 'Windows'],
@@ -954,9 +961,9 @@
       {
         name: 'pdf-to-images',
         path: 'pdf-to-images/SKILL.md',
-        tags: ['PDF', '图片', 'Ghostscript'],
-        desc: '使用系统级 Ghostscript 将 PDF 页面导出为 PNG 图片，支持单页、页码范围和整篇导出。',
-        content: '### PDF 转图片\n- 用 Ghostscript 将 PDF 页面导出成 PNG。\n- 支持单页、页码范围和整篇导出。\n- 包含参数要点、常见问题和验证步骤。'
+        tags: ['PDF', '图片', 'Ghostscript', 'pdftoppm'],
+        desc: '使用系统级 Ghostscript 或 Poppler pdftoppm 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。',
+        content: '### PDF 转图片\n- 用 Ghostscript 或 Poppler pdftoppm 将 PDF 页面导出成 PNG/JPEG。\n- 支持单页、页码范围、整篇导出和 singlefile 输出。\n- 适合 LaTeX 编译后检查页面截断、图表溢出、字体、公式和表格细节。'
       },
       {
         name: 'wave-mosaic-web-theme',
