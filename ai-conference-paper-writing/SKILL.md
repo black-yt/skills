@@ -26,7 +26,7 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 优先按这个顺序推进：
 
 1. **中心命题。** 一句话说明领域缺少什么关键能力/视角/资源，以及本文如何补上。
-2. **核心包装关键词。** 为题目确定 2-3 词的高层新组合词，例如 `Protocol-Conditioned Action Prediction`。
+2. **标题与核心包装关键词。** 为题目确定 2-3 词的高层新组合词，例如 `Protocol-Conditioned Action Prediction`；标题要体现对象和核心能力，不只写方法名、数据集名或系统名。
 3. **核心挑战。** 提炼 3-4 个学术化、带限定词、能映射到方法和实验的 challenge 词。
 4. **贡献列表。** 3-5 点，名词开头，语法并列，避免实现细节。
 5. **图表计划。** Teaser、Method pipeline、组件/算法图、主表、消融表、分析图表、case 展示。
@@ -127,6 +127,14 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 
 - **Markdown 大纲技巧。** 用于规划结构、给出可画图说明、普通 Markdown 表格、GitHub fenced math block。图表说明用 `>` 引用块；图必须包含详细绘图说明、图内英文文本和 `Figure x. caption`；表格 caption 用 `>`，数据表用普通 Markdown 表格。
 - **LaTeX 成稿技巧。** 用于最终 `.tex` 排版，例如表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}` 和 Appendix `tcolorbox`。
+
+中文 Markdown 大纲阶段不要只列 section 标题，还要提前锁定：
+
+- 每张图、每张表和每个 case 出现在正文的哪个位置。
+- 图的 panel 结构、箭头关系、内部英文文本和 caption。
+- 表格要支撑哪个 claim，列名是否对应 challenge 或核心能力。
+- 主文 case 展示哪些压缩字段，完整 case 放到哪个 appendix section。
+- 未知数字、模型名、指标和失败类型用占位符，不要编造。
 
 具体 Markdown 代码模板见 `references/markdown-writing-templates.md`。
 
@@ -269,10 +277,16 @@ Benchmark/data 工作可以在 Method 或 Data section 中加入数据分布表�
 
 Analysis 图表可以包括 error breakdown、performance by difficulty、scaling trend、metric correlation、invalid distribution、category distribution 或 human/model agreement。
 
+主结果表可以用克制的颜色 heatmap、bold/underline 和分组行提升扫读性；颜色尺度要一致，不要把每个 cell 都染得过重，也不要让视觉样式掩盖数字本身。
+
+主结果表、leaderboard 表或模型对比表中，如果已准备可用 logo，模型名前建议加入对应 provider logo 以提升扫读性；logo 只放在第一列模型名处，不替代模型 citation，也不要重复放在每个数值 cell 里。
+
 每个实验部分采用两段式：
 
 1. 结果段：描述数字和趋势。
 2. Insight 段：解释结果为什么支持核心能力 claim。
+
+LaTeX 成稿中，Analysis 或实验解释段优先用 `\paragraph{Insight ...}` 在段首直接给出核心 insight，再展开数字、原因和影响。不同 insight 不需要强行拆成多个 subsection；2-3 个清晰 paragraph 通常比碎片化小节更利于阅读。
 
 结果低也可以成为贡献，但要解释低分来自任务更长、参数更密、状态依赖更强、输出空间更结构化或错误传播更严重。
 
@@ -312,6 +326,8 @@ Appendix 目标是可复现和可审计：
 Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。
 
 如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/latex-paper-templates.md`。
+
+技术报告型论文、project manuscript 或 internal report 可以使用统一主题色，把 title 横线、页眉、section 标题、链接、teaser、abstract box 和 case box 放进同一套视觉语言。正式会议模板中不要擅自重写 `\maketitle`、页眉或 section 样式，除非已经确认该 venue 和阶段允许自定义。
 
 Conclusion 可以一段，也可以两段。短会议论文通常一段；如果需要同时写 limitations/future work，可以两段。Conclusion 只回扣已有主线：重申问题、方法、结果和未来方向。不要在 Conclusion 引入新概念、新实验或新贡献。
 
@@ -369,6 +385,13 @@ Reviewer-risk 快速检查：
 - Overclaim risk：结论是否超过实验、case 或人工分析支持。
 
 最终四轮检查：结构检查、对应检查、术语检查、证据检查。
+
+LaTeX 成稿最终排版检查：
+
+- 段落末行尽量超过半行，避免只剩 1-3 个词的短尾行。
+- 图、表、case box 和 algorithm 不得超出正文边框、页边距、单栏或双栏范围。
+- 修图表溢出时优先调整浮动位置和相邻段落位置，不改正文 claim、caption、图大小或表格数值。
+- 如果仅靠移动位置无法解决真实宽度溢出，先说明需要用户确认是否允许改图大小、表格布局或内容。
 
 ## 输出风格
 
