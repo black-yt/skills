@@ -18,7 +18,7 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 具体模板分开维护：
 
 - **Markdown reference.** 中文大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、表格占位写法：`references/markdown-writing-templates.md`。
-- **LaTeX reference.** 表格配色、`\cmark/\pmark/\xmark`、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、版面微调、紧凑贡献列表、Appendix `tcolorbox`：`references/latex-paper-templates.md`。
+- **LaTeX reference.** 表格配色、`\cmark/\pmark/\xmark`、模型 logo 表格、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、版面微调、紧凑贡献列表、Appendix `tcolorbox`：`references/latex-paper-templates.md`。
 - **使用规则。** 任务涉及上述模板时，必须读取对应 reference。
 
 ## 工作顺序
