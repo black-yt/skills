@@ -537,6 +537,7 @@ Preamble:
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{amssymb}
+\usepackage{textcomp}
 \usepackage{tcolorbox}
 \tcbuselibrary{breakable, skins}
 
@@ -562,6 +563,31 @@ Preamble:
 ```
 
 第一个参数是颜色强度，通常是 0-100 的归一化整数；第二个参数是展示值。同一个表内保持颜色强度尺度一致。如果表格太花，只给关键指标列上色或降低强度。
+
+### Metric 方向箭头
+
+实验表格的指标表头经常需要标注 higher/lower is better。缩放过的表格中不要直接写数学模式箭头，例如 `\textbf{L2 Final Score $\uparrow$}` 或 `\textbf{Error Rate $\downarrow$}`。在 `adjustbox` / `resizebox` 缩放后，数学箭头可能被压到很小的字号，触发类似 `Font shape ... size <4.4> not available` 和 `Size substitutions` 的 pdfTeX warning。
+
+更稳的写法是使用文本箭头宏：
+
+```latex
+\newcommand{\MetricUp}{\textnormal{\textuparrow}}
+\newcommand{\MetricDown}{\textnormal{\textdownarrow}}
+```
+
+表头写法：
+
+```latex
+\textbf{L2 Final Score \MetricUp}
+\textbf{Error Rate \MetricDown}
+```
+
+使用规则：
+
+- 缩放表格里的表头符号尽量用文本符号宏，不要用数学模式符号。
+- `\MetricUp` 表示 higher is better，`\MetricDown` 表示 lower is better。
+- Caption 或表下注明箭头含义，避免读者误解。
+- 如果模板不想引入 `textcomp`，也可以用普通文本 Unicode 箭头，但要确认当前 LaTeX engine 和字体能稳定编译。
 
 ### Related Work 属性对比符号
 

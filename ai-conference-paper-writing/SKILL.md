@@ -277,7 +277,7 @@ Benchmark/data 工作可以在 Method 或 Data section 中加入数据分布表�
 
 Analysis 图表可以包括 error breakdown、performance by difficulty、scaling trend、metric correlation、invalid distribution、category distribution 或 human/model agreement。
 
-主结果表可以用克制的颜色 heatmap、bold/underline 和分组行提升扫读性；颜色尺度要一致，不要把每个 cell 都染得过重，也不要让视觉样式掩盖数字本身。
+主结果表可以用克制的颜色 heatmap、bold/underline、分组行和方向箭头提升扫读性；颜色尺度要一致，不要把每个 cell 都染得过重，也不要让视觉样式掩盖数字本身。缩放表格表头里的方向箭头优先用文本符号宏，不要直接用数学模式箭头。
 
 主结果表、leaderboard 表或模型对比表中，如果已准备可用 logo，模型名前建议加入对应 provider logo 以提升扫读性；logo 只放在第一列模型名处，不替代模型 citation，也不要重复放在每个数值 cell 里。
 
