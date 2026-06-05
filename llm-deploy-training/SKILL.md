@@ -16,6 +16,48 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 - 失败、skip、OOM 或 dry-run 不应标记数据已消费；只有训练成功后才归档或标记 consumed。
 - 如必须补包，先询问；确需安装单包时优先 `pip install --no-deps <pkg>`。
 
+## 版本与源码追溯
+
+- `vllm`、`swift`、`transformers`、`torch` 行为随版本变化明显；参数不确定时先查当前环境版本、help 和源码。
+- 源码只用于阅读和定位问题，不要改源码，不要直接修改共享环境里的 `site-packages`；需要改库或补 patch 时，先征得用户同意，并优先 clone 源码到项目目录后 editable install。
+- `inspect.getsource(...)` 适合追 Python API；CLI 参数优先看 `vllm serve --help`、`swift sft --help`、`swift rlhf --help`。
+
+```bash
+python - <<'PY'
+import importlib
+
+for name in ["vllm", "swift", "transformers", "torch"]:
+    try:
+        mod = importlib.import_module(name)
+        print(name, getattr(mod, "__version__", "unknown"), getattr(mod, "__file__", "no __file__"))
+    except Exception as exc:
+        print(name, "not importable:", exc)
+PY
+```
+
+```bash
+vllm serve --help | sed -n '1,160p'
+swift sft --help | sed -n '1,160p'
+swift rlhf --help | sed -n '1,180p'
+```
+
+示例：追 vLLM serve 入口或配置类时，先定位模块路径，再按当前版本源码确认参数名：
+
+```bash
+python - <<'PY'
+import inspect
+import vllm
+
+print("vllm:", vllm.__version__, vllm.__file__)
+
+try:
+    from vllm.config import CompilationConfig
+    print(inspect.getsource(CompilationConfig))
+except Exception as exc:
+    print("CompilationConfig unavailable:", exc)
+PY
+```
+
 ## 部署：vLLM OpenAI-compatible 服务
 
 ### 核心经验

@@ -52,6 +52,26 @@ env npm_config_cache=/tmp/.npm \
     npx playwright install chromium
 ```
 
+## Playwright 源码追溯
+
+- Playwright 行为以当前 npm 包和浏览器版本为准；截图、locator、等待条件或 console 捕获异常时，先确认版本和包路径。
+- `require.resolve('playwright')` 可定位 Node 包入口。
+- `npm view playwright version` 可查看 registry 最新版本；不要因此自动升级，升级前先确认。
+- 源码只用于阅读和定位问题，不要改源码，不要直接改 `node_modules`；需要改测试脚本时改项目脚本，需要改依赖时先征得用户同意。
+
+```bash
+node - <<'JS'
+const pw = require('playwright');
+console.log('playwright package:', require.resolve('playwright'));
+console.log('chromium executable:', pw.chromium.executablePath());
+JS
+```
+
+```bash
+npx playwright --version
+npm ls playwright
+```
+
 常见 Linux 依赖包括：
 
 ```bash

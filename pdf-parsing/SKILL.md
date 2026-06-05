@@ -34,6 +34,44 @@ python3 -m pip show structai
 python3 -c "import structai; print(structai.__file__)"
 ```
 
+## `read_pdf` 源码追溯
+
+- `read_pdf` 行为以当前安装版本源码为准；如果缓存、上传、下载、图片路径或返回值和预期不一致，先读源码再判断。
+- `inspect.signature(read_pdf)` 用于看函数参数。
+- `inspect.getsource(read_pdf)` 用于看 `read_pdf` 入口逻辑。
+- `structai.__file__` 和 `structai.pdf.__file__` 用于定位安装包源码文件。
+- 源码只用于阅读和定位问题，不要改源码，不要直接修改 `site-packages` 或共享环境；需要改库时，先 clone `https://github.com/black-yt/structai`，在用户确认后用 editable install。
+
+```bash
+python3 - <<'PY'
+import inspect
+import structai
+import structai.pdf as pdf_mod
+from structai import read_pdf
+
+print("structai:", structai.__file__)
+print("structai.pdf:", pdf_mod.__file__)
+print("signature:", inspect.signature(read_pdf))
+print(inspect.getsource(read_pdf))
+PY
+```
+
+如果要继续追 `read_pdf` 调用的内部函数，先查看 `structai.pdf` 模块源码路径，再按函数名读取：
+
+```bash
+python3 - <<'PY'
+import inspect
+import structai.pdf as pdf_mod
+
+print(pdf_mod.__file__)
+for name in ["get_headers"]:
+    obj = getattr(pdf_mod, name, None)
+    if obj is not None:
+        print(f"\n===== {name} =====")
+        print(inspect.getsource(obj))
+PY
+```
+
 ## MinerU Token
 
 `structai.read_pdf` 会调用 MinerU 精准解析 API。该 API 需要 Token，且请求头格式为 `Authorization: Bearer <Token>`。

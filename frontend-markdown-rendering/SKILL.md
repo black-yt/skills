@@ -50,6 +50,32 @@ mermaid.initialize({
 });
 ```
 
+## 库版本与源码追溯
+
+- `marked`、`DOMPurify`、`KaTeX`、`Mermaid` 行为会随版本变化；渲染异常时先确认页面实际加载版本。
+- CDN URL 中固定版本号，不要使用无版本 latest。
+- 本地项目若通过 npm 管理依赖，可用 `require.resolve(...)` 定位源码入口。
+- 源码只用于阅读和定位问题，不要改源码，不要直接改 CDN 压缩文件或 `node_modules`；需要 patch 时写项目侧 wrapper/helper，并保留最小复现。
+
+```js
+console.log('marked', marked?.version || marked);
+console.log('DOMPurify', DOMPurify?.version || DOMPurify);
+console.log('katex', katex?.version || katex);
+console.log('mermaid', mermaid?.version || mermaid);
+```
+
+```bash
+node - <<'JS'
+for (const name of ['marked', 'dompurify', 'katex', 'mermaid']) {
+  try {
+    console.log(name, require.resolve(name));
+  } catch (error) {
+    console.log(name, 'not installed locally; check CDN URL instead');
+  }
+}
+JS
+```
+
 ## 渲染触发条件
 
 只在最终结果消息上启用 Markdown：

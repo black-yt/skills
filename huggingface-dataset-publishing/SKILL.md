@@ -42,6 +42,41 @@ if token:
     login(token=token)
 ```
 
+## 源码追溯
+
+- `datasets` 和 `huggingface_hub` 版本更新较快；当 `Features`、`Image`、`Sequence`、`push_to_hub` 或 `load_dataset` 行为不符合预期时，优先查看当前安装版本源码。
+- `module.__file__` 可定位安装路径。
+- `inspect.getsource(...)` 可查看函数、类或方法实现。
+- 源码只用于阅读和定位问题，不要改源码，不要直接修改 `site-packages`；需要修改依赖时先征得用户同意。
+
+```bash
+python - <<'PY'
+import inspect
+import datasets
+import huggingface_hub
+from datasets import Dataset, DatasetDict, Features, Image, Sequence, load_dataset
+
+print("datasets:", datasets.__version__, datasets.__file__)
+print("huggingface_hub:", huggingface_hub.__version__, huggingface_hub.__file__)
+print("Dataset.push_to_hub:")
+print(inspect.getsource(Dataset.push_to_hub))
+print("load_dataset:")
+print(inspect.getsource(load_dataset))
+PY
+```
+
+图片字段相关问题可重点追 `datasets.Image` 和 `Sequence`：
+
+```bash
+python - <<'PY'
+import inspect
+from datasets import Image, Sequence
+
+print(inspect.getsource(Image))
+print(inspect.getsource(Sequence))
+PY
+```
+
 ## 数据结构选择
 
 常见字段设计：

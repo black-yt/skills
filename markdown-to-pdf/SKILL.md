@@ -23,6 +23,27 @@ pip install markdown2 weasyprint
 python -c "import markdown2; from weasyprint import HTML; print('md2pdf deps ok')"
 ```
 
+## 源码追溯
+
+- Markdown 转 HTML 和 HTML 转 PDF 的行为分别由 `markdown2` 和 `WeasyPrint` 决定；表格、代码块、图片路径、字体或 CSS 问题不确定时，先查看当前安装版本源码。
+- `module.__file__` 可定位安装路径。
+- `inspect.getsource(...)` 可查看关键函数或类。
+- 源码只用于阅读和定位问题，不要改源码，不要直接改 `site-packages`；优先调整本仓库脚本的参数、CSS 或 wrapper。
+
+```bash
+python - <<'PY'
+import inspect
+import markdown2
+import weasyprint
+from weasyprint import HTML
+
+print("markdown2:", getattr(markdown2, "__version__", "unknown"), markdown2.__file__)
+print("weasyprint:", getattr(weasyprint, "__version__", "unknown"), weasyprint.__file__)
+print(inspect.getsource(markdown2.markdown))
+print(inspect.getsource(HTML.write_pdf))
+PY
+```
+
 ## 脚本
 
 优先使用 bundled script：
