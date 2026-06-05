@@ -30,6 +30,7 @@ skill-name/
 | `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
+| `researchharness` | [`researchharness/SKILL.md`](researchharness/SKILL.md) | 使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。 |
 | `structai` | [`structai/SKILL.md`](structai/SKILL.md) | 使用 StructAI Python 工具箱搭建 LLM workflow，覆盖 `LLMAgent`、结构化输出、Judge、并发、文件/PDF 工具、文本解析、私网 no_proxy 和 timeout。 |
 | `lab-cluster-1` | [`lab-cluster-1/SKILL.md`](lab-cluster-1/SKILL.md) | 在 lab cluster 1 / PJLAB 上处理开发机登录、路径和环境、网络代理、模型权重、`rlaunch`/`rjob`、服务部署和排错等集群工作流。 |
 

@@ -11,16 +11,37 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 - 部署脚本使用环境变量配置模型路径、端口、上下文长度、工具调用、多模态限制和 CUDA Graph 策略。
 - 多模态服务必须显式设置 `--limit-mm-per-prompt`，不要依赖 vLLM 默认值或旧脚本默认值。
 - Qwen3.5 工具调用优先使用官方推荐的 auto tool choice 与 parser 参数。
+- 对 vLLM 这类成熟第三方库，优先读官方教程、recipe、serving 文档和 API 文档；官方文档不能解释当前版本行为时，再做只读源码追溯。
 - 训练输出目录不要放在代码仓库里；放到 base checkpoint 同级或专用的大容量模型目录。
 - 训练数据先做 JSONL 格式校验、字段校验和 max length 过滤，再启动训练。
 - 失败、skip、OOM 或 dry-run 不应标记数据已消费；只有训练成功后才归档或标记 consumed。
 - 如必须补包，先询问；确需安装单包时优先 `pip install --no-deps <pkg>`。
 
-## 版本与源码追溯
+## 版本、官方文档与源码追溯
 
-- `vllm`、`swift`、`transformers`、`torch` 行为随版本变化明显；参数不确定时先查当前环境版本、help 和源码。
+- `vllm`、`swift`、`transformers`、`torch` 行为随版本变化明显；参数不确定时先查当前环境版本和官方文档，再看 CLI help，最后才读源码。
+- vLLM 这类知名库应优先使用官方教程、官方 recipe、serving 文档和 API 文档，不要把源码阅读作为第一反应。
+- 源码适合确认当前安装版本的实际参数名、默认值、兼容分支和错误路径；不适合替代官方教程来学习推荐用法。
 - 源码只用于阅读和定位问题，不要改源码，不要直接修改共享环境里的 `site-packages`；需要改库或补 patch 时，先征得用户同意，并优先 clone 源码到项目目录后 editable install。
 - `inspect.getsource(...)` 适合追 Python API；CLI 参数优先看 `vllm serve --help`、`swift sft --help`、`swift rlhf --help`。
+
+vLLM 官方阅读顺序：
+
+1. 先确认当前安装版本：`python -c 'import vllm; print(vllm.__version__)'`。
+2. 在 vLLM 官方文档站选择与当前安装版本匹配的文档版本；不要把 `stable`、`latest` 或某个历史版本链接当作固定答案。
+3. 依次阅读该版本下的文档首页、OpenAI-compatible server、相关模型/场景 recipe 和 API 文档。
+4. 再看当前环境 CLI help：`vllm serve --help`。
+5. 最后只读追溯当前安装版本源码；不修改源码或环境。
+
+版本匹配链接模板。把 `<matched-vllm-doc-version>` 替换为官方文档站里与当前 `vllm.__version__` 对应的版本路径；如果官方文档没有完全相同版本，选择最接近的同系列版本，并在任务记录中写明所选文档版本：
+
+```text
+VLLM_DOCS_BASE="https://docs.vllm.ai/en/<matched-vllm-doc-version>/"
+VLLM_OPENAI_SERVER_DOC="${VLLM_DOCS_BASE}serving/openai_compatible_server/"
+VLLM_COMPILATION_DOC="${VLLM_DOCS_BASE}api/vllm/config/compilation/"
+VLLM_RECIPES_BASE="https://docs.vllm.ai/projects/recipes/en/<matched-vllm-doc-version>/"
+VLLM_QWEN35_RECIPE="${VLLM_RECIPES_BASE}Qwen/Qwen3.5.html"
+```
 
 ```bash
 python - <<'PY'
@@ -102,8 +123,8 @@ SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'
 
 官方参考：
 
-- https://docs.vllm.ai/projects/recipes/en/latest/Qwen/Qwen3.5.html
-- https://docs.vllm.ai/en/stable/api/vllm/config/compilation.html
+- 使用前先按当前 `vllm.__version__` 选择匹配的 vLLM 文档版本。
+- 查 OpenAI-compatible server、Qwen/Qwen3.5 recipe 和 compilation config 时，使用上文的版本匹配链接模板，不要写死 `stable` 或 `latest`。
 
 ### 服务脚本模板
 
@@ -277,6 +298,79 @@ print(resp.choices[0].message.content)
 PY
 ```
 
+### 本地访问集群内网服务
+
+如果 vLLM 服务部署在集群 GPU/CPU 节点上，服务可能只暴露在集群内网 `10.x.x.x`、`100.x.x.x` 或类似私网地址。本地电脑通常不能直接访问这个地址，直连 `http://<service_ip>:<port>/v1` 超时是正常现象。此时使用 SSH local port forwarding：
+
+```text
+本地电脑 127.0.0.1:<local_port>
+  -> SSH 登录开发机 / 跳板机
+  -> 转发到集群内网服务 <service_ip>:<service_port>
+```
+
+通用模板。在本地电脑终端执行，不是在远端开发机 shell 内执行：
+
+```bash
+ssh -N -T \
+  -L <local_port>:<service_ip>:<service_port> \
+  <cluster_login_user>@<cluster_login_host>
+```
+
+如果同时有 raw vLLM 和上层 OpenAI-compatible proxy / overlay 服务，可以转发多个端口：
+
+```bash
+ssh -N -T \
+  -L 18010:<raw_vllm_service_ip>:8010 \
+  -L 18011:<overlay_service_ip>:8011 \
+  <cluster_login_user>@<cluster_login_host>
+```
+
+参数含义：
+
+- `-L <local_port>:<service_ip>:<service_port>`：把本地 `127.0.0.1:<local_port>` 转发到集群内网服务。
+- `-N`：只建立转发，不执行远端命令。
+- `-T`：不分配 TTY，更适合纯转发。
+- SSH 命令必须保持运行；终端关闭、网络断开或 `Ctrl-C` 后转发失效。
+- 本地端口冲突时换端口，例如 `18010`、`18011`、`28010`。
+- 不要把本地监听暴露成 `0.0.0.0`，除非用户明确要求并确认安全边界。
+
+本地测试：
+
+```bash
+curl http://127.0.0.1:18010/v1/models \
+  -H "Authorization: Bearer <API_KEY>"
+
+curl http://127.0.0.1:18011/v1/models \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+本地 OpenAI SDK：
+
+```python
+from openai import OpenAI
+
+client = OpenAI(
+    api_key="<API_KEY>",
+    base_url="http://127.0.0.1:18010/v1",
+)
+
+model = client.models.list().data[0].id
+response = client.chat.completions.create(
+    model=model,
+    messages=[{"role": "user", "content": "hello"}],
+)
+print(response.choices[0].message.content)
+```
+
+排错顺序：
+
+1. 在开发机或集群可访问节点上先确认 `curl http://<service_ip>:<service_port>/v1/models` 可通。
+2. 确认 vLLM 服务监听 `0.0.0.0`，不是只监听 `127.0.0.1`。
+3. 确认 SSH 转发终端仍在运行。
+4. 本地 `curl http://127.0.0.1:<local_port>/v1/models` 超时，优先检查转发是否断开、服务 IP/端口是否变化、job 是否重启。
+5. 返回 `401` 时，检查是否使用了该服务 `.env` 或部署脚本中配置的 `API_KEY`。
+6. rjob / worker 重启后，内网 IP 可能变化；重新从服务日志读取 `SERVICE_IP`、`[INFO] ip=`、`SOCKET_IP` 或 `MASTER_ADDR`，再更新 `ssh -L`。
+
 128k、多模态和 CUDA Graph capture 的首轮启动可能需要几分钟。先看日志是否还在加载权重、profile 或 capture，不要只因为 `/v1/models` 尚未返回就立刻判断失败。
 
 常见问题：
@@ -285,6 +379,7 @@ PY
 - **工具调用不解析。** 检查是否启用 `--enable-auto-tool-choice --tool-call-parser qwen3_coder`。
 - **CUDA Graph 失败。** 先试 `ENFORCE_EAGER=1`；若想保留 graph，试 `SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'`。
 - **OOM。** 先降 `MAX_NUM_SEQS`、`MAX_NUM_BATCHED_TOKENS` 或 `GPU_MEMORY_UTILIZATION`，再考虑降低 `MAX_MODEL_LEN` 或增加 GPU。
+- **本地不能访问集群内网服务。** 使用 SSH local port forwarding，把本地 `127.0.0.1:<local_port>` 转发到集群内网 `<service_ip>:<service_port>`。
 
 ## 训练：ms-swift SFT / DPO / GRPO
 
