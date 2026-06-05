@@ -935,7 +935,7 @@
         path: 'lab-cluster-1/SKILL.md',
         tags: ['集群', 'CPU/GPU', '远程'],
         desc: '处理 CPU/GPU 集群上的开发机登录、路径和环境、网络代理、模型权重、rlaunch/rjob、服务部署和排错等工作流。',
-        content: '### CPU/GPU 集群\n- 覆盖开发机、worker、rjob 任务、代理、路径规范、模型权重和服务部署。\n- 支持把集群内网 vLLM/OpenAI-compatible 服务通过 SSH local port forwarding 转发到本地访问。\n- 复杂远程工作优先交互式 SSH，会话中持续操作；不要擅自修改长期配置、安装软件或污染共享存储。'
+        content: '### CPU/GPU 集群\n- 覆盖开发机、worker、rjob 任务、代理、路径规范、模型权重和服务部署。\n- 支持把集群内网 HTTP/API/TCP 服务通过 SSH local port forwarding 转发到本地访问，不限于 vLLM。\n- 复杂远程工作优先交互式 SSH，会话中持续操作；不要擅自修改长期配置、安装软件或污染共享存储。'
       },
       {
         name: 'latex-compiling',

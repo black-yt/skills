@@ -1188,7 +1188,7 @@ export NO_PROXY="$no_proxy"
 curl --max-time 20 "http://$SERVICE_IP:$PORT/v1/models"
 ```
 
-本地电脑访问集群内网服务时使用 SSH local port forwarding。集群服务通常只暴露在 PJLAB 内网 `10.x.x.x` 或 `100.x.x.x`，本地电脑直连 `http://100.x.x.x:<port>` 超时是正常现象。把本地端口通过开发机转发到集群内网服务后，本地 OpenAI SDK 只访问 `http://127.0.0.1:<local_port>/v1`：
+本地电脑访问集群内网服务时使用 SSH local port forwarding。这个方法不限于 vLLM；任何只在集群内网可达、但需要在本地访问的服务都可以用类似方式，例如 vLLM/OpenAI-compatible API、context-overlay、HTTP dashboard、Jupyter、Web UI、metric endpoint 或项目自定义 API。集群服务通常只暴露在 PJLAB 内网 `10.x.x.x` 或 `100.x.x.x`，本地电脑直连 `http://100.x.x.x:<port>` 超时是正常现象。把本地端口通过开发机转发到集群内网服务后，本地客户端只访问 `127.0.0.1:<local_port>`；如果服务是 OpenAI-compatible，再把 base URL 写成 `http://127.0.0.1:<local_port>/v1`：
 
 ```text
 本地电脑 127.0.0.1:<local_port>
@@ -1204,7 +1204,7 @@ ssh -N -T \
   agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
 ```
 
-如果同时有 raw vLLM 和上层 OpenAI-compatible proxy / overlay 服务，可以转发多个端口：
+如果同时有多个内网服务，可以转发多个端口：
 
 ```bash
 ssh -N -T \
@@ -1233,11 +1233,11 @@ ssh -N -T \
 
 示例含义：
 
-- `18010 -> 100.96.167.106:8010`：raw vLLM 服务。
-- `18011 -> 100.101.195.51:8011`：context-overlay 或其他上层 OpenAI-compatible 代理服务。
-- raw 服务和 overlay 服务可以同时转发，只要本地端口不同。
+- `18010 -> 100.96.167.106:8010`：某个内网服务，例如 raw vLLM/OpenAI-compatible API。
+- `18011 -> 100.101.195.51:8011`：另一个内网服务，例如 context-overlay、Web UI 或自定义 API。
+- 多个服务可以同时转发，只要本地端口不同。
 
-本地测试：
+本地测试。路径按服务类型决定；OpenAI-compatible 服务用 `/v1/models`，普通 HTTP 服务用它自己的健康检查路径、首页或 API path：
 
 ```bash
 curl http://127.0.0.1:18010/v1/models \
@@ -1245,9 +1245,11 @@ curl http://127.0.0.1:18010/v1/models \
 
 curl http://127.0.0.1:18011/v1/models \
   -H "Authorization: Bearer <API_KEY>"
+
+curl http://127.0.0.1:<local_port>/<health_or_service_path>
 ```
 
-本地 Python OpenAI SDK：
+如果是 OpenAI-compatible 服务，本地 Python OpenAI SDK 写法如下：
 
 ```python
 from openai import OpenAI
@@ -1268,11 +1270,11 @@ print(response.choices[0].message.content)
 
 SSH 转发排错：
 
-- 先在开发机或集群可访问节点上确认 `curl http://<service_ip>:<service_port>/v1/models` 可访问。
+- 先在开发机或集群可访问节点上确认 `curl http://<service_ip>:<service_port>/<service_path>` 可访问；OpenAI-compatible 服务可测 `/v1/models`。
 - 确认服务监听 `0.0.0.0`，不是只监听 `127.0.0.1`。
 - 再在本地确认 SSH 转发终端仍在运行。
-- 本地 `curl http://127.0.0.1:<local_port>/v1/models` 超时，多数是转发断开、IP/端口过期、服务未监听 `0.0.0.0` 或 rjob 已重启。
-- 返回 `401` 时，检查 API key；通常需要使用对应服务 `.env` 里的 `API_KEY`，不要混用本地其他 key。
+- 本地 `curl http://127.0.0.1:<local_port>/<service_path>` 超时，多数是转发断开、IP/端口过期、服务未监听 `0.0.0.0` 或 rjob 已重启。
+- 返回 `401`、`403` 或其他业务鉴权错误时，检查服务自己的 API key、cookie、token 或认证头；OpenAI-compatible 服务通常需要使用对应服务 `.env` 里的 `API_KEY`，不要混用本地其他 key。
 - rjob 重启后 `100.x.x.x` / `10.x.x.x` 可能变化，重新查 `SERVICE_IP`、`[INFO] ip=`、`SOCKET_IP` 或 `MASTER_ADDR`，再更新 `ssh -L`。
 
 rlaunch worker 的 KAPI 访问需要 worker id、分区和端口，并从环境变量读取 KAPI AK/SK：
