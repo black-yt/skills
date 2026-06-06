@@ -278,7 +278,20 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 - `.env` 只补齐缺失变量，不覆盖 shell 中已经 export 的进程环境变量。
 - Python 参数名对应大写环境变量，例如 `max_rounds` 对应 `MAX_ROUNDS`，`compact_trigger_tokens` 对应 `COMPACT_TRIGGER_TOKENS`。
 - CLI 中 `--workspace-root` 优先于 `WORKSPACE_ROOT`。
+- API server 中，request-local `model`、`extra_body["workspace-root"]`、`extra_body["llm-extra-body"]` 只覆盖当前请求。
 - `--trace-dir` 没有环境变量等价项；只有显式传入时才写 trace/session state。
+
+Provider-specific `extra_body`：
+
+- 用于传递 OpenAI-compatible provider 的非标准字段，例如 provider-specific thinking / reasoning 开关。
+- ResearchHarness 只校验它是 JSON object / Python dict，不解释字段含义，不写死 provider 名或字段名。
+- Python API：`create_agent(..., extra_body={"enable_thinking": False})`。
+- CLI：`--llm-extra-body-json '{"enable_thinking": false}'`。
+- API server：OpenAI SDK 请求中写 `extra_body={"llm-extra-body": {"enable_thinking": false}}`。
+- API server 的 `extra_body["workspace-root"]` 是 ResearchHarness 请求控制字段，不会转发给底层模型。
+- API server 中 provider-specific 字段必须放进 `llm-extra-body`，不要直接放在顶层 `extra_body`。
+- invalid list/string/null 等非 object 值会在 agent run 开始前被拒绝。
+- 如果上游 provider 不支持某字段，可能由 provider 拒绝请求；开启 thinking / reasoning 时通常需要调高 `MAX_OUTPUT_TOKENS` 或 `max_output_tokens`。
 
 2026-06-06 后的迁移提示：
 
@@ -350,6 +363,13 @@ rh-agent "Read the image and return JSON." \
   --images /path/to/image-1.png /path/to/image-2.png
 ```
 
+传 provider-specific `extra_body`：
+
+```bash
+rh-agent "Answer briefly." \
+  --llm-extra-body-json '{"enable_thinking": false}'
+```
+
 常用 CLI 参数：
 
 | 参数 | 必需 | 说明 |
@@ -364,6 +384,7 @@ rh-agent "Read the image and return JSON." \
 | `--no-chat` | 否 | 强制一问一答，适合脚本或 benchmark。 |
 | `--tool NAME` | 否，可重复 | 定义完整工具全集；不能和 `--extra-tool` 同用。 |
 | `--extra-tool NAME` | 否，可重复 | 启用 optional compatibility tool，例如 `str_replace_editor`。 |
+| `--llm-extra-body-json JSON` | 否 | provider-specific OpenAI-compatible request `extra_body` object。 |
 
 交互式终端中，CLI 默认在 final answer 后等待 follow-up，并保留消息、工具结果和图片路径提示。脚本或 benchmark 需要一问一答时使用 `--no-chat`。
 
@@ -387,6 +408,7 @@ agent = create_agent(
     max_input_tokens=131072,
     max_output_tokens=4096,
     compact_trigger_tokens="96k",
+    extra_body={"enable_thinking": False},
 )
 
 answer = agent.run(
@@ -405,6 +427,7 @@ answer = run_agent(
     workspace_root="./workspace",
     role_prompt="Be concise.",
     images=["/abs/path/to/image-1.png"],
+    extra_body={"enable_thinking": False},
 )
 ```
 
@@ -569,6 +592,28 @@ print(response.choices[0].message.content)
 - 裸模型名如 `gpt-5.5` 会被拒绝。
 - 覆盖只影响当前请求，不修改环境变量，也不影响其他并发请求。
 
+provider-specific model 选项：
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="unused", base_url="http://127.0.0.1:8686/v1")
+
+response = client.chat.completions.create(
+    model="RH--Qwen/Qwen3.5-9B",
+    messages=[{"role": "user", "content": "Answer briefly."}],
+    extra_body={"llm-extra-body": {"enable_thinking": False}},
+)
+```
+
+`llm-extra-body` 要求：
+
+- 必须是 JSON object。
+- 只影响当前 API 请求，不修改 server 默认值，也不影响其他并发请求。
+- 会被原样转发为底层 OpenAI SDK request 的 `extra_body`。
+- ResearchHarness 不解释 provider-specific key；字段是否有效由上游 provider 决定。
+- thinking / reasoning 模式通常会占用更多 completion token，必要时同步调高 `MAX_OUTPUT_TOKENS` 或请求的 `max_completion_tokens`。
+
 自定义 workspace：
 
 ```python
@@ -605,6 +650,8 @@ response = client.chat.completions.create(
 
 - 当前 API 是 conversation-level stateless；每个 HTTP request 是一次隔离 run。
 - 需要多轮 API 对话时，客户端自己管理历史并传入 messages。
+- `extra_body["workspace-root"]` 和 `extra_body["llm-extra-body"]` 都是 request-local 控制字段。
+- `workspace-root` 用于选择 agent workspace；`llm-extra-body` 才会转发给底层模型。
 - `stream` 必须不存在或为 `false`。
 - `n` 必须不存在或为 `1`。
 - 支持 `system`、`user`、`assistant` role；不支持 `tool` role。
