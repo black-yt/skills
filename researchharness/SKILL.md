@@ -109,7 +109,7 @@ python3 run_frontend.py
 8. 如果 assistant 返回 tool calls，按并发规则执行工具，把结果写回 messages 和 trace。
 9. 如果 `ReadImage` 产生图像上下文，在下一轮把压缩图片作为 `image_url` content part 传给模型。
 10. 如果 assistant 返回可接受的普通文本，作为 final result 结束。
-11. 如果达到 round、LLM call、runtime、timeout 或 protocol error 边界，写入 termination/error。
+11. 如果达到 round、runtime、timeout 或 protocol error 边界，写入 termination/error。
 12. 如果启用了 trace/session state，落盘 `trace_*.jsonl` 和 `session_state_*.json`。
 
 执行边界：
