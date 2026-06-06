@@ -216,19 +216,18 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 常用可选变量：
 
 - `WORKSPACE_ROOT`
-- `MAX_LLM_CALL_PER_RUN`
-- `MAX_AGENT_ROUNDS`
-- `MAX_AGENT_RUNTIME_SECONDS`
-- `LLM_TIMEOUT_SECONDS`
+- `MAX_ROUNDS`
+- `MAX_RUNTIME_SECONDS`
+- `TIMEOUT_SECONDS`
 - `WEBFETCH_TIMEOUT_SECONDS`
 - `WEBFETCH_MAX_CHARS`
-- `LLM_MAX_OUTPUT_TOKENS`
+- `MAX_OUTPUT_TOKENS`
 - `MAX_INPUT_TOKENS`
-- `LLM_MAX_RETRIES`
+- `MAX_RETRIES`
 - `TEMPERATURE`
 - `TOP_P`
 - `PRESENCE_PENALTY`
-- `AUTO_COMPACT_TRIGGER_TOKENS`
+- `COMPACT_TRIGGER_TOKENS`
 - `IMAGE_PART_TOKEN_ESTIMATE`
 - `LLM_IMAGE_MAX_EDGE`
 - `LLM_IMAGE_MAX_BYTES`
@@ -243,19 +242,18 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
 | `WORKSPACE_ROOT` | `./workspace` | 未显式传 workspace 时使用。 |
-| `MAX_LLM_CALL_PER_RUN` | `100` | 单次 run 最大 LLM 调用数。 |
-| `MAX_AGENT_ROUNDS` | `100` | ReAct loop 最大轮次。 |
-| `MAX_AGENT_RUNTIME_SECONDS` | `9000` | 单次 run 最大秒数。 |
-| `LLM_TIMEOUT_SECONDS` | `600` | 单次 LLM 请求 timeout。 |
-| `WEBFETCH_TIMEOUT_SECONDS` | `180` | 单次 WebFetch 总 timeout。 |
-| `WEBFETCH_MAX_CHARS` | `30000` | 单次 WebFetch 返回字符上限。 |
-| `LLM_MAX_OUTPUT_TOKENS` | `10000` | 请求模型输出 token 上限。 |
-| `MAX_INPUT_TOKENS` | `320000` | runtime token accounting 输入预算。 |
-| `LLM_MAX_RETRIES` | `10` | LLM API 瞬时错误最大重试次数。 |
+| `MAX_ROUNDS` | `500` | ReAct loop 最大轮次。 |
+| `MAX_RUNTIME_SECONDS` | `10800` | 单次 run 最大秒数。 |
+| `TIMEOUT_SECONDS` | `1200` | 单次 chat-completions 请求 timeout。 |
+| `WEBFETCH_TIMEOUT_SECONDS` | `300` | 单次 WebFetch 总 timeout。 |
+| `WEBFETCH_MAX_CHARS` | `40960` | 单次 WebFetch 返回字符上限。 |
+| `MAX_OUTPUT_TOKENS` | `40960` | 请求模型输出 token 上限。 |
+| `MAX_INPUT_TOKENS` | `128000` | runtime token accounting 输入预算。 |
+| `MAX_RETRIES` | `10` | LLM API 瞬时错误最大重试次数。 |
 | `TEMPERATURE` | `0.6` | 主模型 temperature。 |
 | `TOP_P` | `0.95` | 主模型 top-p。 |
-| `PRESENCE_PENALTY` | `1.1` | provider 支持时使用。 |
-| `AUTO_COMPACT_TRIGGER_TOKENS` | `128k` | 自动上下文压缩触发阈值。 |
+| `PRESENCE_PENALTY` | `1.00` | provider 支持时使用。 |
+| `COMPACT_TRIGGER_TOKENS` | `96k` | 自动上下文压缩触发阈值。 |
 | `IMAGE_PART_TOKEN_ESTIMATE` | `1536` | 每个 image content part 的 token 估计。 |
 | `LLM_IMAGE_MAX_EDGE` | `1568` | 发送给多模态模型的图片最大边长。 |
 | `LLM_IMAGE_MAX_BYTES` | `524288` | 发送给多模态模型的压缩图片最大字节数。 |
@@ -266,6 +264,25 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 ```text
 explicit Python/API/CLI arguments > process environment variables > .env > code defaults
 ```
+
+配置边界：
+
+- `.env` 只补齐缺失变量，不覆盖 shell 中已经 export 的进程环境变量。
+- Python 参数名对应大写环境变量，例如 `max_rounds` 对应 `MAX_ROUNDS`，`compact_trigger_tokens` 对应 `COMPACT_TRIGGER_TOKENS`。
+- CLI 中 `--workspace-root` 优先于 `WORKSPACE_ROOT`。
+- `--trace-dir` 没有环境变量等价项；只有显式传入时才写 trace/session state。
+
+2026-06-06 后的迁移提示：
+
+| 旧变量 | 当前处理 |
+| --- | --- |
+| `MAX_AGENT_ROUNDS` | 改用 `MAX_ROUNDS`。 |
+| `MAX_AGENT_RUNTIME_SECONDS` | 改用 `MAX_RUNTIME_SECONDS`。 |
+| `LLM_TIMEOUT_SECONDS` | 改用 `TIMEOUT_SECONDS`。 |
+| `LLM_MAX_OUTPUT_TOKENS` | 改用 `MAX_OUTPUT_TOKENS`。 |
+| `LLM_MAX_RETRIES` | 改用 `MAX_RETRIES`。 |
+| `AUTO_COMPACT_TRIGGER_TOKENS` | 改用 `COMPACT_TRIGGER_TOKENS`。 |
+| `MAX_LLM_CALL_PER_RUN` | 已移除，没有等价的新环境变量；不要继续写入新脚本。 |
 
 正式使用前运行工具可用性检查：
 
@@ -732,8 +749,8 @@ trace 特点：
 
 自动 compaction：
 
-- 默认触发阈值是 `128k`。
-- CLI/env 可用 `AUTO_COMPACT_TRIGGER_TOKENS=16k`。
+- 默认触发阈值是 `96k`。
+- CLI/env 可用 `COMPACT_TRIGGER_TOKENS=16k`。
 - Python API 可用 `compact_trigger_tokens="32k"`。
 
 ## Benchmark Adapters
