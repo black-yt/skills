@@ -195,6 +195,14 @@ PY
 
 ## 环境变量
 
+启动前要求：
+
+- 运行 ResearchHarness 前必须先配置 `.env.example` 中对应的必需变量。
+- 必需变量不只是 LLM 服务；联网和解析工具的 key 也必须配置。
+- 没有填齐 `SERPER_KEY`、`JINA_KEY`、`MINERU_TOKEN` 时，不要开始真实任务，因为 `WebSearch`、`ScholarSearch`、`WebFetch`、`ReadPDF` 会不可用。
+- 如果是源码 checkout，可以从 `.env.example` 复制为 `.env`，再替换占位符。
+- 不要把缺少 key、依赖缺失、额度耗尽或外部服务不可用当成“可跳过”的问题；这类情况都应该先修好。
+
 必需变量：
 
 ```env
@@ -290,7 +298,13 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 python3 tests/test_tool_availability.py
 ```
 
-如果 `WebSearch`、`ScholarSearch`、`WebFetch` 或 `ReadPDF` 出现 network、TLS、upload、download、PDF parsing 错误，优先尝试关闭 VPN/proxy 后重试。
+检查要求：
+
+- 真实任务开始前必须跑完整工具可用性检查。
+- 预期结果是所有工具通过；只要有工具失败，就不要把当前 ResearchHarness 环境视为可用。
+- 如果失败来自 missing credentials、missing dependencies、exhausted service credits 或 unavailable external tools，应先修复，而不是跳过。
+- 如果 `WebSearch`、`ScholarSearch`、`WebFetch` 或 `ReadPDF` 出现 network、TLS、upload、download、PDF parsing 错误，优先尝试关闭 VPN/proxy 后重试。
+- 如果源码 checkout 里需要机器可读结果，可运行 `python3 tests/test_tool_availability.py --json`。
 
 ## CLI 运行
 
@@ -804,6 +818,9 @@ PY
 ```bash
 python3 tests/test_tool_availability.py
 ```
+
+- 真实任务前必须要求所有工具通过。
+- 需要机器可读结果时使用 `python3 tests/test_tool_availability.py --json`。
 
 推荐测试：
 
