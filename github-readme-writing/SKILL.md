@@ -177,6 +177,39 @@ flowchart TD
 
 如果 Mermaid 在目标平台不渲染，要提供 PNG fallback 或截图。
 
+## 多图懒加载与折叠
+
+当 README 中图片很多、首屏加载很慢、页面滚动卡顿或 GitHub 图片请求过多时，把非首屏图片组放进 `<details>`，并给图片加 `loading="lazy"`。
+
+使用规则：
+
+- 首屏 teaser、核心架构图、最重要 demo 图不要折叠。
+- 长截图、补充实验图、笔记截图、gallery、历史 demo、完整 case 图可以折叠。
+- `<summary>` 要写清楚展开后是什么内容，不要只写 “more”。
+- 图片继续使用本地相对路径，优先放在 `assets/`、`images/` 或 `docs/assets/`。
+- 每张图片都保留 `alt`；如果图片只作视觉展示，也至少写简短描述。
+- `width` 用百分比或固定宽度控制，不要让大图撑爆 README。
+- 一组图片中每张图都用独立的居中 `<p>`，避免 GitHub Markdown 解析错位。
+
+可复制模板：
+
+```markdown
+<details>
+<summary>展开/收起补充图片</summary>
+
+<p align="center">
+  <img loading="lazy" src="images/example-1.png" alt="Example screenshot 1" width="60%">
+</p>
+
+<p align="center">
+  <img loading="lazy" src="images/example-2.png" alt="Example screenshot 2" width="60%">
+</p>
+
+</details>
+```
+
+如果折叠区里图片仍然加载慢，优先压缩图片、缩小分辨率、改用 WebP/PNG 合理格式，或减少 README 中直接展示的图片数量，把更多图片放到独立 docs 页面。
+
 ## How It Works
 
 用 `Understanding [Project]` 或 `How It Works` 做解释章节。结构：
