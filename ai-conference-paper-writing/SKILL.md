@@ -386,6 +386,11 @@ Reviewer-risk 快速检查：
 
 最终四轮检查：结构检查、对应检查、术语检查、证据检查。
 
+GitHub Markdown 初稿检查：
+
+- 如果中文大纲、项目页或 README 需要在 GitHub 预览公式，按 Markdown reference 检查 `math` 围栏、`y_{<t}`、高风险宏和表格公式。
+- 不要用 LaTeX 成稿规则替代 GitHub Markdown 公式规则；两者的渲染环境不同。
+
 LaTeX 成稿最终排版检查：
 
 - 段落末行尽量超过半行，避免只剩 1-3 个词的短尾行。
