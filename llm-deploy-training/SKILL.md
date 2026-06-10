@@ -1,6 +1,6 @@
 ---
 name: llm-deploy-training
-description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、数据校验、显存排错和训练检查。"
+description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、数据校验、显存排错和训练检查。"
 ---
 
 # LLM Deploy And Training
@@ -11,6 +11,7 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 - 部署脚本使用环境变量配置模型路径、端口、上下文长度、工具调用、多模态限制和 CUDA Graph 策略。
 - 多模态服务必须显式设置 `--limit-mm-per-prompt`，不要依赖 vLLM 默认值或旧脚本默认值。
 - Qwen3.5 工具调用优先使用官方推荐的 auto tool choice 与 parser 参数。
+- Qwen thinking/reasoning 不要写死在部署脚本里；部署端只启用必要 parser，请求侧用 `extra_body.chat_template_kwargs.enable_thinking` 控制开关。
 - 对 vLLM 这类成熟第三方库，优先读官方教程、recipe、serving 文档和 API 文档；官方文档不能解释当前版本行为时，再做只读源码追溯。
 - 训练输出目录不要放在代码仓库里；放到 base checkpoint 同级或专用的大容量模型目录。
 - 训练数据先做 JSONL 格式校验、字段校验和 max length 过滤，再启动训练。
@@ -116,7 +117,7 @@ SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'
 
 实用判断：
 
-- **先试 1 GPU。** 在可行时先验证 1 GPU + 目标上下文长度 + 多模态配置，不要一开始就降低上下文或改成多 GPU。
+- **先试 1 GPU。** 对 9B 级或更小模型，在可行时先验证 1 GPU + 目标上下文长度 + 多模态配置，不要一开始就降低上下文或改成多 GPU。对已知 35B 级模型，应按推荐 GPU 数启动，不要强行先试 1 GPU。
 - **观察日志。** vLLM 可能把 `FULL` 自动降为 `FULL_DECODE_ONLY`，只要 graph capture 完成且服务正常，可以接受。
 - **失败顺序。** 先切 `ENFORCE_EAGER=1` 或降低 batch/sequence 相关参数，再考虑降低上下文长度或增加 GPU。
 - **上下文长度。** `MAX_MODEL_LEN` 和 `MAX_NUM_BATCHED_TOKENS` 通常保持一致；smoke test 可先设 `MAX_NUM_SEQS=1`。
@@ -125,6 +126,47 @@ SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'
 
 - 使用前先按当前 `vllm.__version__` 选择匹配的 vLLM 文档版本。
 - 查 OpenAI-compatible server、Qwen/Qwen3.5 recipe 和 compilation config 时，使用上文的版本匹配链接模板，不要写死 `stable` 或 `latest`。
+
+### Qwen3.5 35B-A3B 部署要点
+
+35B 级模型优先只保留一份共享权重，部署脚本通过 `MODEL_PATH` 指向这份目录，不要在不同项目或临时目录复制多份大模型权重。示例占位：
+
+```bash
+MODEL_PATH="${MODEL_ROOT}/Qwen--Qwen3.5-35B-A3B"
+SERVED_MODEL_NAME="Qwen3.5-35B-A3B"
+```
+
+资源建议：
+
+- **GPU 数。** 建议 `2` GPU 起步，并设置 `--tensor-parallel-size 2`；`1` GPU 容易 OOM。
+- **上下文。** 128k 上下文对应 `--max-model-len 131072`，并让 `--max-num-batched-tokens 131072` 与其一致。
+- **多模态。** 显式设置 `--limit-mm-per-prompt '{"image": 4, "video": 0}'`，避免图片输入被旧默认值禁用。
+- **工具调用。** 使用 `--enable-auto-tool-choice --tool-call-parser qwen3_coder`。
+- **reasoning 解析。** 使用 `--reasoning-parser qwen3` 解析 Qwen thinking/reasoning 输出。
+- **CUDA Graph。** 优先试 `--compilation-config '{"mode": 0, "cudagraph_mode": "FULL"}'`；日志中如果因为 attention backend 把 `FULL` 降到 `FULL_DECODE_ONLY`，只要服务正常和 graph capture 完成，一般不需要立刻改成 eager。
+
+35B 级 vLLM 命令骨架：
+
+```bash
+vllm serve "${MODEL_PATH}" \
+  --host 0.0.0.0 \
+  --port "${PORT:-8010}" \
+  --served-model-name "${SERVED_MODEL_NAME:-Qwen3.5-35B-A3B}" \
+  --trust-remote-code \
+  --dtype auto \
+  --max-model-len 131072 \
+  --max-num-batched-tokens 131072 \
+  --max-num-seqs 1 \
+  --limit-mm-per-prompt '{"image": 4, "video": 0}' \
+  --gpu-memory-utilization 0.90 \
+  --tensor-parallel-size 2 \
+  --reasoning-parser qwen3 \
+  --compilation-config '{"mode": 0, "cudagraph_mode": "FULL"}' \
+  --enable-auto-tool-choice \
+  --tool-call-parser qwen3_coder
+```
+
+不要为了启动失败立刻把 `131072` 改成 `96000` 或直接增加更多 GPU。先确认日志中的失败原因：权重加载、profile、CUDA Graph capture、OOM、端口占用和请求侧代理污染是不同问题。
 
 ### 服务脚本模板
 
@@ -158,6 +200,7 @@ ATTENTION_BACKEND="${ATTENTION_BACKEND:-}"
 ENFORCE_EAGER="${ENFORCE_EAGER:-0}"
 ENABLE_AUTO_TOOL_CHOICE="${ENABLE_AUTO_TOOL_CHOICE:-1}"
 TOOL_CALL_PARSER="${TOOL_CALL_PARSER:-qwen3_coder}"
+REASONING_PARSER="${REASONING_PARSER:-}"
 LIMIT_MM_PER_PROMPT=${LIMIT_MM_PER_PROMPT:-'{"image": 4, "video": 0}'}
 SERVE_COMPILATION_CONFIG="${SERVE_COMPILATION_CONFIG:-}"
 
@@ -193,6 +236,7 @@ args=(
 [[ -n "${TENSOR_PARALLEL_SIZE}" ]] && args+=(--tensor-parallel-size "${TENSOR_PARALLEL_SIZE}")
 [[ -n "${ATTENTION_BACKEND}" ]] && args+=(--attention-backend "${ATTENTION_BACKEND}")
 [[ -n "${SERVE_COMPILATION_CONFIG}" ]] && args+=(--compilation-config "${SERVE_COMPILATION_CONFIG}")
+[[ -n "${REASONING_PARSER}" ]] && args+=(--reasoning-parser "${REASONING_PARSER}")
 [[ "${ENFORCE_EAGER}" == "1" ]] && args+=(--enforce-eager)
 [[ "${ENABLE_AUTO_TOOL_CHOICE}" == "1" ]] && args+=(--enable-auto-tool-choice --tool-call-parser "${TOOL_CALL_PARSER}")
 
@@ -206,12 +250,14 @@ exec "${args[@]}"
 
 ### 部署验证
 
-最少验证：
+建议验证顺序：
 
 - `curl http://<host>:<port>/v1/models` 能返回模型。
-- 文本 chat completion 正常。
+- 短文本 chat completion 正常。
 - 工具调用能产出可解析 tool call。
 - 多模态图片请求不会报 `At most 0 image(s)`。
+
+集群内网服务测试优先使用 `httpx.Client(trust_env=False)` 或临时关闭代理，避免代理污染导致 EOF、hang、407 或误判端口不可用。
 
 基础连通性：
 
@@ -297,6 +343,58 @@ resp = client.chat.completions.create(
 print(resp.choices[0].message.content)
 PY
 ```
+
+### Qwen thinking 请求侧控制
+
+thinking 不要写死在部署脚本里。对支持 `chat_template_kwargs` 的 vLLM/Qwen 组合，推荐在请求侧通过 `extra_body` 控制：
+
+```python
+extra_body={"chat_template_kwargs": {"enable_thinking": False}}
+```
+
+不要写成顶层参数：
+
+```python
+extra_body={"enable_thinking": False}
+```
+
+顶层 `enable_thinking` 可能被 vLLM 当作未知参数忽略，导致以为关闭 thinking 但实际没有生效。
+
+关闭 thinking 的短文本验证：
+
+```python
+from openai import OpenAI
+import httpx
+import os
+
+client = OpenAI(
+    api_key=os.environ.get("API_KEY", "EMPTY"),
+    base_url=os.environ["BASE_URL"],
+    http_client=httpx.Client(trust_env=False, timeout=120),
+)
+
+response = client.chat.completions.create(
+    model=os.environ.get("MODEL_NAME", "Qwen3.5-35B-A3B"),
+    messages=[{"role": "user", "content": "Reply exactly: ok"}],
+    max_tokens=128,
+    extra_body={"chat_template_kwargs": {"enable_thinking": False}},
+)
+
+print(response.choices[0].message.content)
+```
+
+打开 thinking 时要给更大的输出预算，否则可能只生成 reasoning，正文为空，或返回 `finish_reason=length`：
+
+```python
+response = client.chat.completions.create(
+    model=os.environ.get("MODEL_NAME", "Qwen3.5-35B-A3B"),
+    messages=[{"role": "user", "content": "Reply exactly: ok"}],
+    max_tokens=1024,
+    extra_body={"chat_template_kwargs": {"enable_thinking": True}},
+)
+```
+
+如果业务侧需要默认关闭 thinking，优先把该策略放在请求配置或 client wrapper 中；如果需要更底层 provider 参数，用可配置的 extra body 覆盖。显式传 `{}` 应表示不自动注入 thinking 配置。
 
 ### 本地访问集群内网服务
 

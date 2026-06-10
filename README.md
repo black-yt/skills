@@ -28,7 +28,7 @@ skill-name/
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
 | `markdown-to-docx` | [`markdown-to-docx/SKILL.md`](markdown-to-docx/SKILL.md) | 使用 [`scripts/build_docx.py`](markdown-to-docx/scripts/build_docx.py) 将 Markdown 文档转为 Word `.docx`，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。 |
-| `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training。 |
+| `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `researchharness` | [`researchharness/SKILL.md`](researchharness/SKILL.md) | 使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。 |
