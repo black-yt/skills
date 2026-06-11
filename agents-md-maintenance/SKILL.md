@@ -91,6 +91,7 @@ AGENTS.local/
 - benchmark、模型、部署的完整配置。
 - README 内容的重复副本。
 - secrets、key、token、credential。
+- 本机端口、私有 endpoint、真实运行 key 名称组合、临时模型服务状态等低频本地配置。
 - 临时本地文件、个人机器状态或未确认可公开的信息。
 
 这些内容应迁移到 `AGENTS.local/` 的 topic 文件，或放入私有 context 文档。
@@ -123,6 +124,13 @@ AGENTS.local/
 - **例外情况。** 如果用户明确要求忽略，或 `AGENTS.local/` 含私有机器路径、内部命令、部署细节、凭据、token、临时本地状态等不应入库内容，再把对应文件或目录加入 `.gitignore`。
 - 如果项目仓库中的 agent 指南被忽略，必须有别处作为 source of truth，不能只存在某个开发者本地工作树。
 
+## Canonical Copy 同步
+
+- 如果 `AGENTS.md` 或 `AGENTS.local/` 被主仓库 ignore，修改完成后只能报告需要同步 canonical copy。
+- 除非用户明确要求“同步 canonical copy / commit / push”，否则不要自动写入、提交或推送 canonical 仓库。
+- 同步前必须先确认目标路径、列出将写入的文件，并用 `diff`、`rsync --dry-run` 或等价检查确认写入范围正确。
+- 同步前必须确认不会把 `AGENTS.local/` 文件误写到上级目录、错误仓库或错误分支。
+
 ## 编辑工作流
 
 1. 先读现有 `AGENTS.md`、`.gitignore` 和已存在的 `AGENTS.local/` topic 文件。
@@ -132,7 +140,7 @@ AGENTS.local/
 5. 如果规则改名或迁移，更新所有旧引用。
 6. 检查没有 secrets、真实凭据和不应公开的本地环境信息。
 7. 运行 `git diff --check`，并按仓库规则做必要测试。
-8. 如果指南是 ignored 文件，同步更新 canonical copy。
+8. 如果指南是 ignored 文件，只报告 canonical copy 需要同步；同步、commit 或 push 必须等用户明确授权。
 
 ## 拆分过大的 AGENTS.md
 
@@ -144,6 +152,15 @@ AGENTS.local/
 4. 确保原有信息没有丢失，只是迁移。
 5. 在 `AGENTS.md` 中添加完整索引和每个详细文件的读取时机；导航表列为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
 6. 按公开/私有策略更新 `.gitignore`。
+
+拆分后必须做结构审计：
+
+- `AGENTS.local/` 文件是否从 `01_` 开始编号，且表格序号与文件名前缀一致。
+- 是否没有 `00_`、`overview`、`project_overview`、`scope`、`README.md` 这类二级总览文件。
+- 导航表列是否为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
+- `触发时机` 是否写成“修改/运行/排查 X 前必须读取”这类可执行条件。
+- `AGENTS.md` 行数是否大致在 `80-200` 行；超出时要判断是否仍然属于常驻上下文。
+- `git diff --check` 是否通过。
 
 ## AGENTS.md 模板
 
@@ -253,5 +270,6 @@ agent 遇到冲突时，应优先遵守高优先级规则。
 - 没有 secrets、真实凭据、私有路径或未确认可公开的信息。
 - 公开/私有仓库的 Git 跟踪策略明确。
 - ignored 指南有 canonical copy 和同步说明。
+- ignored 指南没有在用户授权前被自动同步、commit 或 push。
 - 标题稳定、层级不深、规则可扫描。
 - `git diff --check` 通过。
