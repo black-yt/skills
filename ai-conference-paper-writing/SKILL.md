@@ -5,6 +5,21 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 
 # AI Conference Paper Writing
 
+## 文件导航
+
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+| 1 | 规定 AI conference paper 的中心命题、包装关键词、章节闭环、引用严谨性、实验结构和最终检查顺序。 | 写作原则、工作顺序、论文类型、中心命题、challenge、图表布局、citation、实验、case study、appendix、检查清单 | 默认读取 | `SKILL.md` |
+| 2 | 给出从中文 story 到论文标题、teaser、abstract 和 Introduction 六段结构的早期写作骨架。 | 中文大纲、research story 矩阵、title、teaser、abstract、Introduction 骨架 | 需要先写中文大纲、设计 story 或规划 teaser/intro 时必须读取 | [references/markdown-story-outline.md](references/markdown-story-outline.md) |
+| 3 | 说明中文稿中如何用引用块描述图、表和 case，并提供数据集对比、分布、超参数和术语表模板。 | 图表占位、case 图文本、数据集对比表、数据分布表、超参数表、术语表 | 需要在中文稿中规划图、表、case 或数据统计时必须读取 | [references/markdown-figures-tables-cases.md](references/markdown-figures-tables-cases.md) |
+| 4 | 记录 GitHub Markdown 中数学公式的安全写法，覆盖 `math` 围栏、危险宏、表格内公式和渲染检查。 | `math` 围栏、GitHub 公式渲染、高风险宏、检查清单 | 需要在 Markdown 中写公式，尤其是 GitHub README/notes 公式时必须读取 | [references/github-markdown-math.md](references/github-markdown-math.md) |
+| 5 | 提供 Introduction、Related Work、Method、Benchmark、Evaluation、Experiments、Abstract 和 Conclusion 的可复制段落骨架。 | Method 形式化定义、Introduction、Related Work、Method、Benchmark、Evaluation、Experiments、Abstract/Conclusion | 需要起草或重写具体章节段落时必须读取 | [references/markdown-section-snippets.md](references/markdown-section-snippets.md) |
+| 6 | 汇总 BibTeX 引用规则、摘要前资源图标、技术报告首页框线、页眉和主题色排版方式。 | BibTeX、摘要资源图标、技术报告风格首页、主题排版 | 需要写 LaTeX 引用、摘要资源链接或技术报告风格首页时必须读取 | [references/latex-citation-report-style.md](references/latex-citation-report-style.md) |
+| 7 | 记录 LaTeX 中段末短行、图表浮动越界、贡献列表压缩和不改正文的版面调整策略。 | 版面微调、图表浮动、紧凑贡献列表 | 需要处理图表浮动、段末短行、贡献列表压缩或版面微调时必须读取 | [references/latex-layout-and-contribution.md](references/latex-layout-and-contribution.md) |
+| 8 | 保存论文表格的颜色、分数热力格、最佳/次佳标记、方向箭头和对比表勾叉三角宏。 | 表格配色、score heatmap、metric 方向箭头、`\cmark/\pmark/\xmark`、彩色主结果表 | 需要写主结果表、对比表、score heatmap 或 metric 箭头时必须读取 | [references/latex-table-macros.md](references/latex-table-macros.md) |
+| 9 | 说明摘要资源链接和模型结果表中如何插入 GitHub、Hugging Face、page 与常用模型 logo。 | GitHub logo、Hugging Face logo、page logo、model logo、摘要资源链接、表格模型图标 | 需要在摘要资源链接或模型表格中放 logo 时必须读取 | [references/latex-model-logos.md](references/latex-model-logos.md) |
+| 10 | 说明 appendix 的顺序、实验 insight 的 `\paragraph` 写法，以及用 `tcolorbox` 展示完整 case 的格式。 | `\paragraph{Insight ...}`、appendix 顺序、`tcolorbox`、完整 case 展示 | 需要写 appendix、case study、完整 case box 或实验 insight 段首时必须读取 | [references/latex-appendix-cases.md](references/latex-appendix-cases.md) |
+
 ## 使用原则
 
 - 把论文写成论证，不写成 README、实验报告或工程流水账。
@@ -14,12 +29,6 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
 - 避免 overclaim，但用正向限定包装：在总结性术语或 claim 中加入 1-2 个定语约束适用范围，不要反着说“我们不是 X”。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
-
-具体模板分开维护：
-
-- **Markdown reference.** 中文大纲、GitHub Markdown 公式、teaser/pipeline/case 图说明、表格占位写法：`references/markdown-writing-templates.md`。
-- **LaTeX reference.** 表格配色、`\cmark/\pmark/\xmark`、模型 logo 表格、`\paragraph{Insight ...}`、摘要资源链接图标、技术报告风格首页、版面微调、紧凑贡献列表、Appendix `tcolorbox`：`references/latex-paper-templates.md`。
-- **使用规则。** 任务涉及上述模板时，必须读取对应 reference。
 
 ## 工作顺序
 
@@ -69,7 +78,7 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 - 如果是新造术语，至少在论文中两处出现并前后呼应；只出现一次的包装词要删掉、改名或补足后文设计。
 - 每次出现应承担不同功能：Intro 提出能力缺口，Method 对应设计，Experiment 对应指标，Analysis 对应失败模式，Conclusion 回扣主线。
 
-写作前建立 story 矩阵。每个核心问题至少要有方法、指标/实验和 analysis/case 支撑。Markdown 模板见 `references/markdown-writing-templates.md`。
+写作前建立 story 矩阵。每个核心问题至少要有方法、指标/实验和 analysis/case 支撑。Markdown story 模板见 `references/markdown-story-outline.md`。
 如果某个 challenge 只在 Introduction 出现，后文没有证据，删掉它或补实验证据。
 
 ## Challenge 命名
@@ -136,7 +145,7 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 - 主文 case 展示哪些压缩字段，完整 case 放到哪个 appendix section。
 - 未知数字、模型名、指标和失败类型用占位符，不要编造。
 
-具体 Markdown 代码模板见 `references/markdown-writing-templates.md`。
+具体 Markdown 图表和 case 模板见 `references/markdown-figures-tables-cases.md`。
 
 ## Introduction
 
@@ -151,7 +160,7 @@ Teaser 图必须同时呈现问题场景、输入输出、关键 challenge、本
 
 Introduction 第二段不要罗列论文笔记，要写成分类；第三段不要只列抽象名词或应用需求；第四段顺序必须和 challenge 段一致；第五段要说明结果揭示了什么能力瓶颈。
 
-Introduction 最后一段的贡献列表仍保持 3-5 点、名词开头、语法并列。篇幅很紧时，LaTeX 成稿可以用 `paralist` 的 `compactitem` 写紧凑贡献列表；模板见 `references/latex-paper-templates.md`。
+Introduction 最后一段的贡献列表仍保持 3-5 点、名词开头、语法并列。篇幅很紧时，LaTeX 成稿可以用 `paralist` 的 `compactitem` 写紧凑贡献列表；模板见 `references/latex-layout-and-contribution.md`。
 
 ## Related Work
 
@@ -183,7 +192,7 @@ Related Work 要和贡献对应，不要写与主线无关的名论文。整体�
 - **引用数量。** AI conference paper 的参考文献数量通常不应少于 40 篇，正常情况下约 50 篇；survey 或 benchmark 可以更多。
 - **真实性检查。** 所有引用论文必须通过搜索或原始来源确认真实存在，严禁虚假引用、编造标题、编造作者或编造 venue。
 - **版本选择。** 若同一工作既有 arXiv/preprint 又有已中稿或正式发表版本，优先引用已中稿/正式发表版本；只有没有正式版本或需要引用 preprint 特定内容时才引用 arXiv。
-- **LaTeX 管理。** 编辑 LaTeX 时使用 `.bib` / BibTeX 形式管理引用，不要手写裸文本参考文献；LaTeX citation 模板见 `references/latex-paper-templates.md`。
+- **LaTeX 管理。** 编辑 LaTeX 时使用 `.bib` / BibTeX 形式管理引用，不要手写裸文本参考文献；LaTeX citation 模板见 `references/latex-citation-report-style.md`。
 
 Benchmark/data 对比表要求：
 
@@ -192,7 +201,7 @@ Benchmark/data 对比表要求：
 - **论证。** 表格要证明 gap claim；不要只因为 `Ours` 更大就显得更好。
 - **符号。** yes/no/partial 属性列可用 `\cmark/\pmark/\xmark`，并在 caption 或表下注明含义。
 - **表后解释。** 说明哪些能力过去被分散覆盖，本文如何放到同一个评测、训练或诊断框架里。
-- **模板。** Markdown 草稿见 `references/markdown-writing-templates.md`；LaTeX 成稿见 `references/latex-paper-templates.md`。
+- **模板。** Markdown 草稿按任务读取 `references/markdown-story-outline.md`、`references/markdown-figures-tables-cases.md`、`references/markdown-section-snippets.md`；LaTeX 成稿按任务读取 `references/latex-citation-report-style.md`、`references/latex-table-macros.md`、`references/latex-appendix-cases.md`。
 
 ## Method
 
@@ -311,7 +320,7 @@ Case Study 要真实、完整、可验证：
 - **主文数量。** 主文放 2 个压缩 case 最稳。
 - **对照优先。** correct vs. wrong、valid format vs. invalid format、parameter preserved vs. parameter drift、dependency maintained vs. dependency break。
 - **完整输出。** 不要把完整长输出塞进主文；完整 case 放 Appendix。
-- **Appendix 模板。** `tcolorbox` 可结构化展示 meta info、task、data、rubrics、generated report、figures、score items；模板见 `references/latex-paper-templates.md`。
+- **Appendix 模板。** `tcolorbox` 可结构化展示 meta info、task、data、rubrics、generated report、figures、score items；模板见 `references/latex-appendix-cases.md`。
 
 Appendix 目标是可复现和可审计：
 
@@ -325,7 +334,7 @@ Appendix 目标是可复现和可审计：
 
 Abstract 最后写，且必须是一整段，不要拆成多段或 bullet。稳妥顺序：背景/缺口 -> 本文提出什么 -> 方法或资源范围 -> 关键实验发现 -> 贡献定位。摘要里的每个术语都应该能在 Introduction、Method 和 Experiments 中找到对应内容。摘要中一般不要引用论文；如果某个背景必须有引用，应放到 Introduction，而不是塞进 Abstract。
 
-如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板和内置 PDF logo 见 `references/latex-paper-templates.md`。
+如果论文有公开 homepage/code/data，可以在摘要文字后加入简短资源链接块，并用 Page / GitHub / Hugging Face 图标提高可扫读性。正文 abstract 仍保持一段式；资源链接块只作为附加入口，模板见 `references/latex-citation-report-style.md`，内置 PDF logo 见 `references/latex-model-logos.md`。
 
 技术报告型论文、project manuscript 或 internal report 可以使用统一主题色，把 title 横线、页眉、section 标题、链接、teaser、abstract box 和 case box 放进同一套视觉语言。正式会议模板中不要擅自重写 `\maketitle`、页眉或 section 样式，除非已经确认该 venue 和阶段允许自定义。
 

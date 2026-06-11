@@ -1,0 +1,474 @@
+# Latex Citation Report Style
+
+# LaTeX 论文模板
+
+这个文件只放 AI conference paper 写作中可直接复制和改写的 LaTeX 模板。规则性判断放在 `../SKILL.md`；中文 Markdown 大纲、GitHub Markdown 公式和图表说明模板放在 `markdown-writing-templates.md`。
+
+说明性文字默认用中文；LaTeX 命令、英文 caption、表格/图表内英文文本保留英文，便于直接复制到论文工程中。
+
+## LaTeX 中会用到的
+
+这部分用于最终 `.tex` 论文排版和视觉强化，不是中文版 Markdown 大纲的必需格式。典型做法是：用 `xcolor` 给数值表上色；用 `\ScoreCell`、`\BestScore`、`\SecondScore` 标记结果；用 `\paragraph{Insight ...}` 写分析段首；用 `tcolorbox` 在 Appendix 展示完整 case。这些命令不应强加到中文 Markdown 大纲里，只在写 LaTeX 正文或附录时使用。
+
+### BibTeX 与 Citation 写法
+
+LaTeX 论文中使用 `.bib` / BibTeX 管理引用，不要在 `References` 里手写裸文本条目。所有论文条目都必须先通过搜索或原始页面确认真实存在；如果同一工作有 arXiv 和已接收/正式发表版本，优先使用已接收/正式发表版本对应的 BibTeX。
+
+引用位置要贴近被支持的对象：
+
+```latex
+Vision-language models have been widely used for scientific figure understanding~\citep{li2024scifig,wang2025chartvlm}.
+
+Programmatic evaluation~\citep{chen2021codex,hendrycks2021apps} reduces ambiguity by checking executable outputs rather than relying only on text overlap.
+
+\citet{vaswani2017attention} introduced the Transformer architecture, which later became the backbone of many language-model-based agents.
+```
+
+避免把一整段写完后堆引用：
+
+```latex
+% Avoid.
+Recent work studies multimodal reasoning, tool use, long-horizon planning, and programmatic evaluation. Several benchmarks and agents have been proposed for these problems~\citep{paperA,paperB,paperC,paperD,paperE,paperF}.
+```
+
+更稳的写法是把引用分配到对应术语后：
+
+```latex
+Recent multimodal benchmarks evaluate chart and figure understanding~\citep{paperA,paperB}, while tool-use agents study external API or code execution~\citep{paperC,paperD}. Long-horizon planning benchmarks focus on multi-step state tracking~\citep{paperE}, and programmatic evaluation checks executable outputs directly~\citep{paperF}.
+```
+
+BibTeX 条目示例：
+
+```bibtex
+@inproceedings{vaswani2017attention,
+  title = {Attention Is All You Need},
+  author = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year = {2017}
+}
+
+@article{trinh2024alphageometry,
+  title = {Solving Olympiad Geometry without Human Demonstrations},
+  author = {Trinh, Trieu H. and Wu, Yuhuai and Le, Quoc V. and He, He and Luong, Thang},
+  journal = {Nature},
+  year = {2024}
+}
+```
+
+主文件参考文献写法：
+
+```latex
+\bibliographystyle{plainnat}
+\bibliography{main}
+```
+
+检查项：
+
+- 引用数量：AI conference paper 通常不少于 40 篇，正常约 50 篇；benchmark/survey 可以更多。
+- 引用真实性：每个 BibTeX entry 都要能在论文官网、ACL Anthology、OpenReview、IEEE/ACM、PMLR、NeurIPS proceedings、CVF、Springer、Nature、arXiv 等来源中找到。
+- 版本选择：有正式中稿/发表版时优先引用正式版；不要在正式版已存在时继续引用旧 arXiv，除非正文明确讨论 arXiv 版本特有内容。
+- 位置贴近：citation 放在对应方法、数据集、模型、任务或 claim 后面，不要段末堆引用。
+- Key 稳定：BibTeX key 使用 `surnameYearShortTitle` 风格，避免 `paper1`、`refA`、`unknown2024`。
+
+### 摘要资源链接图标
+
+如果论文有公开 homepage、code 或 dataset，可以在 abstract 正文之后加入一小段资源入口。正文 abstract 仍保持一段式；资源入口是附加块，不要把它写成新的摘要段落或贡献列表。Page、GitHub 与 Hugging Face 的 PDF logo 已随 skill 保存：
+
+- `assets/logos/page-logo.pdf`
+- `assets/logos/github-logo.pdf`
+- `assets/logos/hf-logo.pdf`
+
+在论文项目中使用时，把这些 PDF 放到论文的图片目录，例如 `imgs/page-logo.pdf`、`imgs/github-logo.pdf` 和 `imgs/hf-logo.pdf`，或把下面命令里的路径改成实际路径。
+
+Preamble / command definitions:
+
+```latex
+\newcommand{\homepage}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/page-logo.pdf}}}
+\newcommand{\github}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/github-logo.pdf}}}
+\newcommand{\huggingface}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/hf-logo.pdf}}}
+```
+
+Abstract 末尾资源链接块：
+
+```latex
+\vspace{\baselineskip}
+
+\homepage\ \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
+
+\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+
+\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
+```
+
+如果没有 homepage，可以只保留 Code/Data 两行；如果模板不适合放图标，也可以退回纯文本：
+
+```latex
+\textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
+
+\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+
+\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
+```
+
+使用规则：
+
+- 需要 `graphicx` 和支持 `\url` 的包或模板；如果模板没有加载，补充 `\usepackage{graphicx}` 和 `\usepackage{hyperref}`。
+- 图标高度通常用 `height=1em`，并用 `\raisebox{-1.5pt}{...}` 做基线对齐。
+- 链接标签保持短：`Code`、`Data`、`Page`。不要在 abstract 资源块里解释项目细节。
+- 如果会议模板禁止 abstract 内放链接，把同样的资源块移到 abstract 后、first-page footnote 或 camera-ready artifact section。
+
+### 技术报告风格首页
+
+适用于 arXiv technical report、project manuscript、internal report 或不受严格会议 class 限制的论文。核心思路是统一一个主题色，把标题横线、页眉 logo、章节标题、链接颜色、teaser/abstract box、case box 都放在同一套视觉语言里。不要在 NeurIPS/ICLR/ICML/ACL/CVPR 官方提交模板中强行覆盖 `\maketitle`、页眉或章节标题，除非已经确认 camera-ready 允许自定义。
+
+这一类样式可以参考 LabHorizon 的组织方式：
+
+- 首页左上角放机构/项目 logo，去掉页眉横线。
+- Title 上方和下方各放一条主题色细横线，形成技术报告感。
+- Teaser 和 resource links 放在一个 `tcolorbox` 中，摘要单独放在另一个 `tcolorbox` 中。
+- Abstract 标题用主题色 sans-serif bold，正文保持一段式。
+- Section、subsection、subsubsection 全部使用主题色 sans-serif bold。
+- Caption 的 label 用 sans-serif bold，正文保持正常小字号。
+- Hyperlink、citation、url 颜色与主题色一致。
+
+Preamble / class-level skeleton:
+
+```latex
+\usepackage[top=2.75cm, bottom=2.5cm, left=2.5cm, right=2.5cm, columnsep=0.65cm]{geometry}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\usepackage{graphicx}
+\usepackage[most]{tcolorbox}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{etoolbox}
+\usepackage{placeins}
+\usepackage{hyphenat}
+\usepackage[colorlinks]{hyperref}
+
+\definecolor{ReportTheme}{HTML}{8C1515}
+\definecolor{ReportLightGray}{HTML}{F4F4F4}
+\newcommand{\reporttheme}[1]{{\bfseries\color{ReportTheme}#1}}
+
+\hypersetup{
+  linkcolor=ReportTheme,
+  citecolor=ReportTheme,
+  urlcolor=ReportTheme
+}
+```
+
+首页页眉 logo 和隐藏页眉/页脚横线：
+
+```latex
+\setlength{\headheight}{27pt}
+\fancypagestyle{firststyle}{
+  \fancyhead[R]{}
+  \fancyhead[L]{\includegraphics[height=8mm,keepaspectratio]{figures/[LOGO].png}}
+}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+```
+
+章节标题和 caption 风格：
+
+```latex
+\newcommand{\sectionfont}{\fontsize{12}{10}\selectfont}
+\newcommand{\subsectionfont}{\fontsize{11}{10}\selectfont}
+
+\titleformat*{\paragraph}{\itshape}
+\titleformat*{\section}{\sectionfont\sffamily\bfseries\color{ReportTheme}}
+\titleformat*{\subsection}{\subsectionfont\sffamily\bfseries\color{ReportTheme}}
+\titleformat*{\subsubsection}{\normalsize\sffamily\bfseries\color{ReportTheme}}
+
+\DeclareCaptionLabelSeparator{custom}{}
+\DeclareCaptionFormat{custom}{{\sffamily\textbf{#1 #2}} #3}
+\captionsetup{singlelinecheck=true,format=custom,labelsep=custom,font=small}
+\captionsetup[sub]{singlelinecheck=true,format=custom,labelsep=custom,font=small}
+```
+
+Title 上下横线、teaser/resource box、abstract box：
+
+```latex
+\makeatletter
+\newcommand{\ReportTopTitleBar}{
+  {\color{ReportTheme}\hrule height 0.5pt}
+  \vskip 6mm
+}
+\newcommand{\ReportBottomTitleBar}{
+  \vskip 6mm
+  {\color{ReportTheme}\hrule height 0.5pt}
+}
+
+\newcommand{\titlefont}{\fontsize{17}{20}\selectfont}
+\renewcommand{\title}[1]{\newcommand{\titlelist}{\titlefont{\sffamily #1}}}
+\newcommand{\abstractinfont}{\fontsize{10}{12}\selectfont}
+\renewcommand{\abstract}[1]{\def\abstractlist{{\abstractinfont #1}}}
+\newcommand{\abstractlabel}{\fontsize{12}{12}\selectfont\sffamily\bfseries\textcolor{ReportTheme}{Abstract}}
+
+\newcommand{\teaserlist}{}
+\newcommand{\teaser}[1]{\def\teaserlist{#1}}
+\newcommand{\teasercaptionlist}{}
+\newcommand{\teasercaption}[1]{\def\teasercaptionlist{#1}}
+\newcommand{\resourcelinkslist}{}
+\newcommand{\resourcelinks}[1]{\def\resourcelinkslist{#1}}
+
+\newcommand{\ReportMakeTitle}{%
+  \thispagestyle{firststyle}
+  \vspace*{-6mm}
+  \tcbset{
+    enhanced,
+    left=8mm,
+    right=8mm,
+    top=6mm,
+    bottom=6mm,
+    colback=white,
+    colframe=ReportTheme,
+    boxrule=0.5pt,
+    before skip=0pt,
+    grow to left by=1.5pt,
+    grow to right by=1.5pt,
+    arc=2.5mm
+  }
+  {\setlength{\parskip}{0mm}\centering\nohyphens
+    \ReportTopTitleBar
+    \titlelist\par
+    \ReportBottomTitleBar
+    \vskip 6mm
+    [AUTHOR_LIST]\par
+    \vskip 3mm
+    [AFFILIATION_LIST]\par
+  }
+  \vskip 6mm
+  \begin{tcolorbox}[breakable]
+    \setlength{\parindent}{0cm}
+    \setlength{\parskip}{0cm}
+    \ifdefempty{\teaserlist}{}{
+      \begin{center}
+        \includegraphics[width=0.97\textwidth,height=0.48\textheight,keepaspectratio]{\teaserlist}
+      \end{center}
+      \vskip 2mm
+    }
+    \ifdefempty{\teasercaptionlist}{}{{\small \teasercaptionlist\par}\vskip 3mm}
+    \ifdefempty{\resourcelinkslist}{}{{\small \resourcelinkslist\par}}
+  \end{tcolorbox}
+  \clearpage
+  \begin{tcolorbox}[breakable]
+    \setlength{\parindent}{0cm}
+    \setlength{\parskip}{0cm}
+    \begin{center}
+      \abstractlabel
+      \vskip 3mm
+    \end{center}
+    \abstractlist\par
+  \end{tcolorbox}
+  \tcbset{reset}
+  \FloatBarrier
+}
+\makeatother
+```
+
+作者、机构、贡献说明和元信息列表：
+
+```latex
+\makeatletter
+\newcommand\addtolist[5][]{
+  \begingroup
+    \if\relax#3\relax\def\sep{}\else\def\sep{#5}\fi
+    \let\protect\@unexpandable@protect
+    \xdef#3{\expandafter{#3}\sep #4[#1]{#2}}%
+  \endgroup
+}
+\makeatother
+
+\newcommand{\authorfont}{\fontsize{12}{14}\selectfont}
+\newcommand\authorlist{}
+\newcommand\authorformat[2][]{\authorfont{\sffamily #2$^{#1}$}}
+\renewcommand\author[2][]{\addtolist[#1]{#2}{\authorlist}{\authorformat}{, }}
+
+\newcommand{\affiliationfont}{\fontsize{10}{12}\selectfont}
+\newcommand\affiliationlist{}
+\newcommand\affiliationformat[2][]{{\affiliationfont\sffamily $^{#1}$#2}}
+\newcommand\affiliation[2][]{\addtolist[#1]{#2}{\affiliationlist}{\affiliationformat}{, }}
+
+\newcommand{\contributionfont}{\fontsize{10}{12}\selectfont}
+\newcommand\contributionlist{}
+\newcommand\contributionformat[2][]{{\contributionfont $^{#1}$#2}}
+\newcommand\contribution[2][]{\addtolist[#1]{#2}{\contributionlist}{\contributionformat}{, }}
+
+\newcommand{\checkdatafont}{\fontsize{8}{10}\selectfont}
+\newcommand\checkdatalist{}
+\newcommand\checkdataformat[2][]{{\small{\checkdatafont\sffamily\bfseries #1:} #2}}
+\newcommand\checkdata[2][]{\addtolist[#1]{#2}{\checkdatalist}{\checkdataformat}{\par}}
+\renewcommand\date[1]{\checkdata[Date]{#1}}
+\newcommand\correspondence[1]{\checkdata[Correspondence]{#1}}
+\newcommand{\email}[1]{\href{mailto:#1}{\texttt{#1}}}
+```
+
+把上面的列表接入首页时，将 `ReportMakeTitle` 中的占位替换为：
+
+```latex
+\authorlist
+\vskip 3mm
+\affiliationlist\par
+\vskip 3mm
+\contributionlist\par
+```
+
+如果还要在首页展示日期、项目页、数据集、arXiv 或 correspondence，可以把 `\checkdatalist` 放在 title box 末尾或 abstract box 之后。元信息较多时，不要塞进摘要正文；用 `\checkdata[Project Page]{...}` 这种短行更清楚。
+
+目录、附录入口和参考文献风格：
+
+```latex
+\usepackage[english]{babel}
+\usepackage[subfigure]{tocloft}
+\usepackage[numbers,sort&compress]{natbib}
+
+\def\bibfont{\small}
+\addto{\captionsenglish}{\renewcommand{\refname}{References}}
+
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\renewcommand{\cftsecfont}{\sffamily}
+\renewcommand{\cftsecpagefont}{\sffamily\color{ReportTheme}}
+\renewcommand{\cfttoctitlefont}{\sffamily\sectionfont\color{ReportTheme}}
+
+\newcommand{\beginappendix}{%
+  \appendix{\titlefont\sffamily\textcolor{ReportTheme}{Appendix}\par}%
+}
+```
+
+如果主文需要目录，放在 `\maketitle` 之后、Introduction 之前；会议论文通常不放目录，technical report 或 long-form manuscript 可以放。附录入口常见写法：
+
+```latex
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+\clearpage
+\beginappendix
+\input{sections/appendix}
+```
+
+单栏/双栏 `\maketitle` 适配：
+
+```latex
+\makeatletter
+\if@twocolumn
+\renewcommand{\maketitle}{%
+  \twocolumn[%
+    \vskip 3mm
+    \ReportMakeTitle
+    \vskip 8mm
+  ]%
+}
+\else
+\renewcommand{\maketitle}{%
+  \ReportMakeTitle
+  \vskip 8mm
+}
+\fi
+\makeatother
+```
+
+自定义字体是可选项。只有当论文工程里真的包含对应字体文件时才使用；否则保持默认 Computer Modern 或模板默认字体，避免无法编译。若要复现更强的 report branding，可以把 sans-serif family 换成项目字体：
+
+```latex
+\usepackage[T1]{fontenc}
+
+% Optional. Requires actual font files in the project.
+\DeclareFontFamily{T1}{reportsans}{}
+\DeclareFontShape{T1}{reportsans}{m}{n}{<-> s * [1] path/to/ReportSans-Regular}{}
+\DeclareFontShape{T1}{reportsans}{b}{n}{<-> s * [1] path/to/ReportSans-Bold}{}
+\DeclareFontShape{T1}{reportsans}{bx}{n}{<-> s * [1] path/to/ReportSans-Bold}{}
+\renewcommand{\sfdefault}{reportsans}
+\renewcommand{\rmdefault}{cmr}
+```
+
+完整主文件结构：
+
+```latex
+\documentclass[]{[report_class_or_article]}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{colortbl}
+\usepackage{adjustbox}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+
+% Report theme, title-box, resource-link, table, case-box commands go here.
+
+\title{[Title with Core Packaging Term]}
+\teaser{figures/teaser.png}
+\teasercaption{\textbf{Figure 1. [Project] overview.} [Caption.]}
+\resourcelinks{[Page / Code / Data links]}
+\author[1]{[Author]}
+\affiliation[1]{[Affiliation]}
+\abstract{[One-paragraph abstract.]}
+\date{\today}
+\correspondence{[Contact or project page]}
+\checkdata[Project Page]{\url{https://[PROJECT_PAGE]}}
+\checkdata[Datasets]{\url{https://[DATASET_PAGE]}}
+\checkdata[arXiv]{Coming soon}
+
+\begin{document}
+\maketitle
+\setcounter{figure}{1}
+
+\input{sections/1-introduction}
+\input{sections/2-related-work}
+\input{sections/3-method}
+\input{sections/4-experiments}
+\input{sections/5-conclusion}
+
+\clearpage
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+\clearpage
+\beginappendix
+\input{sections/appendix}
+
+\end{document}
+```
+
+复现 report style 时的检查项：
+
+- 首页是否只在第一页使用 logo 页眉，正文页不要被 logo 干扰。
+- Title 上下横线、box frame、section title、link color 是否使用同一个主题色。
+- Teaser box 是否先出现，abstract box 是否单独成块，abstract 本文是否仍是一段。
+- 作者、机构、贡献和元信息是否是短行结构，不要混进摘要主体。
+- 若使用目录，目录标题、section 文字和页码颜色是否与主题色一致。
+- 若使用自定义字体，字体文件是否随论文工程提交并能被 CI 或 arXiv 编译环境找到。
+
+正文使用示例：
+
+```latex
+\title{[Title with Core Packaging Term]}
+\teaser{figures/teaser.png}
+\teasercaption{\textbf{Figure 1. [Method] overview.} [One-sentence description of the full pipeline and main capability.]}
+\resourcelinks{\begin{center}
+\homepage\ \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}\quad
+\github\ \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}\quad
+\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/[ORG]/[DATASET]}}
+\end{center}}
+\abstract{[One-paragraph abstract. Keep the abstract itself one paragraph even if resource links are shown separately. Avoid citations in the abstract.]}
+
+\begin{document}
+\ReportMakeTitle
+\setcounter{figure}{1} % The title-page teaser is treated as Figure 1 in the paper narrative.
+\section{Introduction}
+```
+
+维护建议：
+
+- 主题色只定义一次，并复用到 title bar、section title、hyperref、box frame 和关键强调，不要每个模块单独发明颜色。
+- Title bar 的 `0.5pt` 横线足够克制；如果论文更偏正式报告，可以保持细线和白底，而不是用大面积色块。
+- Abstract box 和 teaser box 都用 `breakable`，避免内容略长时溢出。
+- 如果 abstract 前有 teaser 图，正文第一张图的计数需要手动对齐，例如 `\setcounter{figure}{1}`。
+- 如果模板已有作者/机构命令，替换上面 `[AUTHOR_LIST]` 和 `[AFFILIATION_LIST]`，不要重复实现一套作者系统。

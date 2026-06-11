@@ -1,0 +1,100 @@
+# Skill 工作流与格式规则
+
+## 新增或更新 Skill
+
+- 新增 skill 时，必须新建独立文件夹，并至少包含 `SKILL.md`。
+- `SKILL.md` 的 frontmatter 必须包含清晰的 `name` 和 `description`；`name` 要与文件夹名一致。
+- 如有详细模板、长示例、图片、脚本，分别放入 `references/`、`assets/`、`scripts/`，不要把所有内容塞进主文件。
+- 必须同步更新 `README.md` 的 Skill 列表，包含 skill 名称、入口链接和一句用途说明。
+- 必须同步更新 `docs/index.html` 中的网页展示数据，包含 `name`、`path`、`tags`、`desc` 和预览 `content`。
+- 新增网页 tag 时，优先复用已有 tag；确实需要新增时，保持中英文粒度一致，专有名词不要硬翻译。
+- 新增 skill 后，用 `find . -maxdepth 2 -name SKILL.md`、`README.md` 和 `docs/index.html` 互相对照，确认没有漏展示、漏链接或路径写错。
+- 提交前运行 `git diff --check`。
+- 若改了 `docs/index.html` 内联脚本，提取脚本或用现有方式做 JS 语法检查。
+
+## 拆分大 Skill 或 Reference
+
+- 主 `SKILL.md` 接近 500 行或难以导航时，应把低频细节拆到 `references/`。
+- 拆分后主 `SKILL.md` 必须保留总览和文件导航表。
+- 文件导航表要说明每个 reference 何时必须读取。
+- 优先沿用仓库已有组织方式，不轻易发明新结构。
+- 避免跨文件重复规则；需要发现性提示时，用短指针即可。
+- 拆分、移动或重命名文件后，必须检查旧路径引用是否已更新、内容是否丢失。
+- 重写、合并或整理已有章节时，必须反查 `git diff --unified=0` 中被删除的有效规则、示例和命令，确认它们已被保留、合并，或有明确理由移除。
+- 将用户给的大段经验写入 skill 时，先把原始经验拆成可检查的覆盖清单，再逐项确认新内容完整覆盖；不要只靠关键词抽查或肉眼判断。
+
+## 跨 Skill 同步
+
+- 同一经验写入多个 skill 或主文件/reference 时，使用同一份覆盖清单做一致性检查。
+- 差异只能来自使用场景不同，不能让一个位置缺少关键示例、验证步骤或失败处理。
+- 同一个工作流如果写入多个 skill，例如集群内网服务 SSH 转发和 LLM 部署本地访问，核心步骤、参数含义、验证命令和排错顺序必须保持一致。
+- 跨 skill 复制经验时，先检查两处内容是否都包含安全边界、执行位置、验证步骤和失败处理，避免一个 skill 详细、另一个 skill 缺关键步骤。
+- 高风险工作流要包含验证步骤和失败处理。
+
+## Skill Frontmatter
+
+- `SKILL.md` 的 frontmatter 必须包含 `name` 和 `description`。
+- `name` 使用 skill 文件夹名。
+- `description` 要清楚说明触发范围，但不要写成超长清单。
+- 正文要明确写出 agent 必须做什么、避免什么、验证什么。
+- 稳定规则和环境专属说明分开。
+- 未知值使用占位符，不要编造。
+
+## 文件导航表
+
+`SKILL.md` 中有 reference 时，应使用文件导航表说明可读文件、内容边界和触发时机。
+
+固定表头：
+
+```md
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+```
+
+列写法：
+
+- `序号`：使用稳定整数，按推荐阅读顺序排列。
+- `文件内容概览`：写成能解释文件实际内容边界的具体短句，让模型不需要靠猜测或不断打开文件寻找；不要只写“模板”“工作流”“详细说明”这类泛泛标签。
+- `关键词`：写检索词、命令名、子系统名、文件类型或风险词；用逗号分隔。
+- `触发时机`：写可执行条件，例如“修改 X 前必须读取”“运行 Y 前必须读取”“排查 Z 时必须读取”。
+- `文件路径`：使用相对路径，放最后一列，并用 Markdown 链接或反引号保持可读。
+
+## README 列表
+
+- 新增或重命名 skill 后，`README.md` 的 Skill 列表必须同步。
+- README 行至少包含 skill 名称、入口链接和一句用途说明。
+- 如果没有新增 skill，只是拆分 reference 或改内部内容，通常不需要更新 README。
+
+## docs/index.html 数据项
+
+`docs/index.html` 中每个 skill 展示项至少要有：
+
+- `name`
+- `path`
+- `tags`
+- `desc`
+- 预览 `content`
+
+网页可见文案优先中文；`GitHub`、`PDF`、`LaTeX`、`Python`、`LLM`、`Canvas`、skill 名称等专有名词不要硬翻译。
+
+## GitHub Markdown 公式
+
+- 在本仓库的 `SKILL.md`、`references/*.md`、`README.md` 或网页预览内容中写 GitHub Markdown 公式时，必须参考 `ai-conference-paper-writing/references/github-markdown-math.md` 的 `GitHub Markdown 公式` 经验。
+- 优先使用 `math` 围栏。
+- 避免表格内复杂公式、`x_{<t}`、高风险宏和未转义 HTML 标签。
+
+## 网页展示同步
+
+- 页面主说明要跟功能同步；新增复制安装 Prompt、复制链接、跳转 GitHub 等操作后，首页说明文案也要更新。
+- 详情里的“查看完整文件”和“打开文件夹”是不同动作，文案要明确。
+- 动态生成外链时，URL 统一由 base URL 和 path 拼接，路径要 `encodeURI`。
+- 搜索输入应覆盖 skill 名称、路径、简介、预览内容和 tag。
+- 空状态要在筛选无结果时显示，并放在滚动区内，避免顶部布局跳动。
+
+## 一键复制安装 Prompt
+
+- 需要“一键复制安装 Prompt”时，Prompt 应写成可直接交给 agent 的操作清单，而不是只复制 URL。
+- 安装 Prompt 应先要求使用仓库下载工具下载整个 skill 文件夹，再检查 `SKILL.md`、frontmatter、相对路径、`references/`、`assets/`、`scripts/`，最后再安装。
+- 安装 Prompt 不要预设安装给某个具体 agent；如果不能确定 skills 安装目录，应要求先询问用户。
+- 安装 Prompt 必须强调：任何潜在危险操作都要先征得用户同意，包括覆盖、删除、移动、改全局配置、安装软件、改 shell 配置、改权限或不可逆操作。
+- 安装 Prompt 若使用本地下载检查目录，安装完成后应询问用户是否删除，未经确认不要删除。

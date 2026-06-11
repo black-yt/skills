@@ -5,6 +5,13 @@ description: "当需要为网页复刻 black-yt 风格的高级前端主题时�
 
 # Wave Mosaic Web Theme
 
+## 文件导航
+
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+| 1 | 说明 Wave Mosaic 背景的视觉目标、canvas 动态方块规则、四种背景颜色切换和组件透明质感。 | 主题原则、动态背景参数、4 种背景颜色系统、组件风格规则 | 默认读取 | `SKILL.md` |
+| 2 | 提供可直接复刻的 HTML/CSS/JS，实现固定全屏 canvas、主题切换按钮、CSS 变量、favicon 和字体加载。 | HTML、CSS、JS、canvas wave-mosaic、theme switcher、favicon、字体 | 需要实际复刻页面背景、主题切换、CSS 变量或完整 HTML/CSS/JS 时必须读取 | [references/theme-implementation.md](references/theme-implementation.md) |
+
 ## 使用原则
 
 - 用这个 skill 复刻一种低噪声、高级、学术/技术感的网页主题。

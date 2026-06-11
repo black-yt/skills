@@ -12,28 +12,61 @@ description: "当需要创建、整理、拆分或维护仓库中的 AGENTS.md �
 - 长流程、历史经验、大命令块、环境细节和低频说明放入 `AGENTS.local/` 或其他 topic docs。
 - 公开仓库中不要写入 secrets、真实凭据、私有路径、内部主机、私有服务地址或个人本地状态。
 - 编辑时保留已有硬规则；如果规则过时，要明确迁移或替换，不要静默删除。
+- 每个对话都应该默认知道的项目背景、总览、硬规则和安全边界必须直接写在 `AGENTS.md`，不要拆成 `AGENTS.local/` 中的单独 overview 文件。
 
 ## 推荐结构
 
-优先采用两层结构：
+优先采用两层结构，但 `AGENTS.local/` 下的文件不要写死。拆分应由项目实际内容决定，不要套固定模板。
 
 ```text
 AGENTS.md
 AGENTS.local/
-  00_project_overview.md
-  01_repository_layout.md
-  02_core_workflows.md
-  03_data_formats.md
-  04_common_pitfalls.md
-  05_development_commands.md
-  06_git_and_release.md
-  07_long_term_notes.md
+  01_<detailed-topic>.md
+  02_<detailed-topic>.md
+  ...
 ```
 
 - `AGENTS.md`：中等长度入口，放必须常驻的规则和索引。
 - `AGENTS.local/`：详细规则、长工作流、历史教训、命令示例和项目维护笔记。
+- `AGENTS.local/` 应该是一组平行的细节章节，不应该包含“总览”“项目概览”这类默认上下文文件。
+- 示例中的 `...` 表示按项目实际内容增减文件；不要让模型误以为只能按示例数量或示例命名拆分。
+- 复制示例到真实 `AGENTS.md` 时，必须把 `...` 替换成真实文件行或删除，不要把省略行当成实际导航项。
+- `AGENTS.local/` 的拆分目标是把语义相同或相近的章节放在一起，并降低常驻上下文压力；不是为了追求固定文件数或固定命名。
+- 不要拆得很碎。只有当内容明显属于不同任务场景、单文件过长、或会导致模型上下文压力时，才拆成多个文件。
+- 同一项目可以只有 1-3 个 `AGENTS.local/` 文件；复杂项目可以更多，但每个文件都应有清晰语义边界。
 - `AGENTS.local/` 的文件导航必须写在 `AGENTS.md` 里，不要依赖 `AGENTS.local/README.md`；因为 `AGENTS.md` 会被自动加载，agent 应该一开始就知道什么时候读哪个详细文件。
+- `AGENTS.md` 中导航 `AGENTS.local/` 文件时必须使用表格，列为：`序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`，其中 `文件路径` 放在最后一列。
+- `文件内容概览` 必须写成具体短句，让 agent 不打开文件也能判断文件包含什么内容，避免靠猜测或不断打开文件寻找；不要只写“项目概览”“工作流”“命令示例”这类粗略标签。
 - 如果仓库已经有等价目录命名，优先沿用现有约定，不强行重命名。
+
+## 文件导航表写法
+
+`AGENTS.md` 中的 `AGENTS.local/` 导航表必须让 agent 一眼知道“该读哪个文件、为什么读、何时必须读”，不能让 agent 靠猜测、反复 `ls`、反复打开文件来定位信息。
+
+表头固定为：
+
+```md
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+```
+
+各列写法：
+
+- **序号。** 使用稳定整数，按推荐阅读顺序排列；不要用字母、emoji 或会频繁变化的优先级标签。表格序号要和文件名前缀一致，例如表格写 `01`，文件名也用 `01_...`。
+- **文件内容概览。** 写 1 个具体句子，说明这个文件实际包含什么、解决什么边界问题；不要只写“项目概览”“工作流”“详细说明”。
+- **关键词。** 写 agent 可能用来判断相关性的检索词、命令名、子系统名、文件类型或风险词；用逗号分隔，不要替代内容概览。
+- **触发时机。** 写具体条件，优先使用“修改 X 前必须读取”“运行 Y 前必须读取”“排查 Z 时必须读取”；避免“需要时读取”这种无法执行的描述。
+- **文件路径。** 使用相对路径，放最后一列，并用反引号包住；移动、重命名或拆分文件后必须同步更新路径。
+
+最小示例。这个示例只展示表格写法，不要求所有项目都使用这些文件名：
+
+```md
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+| 01 | 解释各目录分别负责什么、哪些文件是生成物、哪些资源路径不能被 agent 顺手修改。 | layout、ownership、generated files、do-not-edit | 移动文件、新增目录或修改资源路径前必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
+| 02 | 记录本项目反复使用的开发、测试、发布和排错流程，避免 agent 重新猜执行顺序。 | workflows、commands、test、release、pitfalls | 执行多步维护、运行复杂命令、发布或排查异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
+| ... | 按项目实际语义继续增减，不要为了凑固定数量而拆分。 | ... | ... | `AGENTS.local/...` |
+```
 
 ## AGENTS.md 应该包含
 
@@ -44,7 +77,7 @@ AGENTS.local/
 - Git、commit、push、release 规则。
 - 测试、构建、lint、验证期望。
 - 子系统边界和交互限制。
-- 什么时候读取 `AGENTS.local/` 中的每个详细文件。
+- 以表格写清楚什么时候读取 `AGENTS.local/` 中的每个详细文件。
 - 指向详细文档的短链接，而不是复制完整内容。
 
 推荐长度：约 `80-200` 行。太短容易漏规则，太长会挤占任务上下文。
@@ -73,6 +106,16 @@ AGENTS.local/
 
 判断规则：如果一条说明不是每个会话都必须知道，就优先放到 `AGENTS.local/`。
 
+反向判断：如果一条说明是 agent 每次进入仓库都应该默认知道的背景、硬规则、安全边界或总览，就必须留在 `AGENTS.md`，即使它会让 `AGENTS.md` 略微变长。
+
+拆分规则：
+
+- **按语义合并。** 目录职责和生成物边界通常可以放一起；开发流程和验证命令通常可以放一起；风险、排错和历史教训通常可以放一起。
+- **按触发场景拆分。** 如果两个章节总是被同一类任务同时读取，就不要拆成两个文件。
+- **按上下文压力拆分。** 只有当文件过长、模板太多、命令块太大或任务场景明显不同，才拆出新文件。
+- **避免碎片化。** 不要为了对应固定编号创建很多几十行的小文件；每个文件都应该值得被单独读取。
+- **禁止二级总览。** 不要创建 `overview.md`、`project_overview.md`、`scope.md` 这类只是承载默认背景的 local 文件；这些内容应在 `AGENTS.md` 中默认加载。
+
 ## Git 跟踪策略
 
 - **公开仓库。** 通常建议 `.gitignore` 中忽略 `AGENTS.md` 和 `AGENTS.local/`，并在私有 context 仓库、内部文档或安全知识库中维护 canonical copy。
@@ -96,10 +139,10 @@ AGENTS.local/
 当 `AGENTS.md` 过长、难导航或包含大量低频细节时：
 
 1. 创建 `AGENTS.local/`。
-2. 按主题拆出 Markdown 文件。
+2. 按项目实际语义拆出少量 Markdown 文件，把相近章节放在一起。
 3. 用中等长度入口替换原 `AGENTS.md`。
 4. 确保原有信息没有丢失，只是迁移。
-5. 在 `AGENTS.md` 中添加完整索引和每个详细文件的读取时机。
+5. 在 `AGENTS.md` 中添加完整索引和每个详细文件的读取时机；导航表列为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
 6. 按公开/私有策略更新 `.gitignore`。
 
 ## AGENTS.md 模板
@@ -149,14 +192,11 @@ AGENTS.local/
 
 ## 深入指南
 
-- `AGENTS.local/00_project_overview.md`：项目目的、架构边界和长期方向；大型架构改动前读取。
-- `AGENTS.local/01_repository_layout.md`：目录职责、生成物和禁止误改区域；移动文件或新增目录前读取。
-- `AGENTS.local/02_core_workflows.md`：常见开发、导入、导出和维护流程；修改 [workflow] 前读取。
-- `AGENTS.local/03_data_formats.md`：输入/输出 schema、数据校验和兼容性要求；改数据格式前读取。
-- `AGENTS.local/04_common_pitfalls.md`：已知失败模式和排错历史；触碰 [risky subsystem] 前读取。
-- `AGENTS.local/05_development_commands.md`：完整命令示例和本地验证命令；需要运行复杂命令前读取。
-- `AGENTS.local/06_git_and_release.md`：release、branch、commit 和 publish 流程；发布或版本管理前读取。
-- `AGENTS.local/07_long_term_notes.md`：不需要每轮加载的长期背景；需要理解历史决策时读取。
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+| 01 | 解释各目录分别负责什么、哪些文件是生成物、哪些资源路径不能被 agent 顺手修改。 | layout、ownership、generated files、do-not-edit | 移动文件、新增目录或修改资源路径前必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
+| 02 | 记录本项目反复使用的开发、测试、发布和排错流程，避免 agent 重新猜执行顺序。 | workflows、commands、test、release、pitfalls | 执行多步维护、运行复杂命令、发布或排查异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
+| ... | 按项目实际语义继续增减，不要为了凑固定数量而拆分。 | ... | ... | `AGENTS.local/...` |
 
 如果某个文件不存在，不要假设其内容；按当前任务需要创建或更新，并保持 `AGENTS.md` 中的索引同步。
 
@@ -171,7 +211,7 @@ AGENTS.local/
 
 ## 拆分校验
 
-拆分大文件时，先确认内容是迁移而不是删除。可用下面脚本检查拆分后的文件集合是否稳定：
+拆分大文件时，先确认内容是迁移而不是删除。可用下面脚本检查拆分后的文件集合是否稳定。`files` 列表必须按当前项目实际拆分结果填写，不要照抄示例文件名：
 
 ```bash
 python3 - <<'PY'
@@ -179,14 +219,9 @@ from pathlib import Path
 import hashlib
 
 files = [
-    "00_project_overview.md",
-    "01_repository_layout.md",
-    "02_core_workflows.md",
-    "03_data_formats.md",
-    "04_common_pitfalls.md",
-    "05_development_commands.md",
-    "06_git_and_release.md",
-    "07_long_term_notes.md",
+    "01_repository_layout_and_boundaries.md",
+    "02_workflows_validation_and_release.md",
+    # ...
 ]
 
 text = "".join((Path("AGENTS.local") / f).read_text(encoding="utf-8") for f in files)
