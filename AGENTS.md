@@ -12,10 +12,10 @@
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 01 | 解释 skill 目录、resource 目录、`docs/` 展示层和通常不应修改的资源路径各自承担什么职责。 | layout、SKILL.md、references、assets、docs、GitHub Pages | 新增目录、移动文件、拆分 reference 或修改展示资源路径前必须读取 | `AGENTS.local/01_repository_layout_and_resources.md` |
-| 02 | 记录新增/更新 skill、拆分 reference、同步 README/docs、维护网页展示数据、安装 prompt 和结构化格式的完整规则。 | workflow、frontmatter、file navigation、README、docs/index.html、install prompt | 新增或大改 skill、修改导航表、修改 README/docs 展示项或写 Markdown 公式前必须读取 | `AGENTS.local/02_skill_workflows_and_formats.md` |
-| 03 | 汇总隐私泄漏、路径失效、跨 skill 不一致、源码误改、公式渲染失败等风险，以及验证命令和 Git 交付规则。 | pitfalls、validation、source tracing、git、diff、release | 排查异常、复制经验到多个 skill、追溯第三方库、提交前检查或涉及 commit/push 前必须读取 | `AGENTS.local/03_risks_validation_and_git.md` |
-| 04 | 保留网页布局、标签筛选、按钮样式、复制安装 prompt、渐隐滚动、主题切换和 GitHub Pages 验证等长期 UI 经验。 | web UI、layout、filter、copy prompt、mask、GitHub Pages | 修改 `docs/` 前端、网页交互、视觉样式、筛选逻辑或复制按钮行为前必须读取 | `AGENTS.local/04_web_pages_and_ui_notes.md` |
+| 01 | 解释每个 skill 文件夹与仓库展示层的职责边界，说明 `SKILL.md`、`references/`、`assets/`、`scripts/`、`docs/`、`docs/.nojekyll`、favicon 和 `download_skill.py` 分别何时可改、何时不应顺手修改。 | layout、skill folder、`SKILL.md`、`references/`、`assets/`、`scripts/`、`docs/index.html`、`docs/.nojekyll`、favicon、`download_skill.py`、GitHub Pages、资源路径、生成物边界 | 新增/删除/移动 skill 文件夹前；拆分/合并 reference 前；移动 assets/scripts 前；修改 GitHub Pages 资源路径、favicon、下载脚本或展示层目录前必须读取 | `AGENTS.local/01_repository_layout_and_resources.md` |
+| 02 | 记录新增和更新 skill 的完整维护流程，包括 frontmatter、reference 拆分、文件导航表、README 列表、`docs/index.html` 展示数据、安装 prompt、Markdown 公式和跨文件同步要求。 | skill workflow、frontmatter、name/description、file navigation、README.md、`docs/index.html`、tags、preview content、install prompt、GitHub Markdown math、reference split、coverage checklist | 新增 skill 前；大改 `SKILL.md` 前；修改导航表前；更新 README/docs 展示项前；写 GitHub Markdown 公式前；整理用户大段经验或拆分 reference 前必须读取 | `AGENTS.local/02_skill_workflows_and_formats.md` |
+| 03 | 汇总维护过程中的风险和验证方法，覆盖隐私泄漏、路径失效、跨 skill 规则不一致、第三方源码误改、公式渲染失败、内容迁移丢失、canonical copy 同步、`rsync --dry-run`、Git 暂存提交和 push 前检查。 | pitfalls、privacy、validation、source tracing、site-packages、third-party docs、git diff、git status、commit、push、stale path、content loss、cross-skill consistency、formula rendering、canonical copy、rsync dry-run | 排查异常时；复制经验到多个 skill 前；追溯第三方库源码前；移动/删除文件后；同步 ignored 指南到 canonical copy 前；提交或 push 前；检查内容是否丢失、路径是否过期或规则是否冲突时必须读取 | `AGENTS.local/03_risks_validation_and_git.md` |
+| 04 | 保留 `docs/` 静态网页的长期 UI 经验，覆盖固定头部和滚动列表、自定义多选标签、复制链接/安装 prompt、按钮字体一致性、渐隐 mask、4 种背景颜色切换和 GitHub Pages 视觉验证。 | web UI、`docs/index.html`、layout、fixed header、scroll list、tag filter、checkbox dropdown、copy prompt、copy link、button style、mask-image、theme switcher、GitHub Pages、responsive | 修改 `docs/` 前端前；调整搜索/筛选/展开交互前；改复制按钮或安装 prompt 前；改渐隐滚动、主题切换、移动端样式、favicon 或页面文案前必须读取 | `AGENTS.local/04_web_pages_and_ui_notes.md` |
 
 如果某个文件不存在，不要假设其内容；按当前任务需要创建或更新，并保持本表同步。
 
@@ -44,14 +44,15 @@
 - `references/` 放详细模板、示例和较长流程说明；`assets/` 放会被输出复用的静态资源；`scripts/` 放可执行辅助脚本。
 - 不要随意增加额外说明文件；只有直接服务 skill 功能时才新增。
 - 新增或大改 skill 后，必须同步检查 `README.md` 和 `docs/index.html`。
+- 维护任何 `AGENTS.md`、`CLAUDE.md` 或同类默认加载的 agent 指南时，主入口文件必须包含项目或工作空间的整体描述，让 agent 默认理解项目目标、主要结构、关键产物和维护边界；这些总览信息不要拆到 local 文件。
 
 ## 文件导航表规则
 
 - 有 `references/` 的 `SKILL.md` 必须包含文件导航表，表头固定为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
 - `序号` 使用稳定整数；如果导航对象文件名带数字前缀，序号必须和文件名前缀一致。
-- `文件内容概览` 必须写成能解释文件实际内容边界的具体短句，让模型不需要靠猜测或不断打开文件寻找；不要只写“模板”“工作流”“详细说明”。
-- `关键词` 写检索词、命令名、子系统名、文件类型或风险词；用逗号分隔，不要替代内容概览。
-- `触发时机` 写可执行条件，例如“修改 X 前必须读取”“运行 Y 前必须读取”“排查 Z 时必须读取”；避免“需要时读取”这种无法执行的描述。
+- `文件内容概览` 必须写成足够具体的 1-2 个短句，说明文件实际覆盖的模块、文件名、命令、边界和排除项；不要只写“模板”“工作流”“详细说明”。
+- `关键词` 要写足够多的检索词，通常至少 6-12 项；包含同义词、命令名、文件名、目录名、库名、错误类型和场景词，用逗号分隔，但不要替代内容概览。
+- `触发时机` 要列出多个具体可执行条件，通常至少 3 个，用分号分隔，例如“修改 X 前必须读取；运行 Y 前必须读取；排查 Z 时必须读取”；避免只写“需要时读取”或过宽泛的“默认读取”。
 - `文件路径` 使用相对路径，放最后一列；移动、重命名或拆分文件后必须同步更新。
 - 示例里的 `...` 只表示省略；真实导航表中必须删除或替换成实际文件行。
 

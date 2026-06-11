@@ -27,6 +27,23 @@
 - 删除或重命名 reference 后，`SKILL.md`、`AGENTS.md`、README、docs 里的旧路径都要检查。
 - 新增文件必须能从主 `SKILL.md`、`AGENTS.md` 或其他入口追溯，不要留下幽灵文件。
 
+## Canonical Copy 同步检查
+
+- 如果某个项目的 `AGENTS.md` 或 `AGENTS.local/` 被主仓库 ignore，只能在用户明确授权后同步 canonical copy、commit 或 push。
+- 同步前必须确认目标仓库、目标目录和将写入的文件列表。
+- `rsync` 源路径末尾斜杠含义不同：`AGENTS.local` 复制目录本身，`AGENTS.local/` 复制目录内容。
+- 使用 `--delete` 前必须先执行 `--dry-run`，确认不会误删或误写上级目录。
+
+```bash
+# 同步单个入口文件，先预演再执行
+rsync -a --dry-run AGENTS.md [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.md
+rsync -a AGENTS.md [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.md
+
+# 同步 AGENTS.local 目录内容，目标应是该仓库自己的 AGENTS.local/
+rsync -a --delete --dry-run AGENTS.local/ [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.local/
+rsync -a --delete AGENTS.local/ [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.local/
+```
+
 ## 公式渲染失败
 
 - GitHub Markdown 公式优先使用 `math` 围栏。
@@ -56,6 +73,7 @@ find . -maxdepth 2 -name SKILL.md
 ```bash
 python3 - <<'PY'
 from pathlib import Path
+import re
 for skill in sorted(p for p in Path('.').iterdir() if p.is_dir() and (p / 'SKILL.md').exists()):
     refs = sorted((skill / 'references').glob('*.md')) if (skill / 'references').exists() else []
     if not refs:
@@ -68,6 +86,22 @@ for skill in sorted(p for p in Path('.').iterdir() if p.is_dir() and (p / 'SKILL
         rel = ref.relative_to(skill).as_posix()
         if rel not in text:
             raise SystemExit(f'{skill}: missing {rel}')
+    for line in text.splitlines():
+        if not line.startswith('| ') or line.startswith('| ---') or line.startswith('| 序号'):
+            continue
+        cells = [c.strip() for c in line.strip('|').split('|')]
+        if len(cells) != 5 or not cells[0].isdigit():
+            continue
+        keyword_count = len([x for x in re.split(r'[、,，/]+', cells[2]) if x.strip()])
+        trigger_count = len([x for x in re.split(r'[；;]+', cells[3]) if x.strip()])
+        if len(cells[1]) < 35:
+            raise SystemExit(f'{skill}: navigation overview too short: {line}')
+        if keyword_count < 6:
+            raise SystemExit(f'{skill}: navigation keywords too few: {line}')
+        if cells[3] == '默认读取':
+            raise SystemExit(f'{skill}: navigation trigger too vague: {line}')
+        if cells[0] != '1' and trigger_count < 2:
+            raise SystemExit(f'{skill}: navigation triggers too few: {line}')
 print('navigation ok')
 PY
 ```

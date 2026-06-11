@@ -1,6 +1,6 @@
 ---
 name: agents-md-maintenance
-description: "当需要创建、整理、拆分或维护仓库中的 AGENTS.md 与 AGENTS.local/ agent 操作指南时使用；覆盖常驻上下文边界、公开/私有跟踪策略、拆分规则、同步校验和安全编辑。"
+description: "当需要创建、整理、拆分或维护仓库中的 AGENTS.md、CLAUDE.md 或同类默认加载 agent 操作指南时使用；覆盖常驻上下文边界、*.local/ 按需拆分、公开/私有跟踪策略、同步校验和安全编辑。"
 ---
 
 # AGENTS.md 维护
@@ -13,6 +13,15 @@ description: "当需要创建、整理、拆分或维护仓库中的 AGENTS.md �
 - 公开仓库中不要写入 secrets、真实凭据、私有路径、内部主机、私有服务地址或个人本地状态。
 - 编辑时保留已有硬规则；如果规则过时，要明确迁移或替换，不要静默删除。
 - 每个对话都应该默认知道的项目背景、总览、硬规则和安全边界必须直接写在 `AGENTS.md`，不要拆成 `AGENTS.local/` 中的单独 overview 文件。
+- 主 `AGENTS.md` 必须提供整个项目或工作空间的全局描述，让 agent 能从整体角度理解这个仓库是做什么的、核心目标是什么、主要结构如何组织、关键产物和维护边界是什么。
+
+## 适用范围
+
+- 这个 skill 主要面向 Codex 这类会自动加载 `AGENTS.md` 的智能体操作指南。
+- 其他智能体可能使用不同入口文件名，例如 Claude Code 常用 `CLAUDE.md`；文件名不同，但维护逻辑相同。
+- 维护非 `AGENTS.md` 入口时，把规则中的 `AGENTS.md` / `AGENTS.local/` 等价替换为对应文件和目录，例如 `CLAUDE.md` / `CLAUDE.local/`。
+- 核心目标不是固定文件名，而是在默认加载的入口文件中提供足够全局上下文和硬规则，同时把低频细节拆到 local 目录按需读取，避免默认加载文档浪费上下文窗口。
+- 如果采用 `CLAUDE.md`、`CLAUDE.local/` 或其他同类命名，也要同步维护 `.gitignore`、canonical copy、导航表和文件路径引用。
 
 ## 推荐结构
 
@@ -21,6 +30,16 @@ description: "当需要创建、整理、拆分或维护仓库中的 AGENTS.md �
 ```text
 AGENTS.md
 AGENTS.local/
+  01_<detailed-topic>.md
+  02_<detailed-topic>.md
+  ...
+```
+
+如果入口文件不是 `AGENTS.md`，保持同样结构语义，只替换文件名：
+
+```text
+CLAUDE.md
+CLAUDE.local/
   01_<detailed-topic>.md
   02_<detailed-topic>.md
   ...
@@ -36,7 +55,9 @@ AGENTS.local/
 - 同一项目可以只有 1-3 个 `AGENTS.local/` 文件；复杂项目可以更多，但每个文件都应有清晰语义边界。
 - `AGENTS.local/` 的文件导航必须写在 `AGENTS.md` 里，不要依赖 `AGENTS.local/README.md`；因为 `AGENTS.md` 会被自动加载，agent 应该一开始就知道什么时候读哪个详细文件。
 - `AGENTS.md` 中导航 `AGENTS.local/` 文件时必须使用表格，列为：`序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`，其中 `文件路径` 放在最后一列。
-- `文件内容概览` 必须写成具体短句，让 agent 不打开文件也能判断文件包含什么内容，避免靠猜测或不断打开文件寻找；不要只写“项目概览”“工作流”“命令示例”这类粗略标签。
+- `文件内容概览`、`关键词` 和 `触发时机` 都必须非常具体。目标是让 agent 不打开文件也能判断“是否必须读这个文件”，避免靠猜测、反复 `ls` 或反复打开文件寻找。
+- `文件内容概览` 必须写清实际覆盖的模块、文件名、命令、边界和排除项；不要只写“项目概览”“工作流”“命令示例”这类粗略标签。
+- `关键词` 和 `触发时机` 要覆盖足够多的真实检索词和任务场景；过少会导致模型查阅低效。
 - 如果仓库已经有等价目录命名，优先沿用现有约定，不强行重命名。
 
 ## 文件导航表写法
@@ -53,9 +74,9 @@ AGENTS.local/
 各列写法：
 
 - **序号。** 使用稳定整数，按推荐阅读顺序排列；不要用字母、emoji 或会频繁变化的优先级标签。表格序号要和文件名前缀一致，例如表格写 `01`，文件名也用 `01_...`。
-- **文件内容概览。** 写 1 个具体句子，说明这个文件实际包含什么、解决什么边界问题；不要只写“项目概览”“工作流”“详细说明”。
-- **关键词。** 写 agent 可能用来判断相关性的检索词、命令名、子系统名、文件类型或风险词；用逗号分隔，不要替代内容概览。
-- **触发时机。** 写具体条件，优先使用“修改 X 前必须读取”“运行 Y 前必须读取”“排查 Z 时必须读取”；避免“需要时读取”这种无法执行的描述。
+- **文件内容概览。** 写 1-2 个具体短句，说明这个文件实际包含什么、解决什么边界问题、涉及哪些关键文件/命令/系统，以及不覆盖什么；不要只写“项目概览”“工作流”“详细说明”。
+- **关键词。** 写足够多的检索词，通常至少 6-12 项；包含同义词、命令名、文件名、目录名、库名、错误类型、任务阶段和风险词。关键词用逗号分隔，不要替代内容概览。
+- **触发时机。** 写多个具体条件，通常至少 3 个；优先使用“修改 X 前必须读取”“运行 Y 前必须读取”“排查 Z 时必须读取”“同步 A 到 B 前必须读取”；用分号分隔，避免只写“需要时读取”“默认读取”或过宽泛的描述。
 - **文件路径。** 使用相对路径，放最后一列，并用反引号包住；移动、重命名或拆分文件后必须同步更新路径。
 
 最小示例。这个示例只展示表格写法，不要求所有项目都使用这些文件名：
@@ -63,14 +84,15 @@ AGENTS.local/
 ```md
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 01 | 解释各目录分别负责什么、哪些文件是生成物、哪些资源路径不能被 agent 顺手修改。 | layout、ownership、generated files、do-not-edit | 移动文件、新增目录或修改资源路径前必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
-| 02 | 记录本项目反复使用的开发、测试、发布和排错流程，避免 agent 重新猜执行顺序。 | workflows、commands、test、release、pitfalls | 执行多步维护、运行复杂命令、发布或排查异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
+| 01 | 解释仓库源码、生成物、配置、数据、文档和静态资源目录的职责边界，并标明哪些路径可以改、哪些路径只能读、哪些路径由工具生成不能手写。 | layout、ownership、generated files、do-not-edit、config、data、docs、assets、scripts、build output、resource path、path safety | 新增/移动/删除目录前；修改资源路径前；编辑生成物前；调整构建产物位置前；不确定某个路径是否可改时必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
+| 02 | 记录开发、测试、构建、发布、回滚和排错的项目级流程，包含常用命令、执行顺序、前置条件、失败处理和哪些命令不能直接运行。 | workflows、commands、test、lint、build、release、rollback、CI、debug、dry-run、pitfalls、failure handling | 执行多步维护前；运行复杂命令前；发布/回滚前；修 CI 或测试失败前；排查环境、依赖、权限或构建异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
 | ... | 按项目实际语义继续增减，不要为了凑固定数量而拆分。 | ... | ... | `AGENTS.local/...` |
 ```
 
 ## AGENTS.md 应该包含
 
-- 项目目的和一段式 overview。
+- 项目或工作空间的整体描述：这个仓库做什么、服务谁、核心目标是什么、主要产物是什么。
+- 主要结构的全局说明：核心目录、关键文件、展示层、生成物、配置和外部资源各自承担什么职责。
 - 主要目录、服务、子系统及职责边界。
 - 高优先级安全规则和数据完整性规则。
 - 不能误改的文件、目录、生成物或外部资源。
@@ -131,6 +153,30 @@ AGENTS.local/
 - 同步前必须先确认目标路径、列出将写入的文件，并用 `diff`、`rsync --dry-run` 或等价检查确认写入范围正确。
 - 同步前必须确认不会把 `AGENTS.local/` 文件误写到上级目录、错误仓库或错误分支。
 
+`rsync` 适合把 ignored 的 `AGENTS.md` 和 `AGENTS.local/` 增量同步到 canonical copy，但必须先 dry-run。源路径末尾斜杠含义不同：
+
+- `AGENTS.local`：复制整个目录本身，目标下会出现 `AGENTS.local/`。
+- `AGENTS.local/`：复制目录里面的内容，适合同步到已存在的 `DEST/AGENTS.local/`。
+
+推荐流程：
+
+```bash
+# 同步单个入口文件
+rsync -a --dry-run AGENTS.md [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.md
+rsync -a AGENTS.md [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.md
+
+# 同步 AGENTS.local 目录内容，先预演再执行
+rsync -a --delete --dry-run AGENTS.local/ [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.local/
+rsync -a --delete AGENTS.local/ [CANONICAL_ROOT]/[REPO_NAME]/AGENTS.local/
+```
+
+安全规则：
+
+- 使用 `--delete` 前必须先跑 `--dry-run`。
+- 先确认 `[CANONICAL_ROOT]`、`[REPO_NAME]` 和目标目录都正确，再去掉 `--dry-run`。
+- 需要显示过程时加 `-v`；大目录可加 `-P`；需要排除缓存时用 `--exclude '__pycache__/' --exclude '*.pyc'`。
+- 不要把 `AGENTS.local/` 同步到 canonical 根目录本身，除非目标就是专门为该仓库准备的目录。
+
 ## 编辑工作流
 
 1. 先读现有 `AGENTS.md`、`.gitignore` 和已存在的 `AGENTS.local/` topic 文件。
@@ -150,7 +196,7 @@ AGENTS.local/
 2. 按项目实际语义拆出少量 Markdown 文件，把相近章节放在一起。
 3. 用中等长度入口替换原 `AGENTS.md`。
 4. 确保原有信息没有丢失，只是迁移。
-5. 在 `AGENTS.md` 中添加完整索引和每个详细文件的读取时机；导航表列为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
+5. 在 `AGENTS.md` 中添加完整索引和每个详细文件的读取时机；导航表列为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`，且后三列必须足够具体，不能让 agent 靠猜。
 6. 按公开/私有策略更新 `.gitignore`。
 
 拆分后必须做结构审计：
@@ -158,7 +204,9 @@ AGENTS.local/
 - `AGENTS.local/` 文件是否从 `01_` 开始编号，且表格序号与文件名前缀一致。
 - 是否没有 `00_`、`overview`、`project_overview`、`scope`、`README.md` 这类二级总览文件。
 - 导航表列是否为 `序号 / 文件内容概览 / 关键词 / 触发时机 / 文件路径`。
-- `触发时机` 是否写成“修改/运行/排查 X 前必须读取”这类可执行条件。
+- `文件内容概览` 是否具体说明文件里的真实内容、关键文件/命令/边界和不覆盖项。
+- `关键词` 是否包含足够多的同义词、命令名、目录名、错误类型和任务场景，而不是 2-3 个泛词。
+- `触发时机` 是否写成多个“修改/运行/排查/同步 X 前必须读取”这类可执行条件。
 - `AGENTS.md` 行数是否大致在 `80-200` 行；超出时要判断是否仍然属于常驻上下文。
 - `git diff --check` 是否通过。
 
@@ -169,9 +217,9 @@ AGENTS.local/
 
 ## 项目概览
 
-- [用一段话说明这个仓库做什么。]
-- [说明主要用户、运行方式、部署目标或产物类型。]
-- [说明 agent 最需要保护或避免破坏的东西。]
+- [用一段话说明这个项目或工作空间做什么、服务谁、核心目标是什么。]
+- [说明主要产物、运行方式、部署目标、数据/模型/文档等关键对象。]
+- [说明主要目录和子系统如何组织，以及 agent 最需要保护或避免破坏的东西。]
 
 ## 仓库结构
 
@@ -211,8 +259,8 @@ AGENTS.local/
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 01 | 解释各目录分别负责什么、哪些文件是生成物、哪些资源路径不能被 agent 顺手修改。 | layout、ownership、generated files、do-not-edit | 移动文件、新增目录或修改资源路径前必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
-| 02 | 记录本项目反复使用的开发、测试、发布和排错流程，避免 agent 重新猜执行顺序。 | workflows、commands、test、release、pitfalls | 执行多步维护、运行复杂命令、发布或排查异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
+| 01 | 解释仓库源码、生成物、配置、数据、文档和静态资源目录的职责边界，并标明哪些路径可以改、哪些路径只能读、哪些路径由工具生成不能手写。 | layout、ownership、generated files、do-not-edit、config、data、docs、assets、scripts、build output、resource path、path safety | 新增/移动/删除目录前；修改资源路径前；编辑生成物前；调整构建产物位置前；不确定某个路径是否可改时必须读取 | `AGENTS.local/01_repository_layout_and_boundaries.md` |
+| 02 | 记录开发、测试、构建、发布、回滚和排错的项目级流程，包含常用命令、执行顺序、前置条件、失败处理和哪些命令不能直接运行。 | workflows、commands、test、lint、build、release、rollback、CI、debug、dry-run、pitfalls、failure handling | 执行多步维护前；运行复杂命令前；发布/回滚前；修 CI 或测试失败前；排查环境、依赖、权限或构建异常前必须读取 | `AGENTS.local/02_workflows_validation_and_release.md` |
 | ... | 按项目实际语义继续增减，不要为了凑固定数量而拆分。 | ... | ... | `AGENTS.local/...` |
 
 如果某个文件不存在，不要假设其内容；按当前任务需要创建或更新，并保持 `AGENTS.md` 中的索引同步。
@@ -264,7 +312,9 @@ agent 遇到冲突时，应优先遵守高优先级规则。
 ## Review 清单
 
 - `AGENTS.md` 回答了“动手前必须知道什么”。
+- `AGENTS.md` 提供了项目或工作空间的全局描述，能让 agent 理解项目目标、主要结构、关键产物和维护边界。
 - `AGENTS.local/` 回答了“做某类任务前还应读什么”。
+- 导航表的 `文件内容概览 / 关键词 / 触发时机` 足够具体，模型不需要靠猜测或反复打开文件定位信息。
 - 没有把低频细节塞进常驻上下文。
 - 没有丢失已有硬规则或历史教训。
 - 没有 secrets、真实凭据、私有路径或未确认可公开的信息。

@@ -9,9 +9,9 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 1 | 规定 LLM/VLM 部署和训练的共通安全原则、版本匹配方法、官方文档优先级和只读源码追溯方式。 | 核心原则、版本匹配、官方文档、源码追溯 | 默认读取 | `SKILL.md` |
-| 2 | 记录 vLLM OpenAI-compatible 服务的部署脚本参数、多模态限制、工具调用、Qwen thinking、CUDA Graph 和本地端口转发验证。 | OpenAI-compatible 服务、多模态、工具调用、Qwen thinking、CUDA Graph、SSH local port forwarding | 需要部署、验证或排错 vLLM 服务，尤其是多模态、工具调用、thinking 或本地转发时必须读取 | [references/vllm-deployment.md](references/vllm-deployment.md) |
-| 3 | 记录 ms-swift SFT/DPO/GRPO full training 的默认超参、JSONL 数据格式、显存排错顺序、训练前后检查和 rjob 资源模板。 | SFT、DPO、GRPO、full training、数据格式、显存排错、rjob 资源建议 | 需要编写、审查或排错 ms-swift SFT/DPO/GRPO 训练脚本时必须读取 | [references/ms-swift-training.md](references/ms-swift-training.md) |
+| 1 | 规定 LLM/VLM 部署和训练的共通安全边界，说明不要改共享环境、如何匹配 vLLM/ms-swift/transformers/torch 版本、何时读官方文档、何时只读追溯源码。 | LLM deploy、VLM deploy、training、shared env、conda、version match、official docs、CLI help、source tracing、site-packages、vLLM、ms-swift、transformers、torch | 触发本 skill 后默认读取；部署或训练前；准备安装/升级依赖前；参数不确定要查文档或源码前；涉及共享 conda、CUDA、torch/vLLM/ms-swift 环境时读取 | `SKILL.md` |
+| 2 | 记录 vLLM OpenAI-compatible 服务的完整部署和验证经验，覆盖 `vllm serve` 参数、多模态 `limit-mm-per-prompt`、Qwen3.5 工具调用、thinking/reasoning、35B 2 卡、CUDA Graph、`extra_body`、内网访问和 SSH local port forwarding。 | vLLM、OpenAI-compatible server、`vllm serve`、multimodal、`limit-mm-per-prompt`、auto tool choice、`qwen3_coder`、Qwen thinking、reasoning parser、35B、tensor parallel、CUDA Graph、`extra_body`、SSH forwarding、`/v1/models` | 写或审查 vLLM 部署脚本前；验证 `/v1/models`/短文本/工具调用/图片输入前；配置 Qwen thinking 开关或 35B 服务前；排查 CUDA Graph、OOM、多模态报错、工具调用失败或本地访问内网服务时必须读取 | [references/vllm-deployment.md](references/vllm-deployment.md) |
+| 3 | 记录 ms-swift SFT/DPO/GRPO full training 的完整训练经验，覆盖默认超参、bf16/zero3/save_only_model、JSONL validator、max length 过滤、显存排错、dry-run、训练后检查和 rjob 资源模板。 | ms-swift、SFT、DPO、GRPO、full training、bf16、DeepSpeed zero3、save_only_model、JSONL、validator、max_length、OOM、dry-run、rjob、checkpoint、consumed data | 编写/审查 SFT、DPO 或 GRPO 脚本前；准备 full training 超参前；训练数据格式校验前；排查 OOM、LoRA/full 混用、checkpoint 膨胀、训练失败或 consumed 标记问题时必须读取 | [references/ms-swift-training.md](references/ms-swift-training.md) |
 
 ## 核心原则
 

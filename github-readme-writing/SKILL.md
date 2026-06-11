@@ -9,8 +9,8 @@ description: "当需要为 GitHub 项目创建、重构或审阅高质量 README
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 1 | 规定 GitHub README 的居中标题、badge、highlights、news 折叠、Mermaid、目录、Quick Start、citation 和 star history 结构。 | README 结构、视觉组件、news、Mermaid、quick start、citation、star history | 默认读取 | `SKILL.md` |
-| 2 | 记录 README 里公式如何稳定通过 GitHub 渲染，包含 `math` 围栏、危险宏、表格公式和检查命令。 | `math` 围栏、GitHub 公式渲染、高风险宏、检查清单 | README 中需要写公式、概率表达式、指标定义或复杂数学块时必须读取 | [references/github-math-rendering.md](references/github-math-rendering.md) |
+| 1 | 规定 GitHub README 的整体信息架构和视觉组件，覆盖居中标题、badge、目录导航、teaser、highlights 表格、news 折叠、Mermaid、项目结构树、Quick Start、联系方式、citation、star history 和图片懒加载。 | README structure、centered title、badge、navigation、teaser、highlights table、news、`details`、Mermaid、project tree、Quick Start、citation、star history、lazy image、emoji | 触发本 skill 后默认读取；新建 README 前；重构 README 首页结构前；增加 news/highlights/demo/quick start/citation/star history 前；检查 README 是否像项目主页而不是文档清单时读取 | `SKILL.md` |
+| 2 | 记录 README 和 GitHub Markdown 中公式稳定渲染的写法，覆盖 `math` 围栏、`$$` 风险、`x_{<t}` 替代、高风险宏、表格内公式、OCR 公式清理和渲染检查命令。 | GitHub math、KaTeX、`math` fence、`$$`、inline math、`\operatorname`、`\mathrm`、`x_{<t}`、`\mid`、Markdown table、OCR formula、`grep` check | README 或 GitHub notes 中写长公式/多行公式前；表格里需要表达变量或条件概率前；从 PDF/OCR 粘贴公式后；出现 Unable to render rich display 或 KaTeX 报错时必须读取 | [references/github-math-rendering.md](references/github-math-rendering.md) |
 
 ## 核心原则
 

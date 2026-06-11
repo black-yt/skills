@@ -9,8 +9,8 @@ description: Use when converting Markdown documents into Microsoft Word .docx de
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 1 | 说明 Markdown 转 DOCX 的适用边界、依赖安装、脚本参数、图片/表格/公式处理策略和质量检查方式。 | 使用边界、能力范围、核心流程、依赖、输入组织、脚本参数、转换策略、质量检查 | 默认读取 | `SKILL.md` |
-| 2 | 展开从 Markdown 材料组织 Word 文档的完整流程，包括一级章节、图文块、caption、目录结构和拆分策略。 | 端到端 Markdown 转 DOCX、一级章节写法、图文块、caption、目录组织 | 需要从 Markdown 组织一份完整 Word 文档、拆图文块或规划一级章节时必须读取 | [references/docx-workflow-and-structure.md](references/docx-workflow-and-structure.md) |
+| 1 | 说明 Markdown 转 DOCX 的使用边界和执行入口，覆盖依赖、`build_docx.py`/`count_visible_words.py` 参数、本地图片、caption、表格展开、公式降级、字体、输出检查和 `/tmp` 清理。 | Markdown to DOCX、Word、`.docx`、`python-docx`、`build_docx.py`、`count_visible_words.py`、images、caption、HTML img、tables、formula、font、word count、quality check | 触发本 skill 后默认读取；需要把 Markdown 交付为 Word 前；选择脚本参数前；处理图片/表格/公式前；检查 docx 字数、图片、caption 或格式问题前读取 | `SKILL.md` |
+| 2 | 展开从零组织一份 Word 文档的内容工作流，说明 Markdown 材料如何拆成一级章节、图文块、居中图片、caption、目录结构、正文段落和可维护的分文件草稿。 | document workflow、section plan、Heading 1、image-text block、caption、table-to-text、directory structure、split draft、article、report、public draft、PR document | 从零规划 DOCX 文档结构前；把杂乱 Markdown/图片整理成正式 Word 前；需要拆分长文、组织图文块、重写一级章节或统一 caption 时必须读取 | [references/docx-workflow-and-structure.md](references/docx-workflow-and-structure.md) |
 
 ## 使用边界
 
