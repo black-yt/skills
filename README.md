@@ -16,6 +16,7 @@ skill-name/
 
 | Skill | 入口文档 | 用途 |
 | --- | --- | --- |
+| `agents-md-maintenance` | [`agents-md-maintenance/SKILL.md`](agents-md-maintenance/SKILL.md) | 创建、整理、拆分和维护仓库级 `AGENTS.md` 与 `AGENTS.local/`，覆盖常驻上下文边界、公开/私有跟踪策略、同步校验和安全编辑。 |
 | `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
 | `context-overlay` | [`context-overlay/SKILL.md`](context-overlay/SKILL.md) | 配置和验证 OpenAI-compatible context overlay proxy，覆盖 rule matching、prompt/context 注入、prompt patch、routing、reject、skill_dir 检索和转发安全。 |
