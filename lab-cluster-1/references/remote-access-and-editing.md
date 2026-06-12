@@ -8,6 +8,14 @@
 ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
 ```
 
+如果 `h.pjlab.org.cn` 域名 SSH 连接失败、DNS 解析异常或网络到域名不稳定，可以保持相同用户名，把目标主机临时换成开发机 IP 试一次：
+
+```bash
+ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@10.102.254.2
+```
+
+这只是 SSH 入口的备用连接方式。后续 `rjob` 日志里的服务 IP、worker 内网 IP、KAPI URL 和 `ssh -L` 转发目标仍按对应章节从日志或实际服务信息获取，不要用这个入口 IP 代替服务 IP。
+
 推荐工作方式：先保持一个后台持久 SSH 终端，再在这个终端内连续执行 `cd`、编辑、提交、日志查看和清理。对于 Codex 或其他自动化 agent，这意味着优先维护一个长期 PTY/session，而不是每一步都新发一次 `ssh 'command'`。只有下面这种单次简单检查才适合一次性 SSH：
 
 ```bash
