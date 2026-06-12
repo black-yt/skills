@@ -903,6 +903,13 @@
         content: '### 浏览器渲染可视化\n- 用真实 Chromium 渲染网页，而不是只检查 HTML 源码。\n- 覆盖本地 HTTP server、Playwright CLI 截图、桌面/移动端 viewport 和 console/pageerror 捕获。\n- 对 Canvas、Three.js、WebGL 页面额外检查截图是否非空白，避免页面打开但核心画面没渲染。'
       },
       {
+        name: 'codex-history-sync',
+        path: 'codex-history-sync/SKILL.md',
+        tags: ['Codex', '同步', 'Python', '迁移'],
+        desc: '把一个 .codex 的 Codex 会话记录、history.jsonl、sessions 和 thread title 元数据保守地单向同步到另一个用户或目录。',
+        content: '### Codex 历史同步\n- 用于把一个 CODEX_HOME/.codex 的会话记录同步到另一个用户、机器、WSL/Windows 目录或备份目录。\n- bundled 脚本默认同步 sessions/ 和 history.jsonl，并排除 auth/config/credentials/settings/.env 等敏感配置。\n- 强制要求先 dry-run/verbose 检查复制、覆盖、过滤和 title 更新范围，只有明确需要时才使用 --force 或 --include-sensitive。'
+      },
+      {
         name: 'context-overlay',
         path: 'context-overlay/SKILL.md',
         tags: ['LLM', '代理', 'OpenAI', 'Prompt'],
