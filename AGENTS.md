@@ -44,6 +44,7 @@
 - `references/` 放详细模板、示例和较长流程说明；`assets/` 放会被输出复用的静态资源；`scripts/` 放可执行辅助脚本。
 - 不要随意增加额外说明文件；只有直接服务 skill 功能时才新增。
 - 新增或大改 skill 后，必须同步检查 `README.md` 和 `docs/index.html`。
+- 新增、删除或重命名 skill 后，`README.md` 和 `docs/index.html` 不仅要同步名称、链接和数量，还要按当前仓库展示顺序重新排序；重命名后的条目不能停留在旧名称所在位置。
 - 维护任何 `AGENTS.md`、`CLAUDE.md` 或同类默认加载的 agent 指南时，主入口文件必须包含项目或工作空间的整体描述，让 agent 默认理解项目目标、主要结构、关键产物和维护边界；这些总览信息不要拆到 local 文件。
 - skill 默认面向“使用这个能力的用户”，不是面向“维护上游仓库的人”；除非 skill 明确是维护类，例如 `agents-md-maintenance`，否则不要记录上游 `.gitignore`、发布流程、内部维护习惯或与使用技能无关的仓库治理细节。
 - `lab-cluster-1` 和 `lab-cluster-1-web-portal` 是面向相同集群使用者的具体 skill，不是通用模板；维护时可以保留技能本身必要的具体网站、分区、namespace、charged group、mount 目录、共享存储路径、CUDA/conda 路径和登录 endpoint。

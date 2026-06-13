@@ -7,6 +7,7 @@
 - 如有详细模板、长示例、图片、脚本，分别放入 `references/`、`assets/`、`scripts/`，不要把所有内容塞进主文件。
 - 必须同步更新 `README.md` 的 Skill 列表，包含 skill 名称、入口链接和一句用途说明。
 - 必须同步更新 `docs/index.html` 中的网页展示数据，包含 `name`、`path`、`tags`、`desc` 和预览 `content`。
+- 新增、删除或重命名 skill 后，`README.md` 和 `docs/index.html` 的条目顺序也必须同步更新；本仓库默认按实际 skill 文件夹名展示，重命名后的条目应移动到新名称对应的位置，不要保留在旧名称排序位置。
 - 新增网页 tag 时，优先复用已有 tag；确实需要新增时，保持中英文粒度一致，专有名词不要硬翻译。
 - 新增 skill 后，用 `find . -maxdepth 2 -name SKILL.md`、`README.md` 和 `docs/index.html` 互相对照，确认没有漏展示、漏链接或路径写错。
 - 提交前运行 `git diff --check`。
@@ -65,6 +66,7 @@
 
 - 新增或重命名 skill 后，`README.md` 的 Skill 列表必须同步。
 - README 行至少包含 skill 名称、入口链接和一句用途说明。
+- README 列表顺序必须与当前仓库展示顺序一致；如果重命名改变了字母序或分组位置，必须移动整行，而不是只改行内文字。
 - 如果没有新增 skill，只是拆分 reference 或改内部内容，通常不需要更新 README。
 
 ## docs/index.html 数据项
@@ -76,6 +78,8 @@
 - `tags`
 - `desc`
 - 预览 `content`
+
+数据项顺序必须与 README 的 Skill 列表一致；重命名 skill 后必须移动整个对象块到新排序位置，并检查旧名称附近没有残留对象。
 
 网页可见文案优先中文；`GitHub`、`PDF`、`LaTeX`、`Python`、`LLM`、`Canvas`、skill 名称等专有名词不要硬翻译。
 

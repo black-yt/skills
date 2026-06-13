@@ -65,6 +65,7 @@ find . -maxdepth 2 -name SKILL.md
 ```
 
 新增 skill 后，用实际 `SKILL.md` 列表、`README.md` 和 `docs/index.html` 互相对照，确认没有漏展示、漏链接或路径写错。
+重命名 skill 后还要确认两处展示顺序已重排；不要只检查名称和链接是否存在。
 
 ## Reference 导航检查
 
@@ -115,19 +116,27 @@ import re
 
 readme = Path('README.md').read_text(encoding='utf-8')
 docs = Path('docs/index.html').read_text(encoding='utf-8')
-doc_names = set(re.findall(r"name:\\s*['\\\"]([^'\\\"]+)['\\\"]", docs))
 skills = sorted(p.name for p in Path('.').iterdir() if p.is_dir() and (p / 'SKILL.md').exists())
+readme_names = re.findall(r"^\| `([^`]+)` \|", readme, flags=re.M)
+doc_names = re.findall(r"name:\s*['\"]([^'\"]+)['\"]", docs)
 
-missing_readme = [s for s in skills if f'`{s}`' not in readme]
+missing_readme = [s for s in skills if s not in readme_names]
 missing_docs = [s for s in skills if s not in doc_names]
-extra_docs = sorted(doc_names - set(skills))
+extra_readme = sorted(set(readme_names) - set(skills))
+extra_docs = sorted(set(doc_names) - set(skills))
+readme_order_ok = readme_names == skills
+docs_order_ok = doc_names == skills
 
 print('skill files:', len(skills))
+print('README entries:', len(readme_names))
 print('docs entries:', len(doc_names))
 print('missing README:', missing_readme)
 print('missing docs:', missing_docs)
+print('extra README:', extra_readme)
 print('extra docs:', extra_docs)
-if missing_readme or missing_docs or extra_docs:
+print('README order ok:', readme_order_ok)
+print('docs order ok:', docs_order_ok)
+if missing_readme or missing_docs or extra_readme or extra_docs or not readme_order_ok or not docs_order_ok:
     raise SystemExit(1)
 PY
 ```

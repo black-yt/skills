@@ -917,20 +917,6 @@
         content: '### Context Overlay\n- 用于在 OpenAI SDK client 和上游模型服务之间插入轻量 request proxy。\n- 支持按 path、model、messages 和 extra_body 匹配请求，并应用 system/user 注入、regex_replace、route、reject 等 transform。\n- 强调不运行 agent loop、不执行 tools、不解释模型输出，并保留 tools、image_url、response_format、stream 等 OpenAI-compatible 字段。'
       },
       {
-        name: 'lab-cluster-1-web-portal',
-        path: 'lab-cluster-1-web-portal/SKILL.md',
-        tags: ['集群', 'Web', '监控', 'OIDC', 'GPU'],
-        desc: '访问、登录和只读查询 lab-cluster-1 的 h.pjlab.org.cn 集群管理网站，覆盖 OIDC 会话、token 安全、Prometheus/DCGM 监控、pod/rjob 映射和报告数据分层。',
-        content: '### Lab Cluster 1 Web Portal\n- 用于登录 `https://h.pjlab.org.cn/` 并只读获取监控和状态信息，避免把网页登录、rjob 查询和飞书通知混成一个系统。\n- 覆盖 h.pjlab.org.cn 的 OIDC authorization code flow、token/cookie 安全、refresh、`/kapi/auth` endpoint 和 Prometheus/DCGM 查询。\n- 强调用 pod、replica、namespace 把监控指标映射到 rjob；无法映射的数据单独作为其他占用展示，不硬归因。'
-      },
-      {
-        name: 'frontend-markdown-rendering',
-        path: 'frontend-markdown-rendering/SKILL.md',
-        tags: ['前端', 'Markdown', 'KaTeX', 'Mermaid'],
-        desc: '在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。',
-        content: '### 前端 Markdown 渲染\n- 只把最终 assistant result 当 Markdown 渲染，工具调用、trace、错误日志仍按纯文本或 JSON 展示。\n- 使用 marked、DOMPurify、KaTeX 和 Mermaid 组合，不自己手写完整 Markdown parser。\n- 覆盖公式保护、workspace 图片安全路由、图片/表格/SVG 宽度约束和常见渲染错误。'
-      },
-      {
         name: 'docx-splitting',
         path: 'docx-splitting/SKILL.md',
         tags: ['DOCX', '办公', 'Windows'],
@@ -943,6 +929,13 @@
         tags: ['飞书', 'Lark', '机器人', 'Webhook', 'API'],
         desc: '创建、配置、调用和排查飞书/Lark 机器人，区分自定义机器人 webhook、Markdown 表格卡片渲染与应用机器人开放平台 API。',
         content: '### 飞书机器人\n- 用于判断该用自定义机器人 webhook 还是应用机器人，并避免把两种请求体和能力边界混用。\n- 自定义机器人适合单向群通知，覆盖 text、post、image、share_chat、interactive card、schema 2.0 Markdown 表格、签名校验和常见错误码。\n- 应用机器人适合收消息、自动回复、查 open_id、上传资源、群管理、卡片交互和正式业务系统集成。'
+      },
+      {
+        name: 'frontend-markdown-rendering',
+        path: 'frontend-markdown-rendering/SKILL.md',
+        tags: ['前端', 'Markdown', 'KaTeX', 'Mermaid'],
+        desc: '在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。',
+        content: '### 前端 Markdown 渲染\n- 只把最终 assistant result 当 Markdown 渲染，工具调用、trace、错误日志仍按纯文本或 JSON 展示。\n- 使用 marked、DOMPurify、KaTeX 和 Mermaid 组合，不自己手写完整 Markdown parser。\n- 覆盖公式保护、workspace 图片安全路由、图片/表格/SVG 宽度约束和常见渲染错误。'
       },
       {
         name: 'github-readme-writing',
@@ -966,6 +959,13 @@
         content: '### CPU/GPU 集群\n- 覆盖开发机、worker、rjob 任务、代理、路径规范、模型权重和服务部署。\n- 支持把集群内网 HTTP/API/TCP 服务通过 SSH local port forwarding 转发到本地访问，不限于 vLLM。\n- 复杂远程工作优先交互式 SSH，会话中持续操作；不要擅自修改长期配置、安装软件或污染共享存储。'
       },
       {
+        name: 'lab-cluster-1-web-portal',
+        path: 'lab-cluster-1-web-portal/SKILL.md',
+        tags: ['集群', 'Web', '监控', 'OIDC', 'GPU'],
+        desc: '访问、登录和只读查询 lab-cluster-1 的 h.pjlab.org.cn 集群管理网站，覆盖 OIDC 会话、token 安全、Prometheus/DCGM 监控、pod/rjob 映射和报告数据分层。',
+        content: '### Lab Cluster 1 Web Portal\n- 用于登录 `https://h.pjlab.org.cn/` 并只读获取监控和状态信息，避免把网页登录、rjob 查询和飞书通知混成一个系统。\n- 覆盖 h.pjlab.org.cn 的 OIDC authorization code flow、token/cookie 安全、refresh、`/kapi/auth` endpoint 和 Prometheus/DCGM 查询。\n- 强调用 pod、replica、namespace 把监控指标映射到 rjob；无法映射的数据单独作为其他占用展示，不硬归因。'
+      },
+      {
         name: 'latex-compiling',
         path: 'latex-compiling/SKILL.md',
         tags: ['LaTeX', 'PDF', '编译'],
@@ -987,18 +987,18 @@
         content: '### LLM 图像生成\n- 用于调用 OpenAI-compatible 图像生成模型。\n- 优先从环境变量读取 API key 和 base URL，缺失时提示用户配置。\n- 明确图像生成可能需要较长等待时间，避免误判为无响应。'
       },
       {
-        name: 'markdown-to-pdf',
-        path: 'markdown-to-pdf/SKILL.md',
-        tags: ['Markdown', 'PDF', 'Python'],
-        desc: '使用 Python 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。',
-        content: '### Markdown 转 PDF\n- 使用本仓库脚本将 Markdown 转换为 PDF。\n- 覆盖命令行用法、Python 调用、图片路径、表格和基础 CSS。\n- 适合把 Markdown 报告、说明和实验记录转成可分享 PDF。'
-      },
-      {
         name: 'markdown-to-docx',
         path: 'markdown-to-docx/SKILL.md',
         tags: ['Markdown', 'DOCX', 'Python'],
         desc: '使用 Python 将 Markdown 文档转为 Word .docx，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。',
         content: '### Markdown 转 DOCX\n- 用于把 Markdown 文章、报告、公告、项目文档、会议材料和图文稿转换成可交付 Word 文档。\n- 支持本地图片嵌入、caption、标题层级、列表、引用、链接和图文块表格展开。\n- 提供 build_docx.py 和 count_visible_words.py，转换后需要检查图片、caption、标题和可见字数。'
+      },
+      {
+        name: 'markdown-to-pdf',
+        path: 'markdown-to-pdf/SKILL.md',
+        tags: ['Markdown', 'PDF', 'Python'],
+        desc: '使用 Python 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。',
+        content: '### Markdown 转 PDF\n- 使用本仓库脚本将 Markdown 转换为 PDF。\n- 覆盖命令行用法、Python 调用、图片路径、表格和基础 CSS。\n- 适合把 Markdown 报告、说明和实验记录转成可分享 PDF。'
       },
       {
         name: 'pdf-parsing',
