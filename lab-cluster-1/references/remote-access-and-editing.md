@@ -26,6 +26,14 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliv
 
 复杂远端操作，例如项目内多步修改、任务脚本编写、`rjob` 提交后跟日志、`rlaunch` worker 交互、服务启动和端口测试，都应在后台持久 SSH 终端中完成。
 
+长时间交互或后台终端建议显式加 keepalive，并分配 TTY：
+
+```bash
+ssh -tt -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -CAXY [USER]@[DEV_HOST]
+```
+
+其中 `[DEV_HOST]` 可以是域名，也可以在域名连接异常时临时换成已确认的开发机入口 IP。不要把这个入口地址当作 rjob 服务地址或 worker 内网服务地址。
+
 登录后最小检查：
 
 ```bash

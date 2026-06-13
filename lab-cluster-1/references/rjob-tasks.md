@@ -78,6 +78,14 @@ KUBEBRAIN_NAMESPACE=<namespace> rjob logs job <job-name> --tail-lines 100
 
 scieval 的 namespace 通常是 `ailab-scieval`。ai4sdata 通常不需要 namespace 前缀；如果某个命令查不到任务，先核对任务实际提交的 namespace 和 charged group。
 
+数据源要分层，不要把 `rjob` 信息和网页监控信息混成一个来源：
+
+- `rjob` / rjob SDK 负责任务层信息：运行/排队状态、提交者、申请 GPU 数、运行时长、replica、节点、pod 名、任务命令和最近事件。
+- 集群管理网页或监控后端负责监控层信息：GPU 计算利用率、显存 used/free、显存占用率、功率、温度、节点、卡号、namespace、pod。
+- 两边通常通过 `pod`、`replica name`、`namespace` 或监控 label 映射。只有监控中的 pod 能匹配到 rjob replica 时，才能把卡级指标归属到具体 rjob 和提交者。
+- 无法映射到 rjob 的 pod 不要硬归因给某个用户或任务；报告中应单独归为“其他占用”或只显示 namespace/pod。
+- `rjob` 卡位占用率不是 GPU 计算利用率。不要用 running replica 的 GPU 数推断训练是否高效；真实利用率、显存、功率和温度必须来自监控系统或任务自上报。
+
 `rjob get` 有时会把 `Inqueue` 显示成 `Unknown`。自动巡检时不要只解析 CLI 文本，应优先读底层对象的 `status.phase`、`status.conditions` 和 replica 状态。
 
 结构化查询通常需要开发机系统 Python 中可用的 `brainpp.rjob`。不要默认使用 conda Python；先做只读 import 检查：
@@ -276,8 +284,11 @@ insufficient group quota: nvidia.com/gpu : <used>/<quota>
 重要坑点：
 
 - `rjob logs` 对 Pending/Inqueue replica 可能报 `TypeError: 'NoneType' object is not iterable`；这通常是 CLI 在无日志时处理不好，不代表任务脚本错了。
+- 不要在 `set -u` 下直接 `source /jobutils/scripts/worker_init.sh`。部分环境初始化脚本可能读取未定义变量，导致 `unbound variable`；作业脚本默认用 `set -eo pipefail`，或在 source 前临时关闭 nounset。
 - 0 GPU 的 GPU 分区任务可能调度到 GPU 节点，但容器里没有 `nvidia-smi`、没有 `/dev/nvidia*`，`CUDA_VISIBLE_DEVICES` 为空；不能用 0 GPU 任务绕过隔离去查 GPU 利用率。
 - GPU 分区通常没有外网；外部 webhook/API 通知更适合放在开发机、CPU worker 或 CPU rjob。GPU 任务只写共享存储或提供内网数据，避免在 GPU 任务里依赖外网通知。
+- 需要周期性巡检或发送外部通知时，优先放在 CPU rjob 或开发机轻量进程中。若放在 CPU rjob，使用 `PYTHONUNBUFFERED=1` 或等价方式保证日志及时刷新，避免 `rjob logs` 长时间看不到输出。
+- 正式启用巡检前先跑 smoke rjob：只做 dry-run 或只生成报告，不发送外部通知；确认能读取 rjob、读取监控后端、生成报告并退出后，再开启循环和通知。
 
 可稳定得到的巡检信息：
 
@@ -294,6 +305,13 @@ GPU 总卡数
 排队原因 / 最近状态
 成员维度汇总
 ```
+
+合并成报告时，建议按以下顺序组织：
+
+1. 任务层汇总：总卡数、占用卡、空卡、运行任务、排队任务、成员维度汇总。
+2. rjob 明细：运行中任务、排队/启动中任务、申请 GPU、实际运行 GPU、节点、运行/等待时长、最近事件。
+3. 监控明细：已映射到 rjob 的 GPU 利用率、显存、功率、温度；未映射的 namespace/pod 单独列为其他占用。
+4. 提醒项：连续多轮低利用率、低显存占用、低功率、空卡率异常或排队时间过长。不要只凭单轮瞬时值下结论。
 
 ## rjob CPU 任务
 

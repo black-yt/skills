@@ -21,7 +21,9 @@
 | [自定义机器人使用指南](https://open.feishu.cn/document/client-docs/bot-v3/add-custom-bot) | 查看 webhook 如何发消息、`msg_type` 如何填写、签名如何计算、安全策略和常见错误。 |
 | [机器人概述](https://open.feishu.cn/document/client-docs/bot-v3/bot-overview) | 查看自定义机器人和应用机器人的能力边界，确认当前需求是否只能单向推送，还是需要正式应用机器人。 |
 | [飞书卡片概述](https://open.feishu.cn/document/uAjLw4CM/ukzMukzMukzM/feishu-cards/feishu-card-overview) | 查看卡片消息整体结构、卡片 JSON 2.0 风格和可用元素。Markdown 表格渲染应按卡片 JSON 2.0 写。 |
+| [飞书消息卡片 Markdown 文档](https://open.feishu.cn/document/common-capabilities/message-card/message-cards-content/using-markdown-tags) | 查看卡片 Markdown 元素支持的语法和限制，特别是表格、列表、链接、代码块等是否按当前卡片版本支持。 |
 | [飞书卡片搭建工具 CardKit](https://open.feishu.cn/cardkit) | 需要登录；适合可视化搭建和验证卡片，尤其是 `schema: "2.0"`、`body.elements`、`tag: "markdown"` 等结构。 |
+| [飞书卡片搭建工具 Card Builder](https://open.feishu.cn/tool/cardbuilder) | 需要登录；如果 CardKit 入口不可用或界面不同，用这个入口可视化验证卡片 JSON 和元素渲染。 |
 
 当前已验证成功的 Markdown 表格最小模板：
 
@@ -289,6 +291,40 @@ interactive card
 schema 2.0
 body.elements markdown
 标准 Markdown 表格
+```
+
+### 报告型卡片排版与限制
+
+飞书卡片适合承载短报告，但不要把所有信息都塞成表格。经验上把一张卡里的 Markdown 表格控制在少量核心表格内，通常不超过 4 张；如果表格太多，可能返回类似 `card table number over limit` 或 `ErrCode: 11310`。通用处理方式：
+
+- 重要数据用表格，例如成员汇总、运行任务、节点卡位、提醒项。
+- 次要数据用分点，例如排队摘要、其他占用、阈值说明和补充备注。
+- 每个章节之间保留显式空行，表格后不要紧贴下一个标题或代码 fence。
+- 对外部通知正文设置保守长度上限，例如 18k 字符左右；接近限制时截断并在末尾说明。
+- 卡片发送成功只说明 JSON 被飞书接收，不代表内容排版好看；重要模板要实际在群里看一次渲染效果。
+
+推荐用 helper 拼接章节，统一处理空行和长度限制：
+
+```python
+MAX_CARD_MARKDOWN = 18000
+
+
+def trim_text(text: str, limit: int = MAX_CARD_MARKDOWN) -> str:
+    if len(text) <= limit:
+        return text
+    suffix = "\n\n> 内容过长，已截断。"
+    return text[: max(0, limit - len(suffix))].rstrip() + suffix
+
+
+def section(title: str, body: str) -> str:
+    body = body.strip() if body else "无"
+    return f"## {title}\n\n{body}"
+
+
+markdown = "\n\n".join([
+    section("成员汇总", table(["提交者", "运行任务", "占用资源"], rows)),
+    section("提醒项", "- 暂无需要提醒的异常。"),
+])
 ```
 
 注意：下面这类配置不像飞书自定义 webhook 的原生请求体，更像某个上层通知库的配置；直接发给飞书 webhook 没用。

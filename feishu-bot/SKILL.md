@@ -9,7 +9,7 @@ description: "当需要创建、配置、调用或排查飞书/Lark 机器人时
 
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
-| 1 | 说明飞书自定义机器人 webhook 的创建、发送、签名、安全设置、消息类型、Markdown 表格渲染、官方文档入口和常见错误码；它只适合往某个群里单向推送告警、日报、CI/CD 通知或临时消息。 | 飞书、Lark、custom bot、webhook、群机器人、text、post、interactive card、schema 2.0、CardKit、tag markdown、Markdown 表格、lark_md、sign、HMAC、关键词、IP 白名单、错误码、单向通知 | 只需要给群推送通知前；已有 webhook 需要发文本/富文本/卡片/Markdown 表格前；需要查官方文档或 CardKit 验证卡片 JSON 前；排查 `9499`、`19021`、`19022`、`19024` 前；配置签名校验或安全策略前必须读取 | [references/custom-webhook.md](references/custom-webhook.md) |
+| 1 | 说明飞书自定义机器人 webhook 的创建、发送、签名、安全设置、消息类型、Markdown 表格渲染、报告型卡片排版/长度/表格数量限制、官方文档入口和常见错误码；它只适合往某个群里单向推送告警、日报、CI/CD 通知或临时消息。 | 飞书、Lark、custom bot、webhook、群机器人、text、post、interactive card、schema 2.0、CardKit、tag markdown、Markdown 表格、card table number over limit、ErrCode 11310、报告卡片、长度截断、lark_md、sign、HMAC、关键词、IP 白名单、错误码、单向通知 | 只需要给群推送通知前；已有 webhook 需要发文本/富文本/卡片/Markdown 表格前；需要查官方文档或 CardKit 验证卡片 JSON 前；报告卡片出现表格不渲染、内容拥挤、表格数量超限或正文过长时；排查 `9499`、`19021`、`19022`、`19024`、`11310` 前；配置签名校验或安全策略前必须读取 | [references/custom-webhook.md](references/custom-webhook.md) |
 | 2 | 说明飞书应用机器人的正式开发链路，覆盖自建应用、机器人能力、权限、`tenant_access_token`、消息 API、事件订阅、回复/编辑/撤回、资源上传、群管理和卡片回调边界。 | 飞书开放平台、应用机器人、自建应用、tenant_access_token、im:message、send_as_bot、chat_id、open_id、事件订阅、reply、update、delete、upload image、upload file、card callback | 需要收消息、自动回复、查用户 ID、发单聊、撤回/编辑消息、上传图片/文件、群管理、按钮点击回调或 AI Bot 前；自定义机器人能力不够时必须读取 | [references/app-bot.md](references/app-bot.md) |
 
 ## 路线选择

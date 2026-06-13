@@ -917,6 +917,13 @@
         content: '### Context Overlay\n- 用于在 OpenAI SDK client 和上游模型服务之间插入轻量 request proxy。\n- 支持按 path、model、messages 和 extra_body 匹配请求，并应用 system/user 注入、regex_replace、route、reject 等 transform。\n- 强调不运行 agent loop、不执行 tools、不解释模型输出，并保留 tools、image_url、response_format、stream 等 OpenAI-compatible 字段。'
       },
       {
+        name: 'cluster-web-portal',
+        path: 'cluster-web-portal/SKILL.md',
+        tags: ['集群', 'Web', '监控', 'OIDC', 'GPU'],
+        desc: '访问、登录和只读查询集群管理网站，覆盖 OIDC 会话、token 安全、网页后端 API、Prometheus/DCGM 监控、pod/rjob 映射和报告数据分层。',
+        content: '### 集群管理网站\n- 用于登录集群 Web 控制台并只读获取监控和状态信息，避免把网页登录、rjob 查询和飞书通知混成一个系统。\n- 覆盖浏览器式 OIDC authorization code flow、token/cookie 安全、refresh、网页后端 API 探索和 Prometheus/DCGM 查询。\n- 强调用 pod、replica、namespace 把监控指标映射到 rjob；无法映射的数据单独作为其他占用展示，不硬归因。'
+      },
+      {
         name: 'frontend-markdown-rendering',
         path: 'frontend-markdown-rendering/SKILL.md',
         tags: ['前端', 'Markdown', 'KaTeX', 'Mermaid'],
