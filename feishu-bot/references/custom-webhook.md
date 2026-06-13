@@ -12,6 +12,48 @@
 - 不能自行撤回消息。
 - 不能查用户 ID。
 
+## 官方入口
+
+优先看这些官方页面，不要只凭旧脚本猜字段结构：
+
+| 入口 | 用途 |
+| --- | --- |
+| [自定义机器人使用指南](https://open.feishu.cn/document/client-docs/bot-v3/add-custom-bot) | 查看 webhook 如何发消息、`msg_type` 如何填写、签名如何计算、安全策略和常见错误。 |
+| [机器人概述](https://open.feishu.cn/document/client-docs/bot-v3/bot-overview) | 查看自定义机器人和应用机器人的能力边界，确认当前需求是否只能单向推送，还是需要正式应用机器人。 |
+| [飞书卡片概述](https://open.feishu.cn/document/uAjLw4CM/ukzMukzMukzM/feishu-cards/feishu-card-overview) | 查看卡片消息整体结构、卡片 JSON 2.0 风格和可用元素。Markdown 表格渲染应按卡片 JSON 2.0 写。 |
+| [飞书卡片搭建工具 CardKit](https://open.feishu.cn/cardkit) | 需要登录；适合可视化搭建和验证卡片，尤其是 `schema: "2.0"`、`body.elements`、`tag: "markdown"` 等结构。 |
+
+当前已验证成功的 Markdown 表格最小模板：
+
+```json
+{
+  "msg_type": "interactive",
+  "card": {
+    "schema": "2.0",
+    "config": {
+      "wide_screen_mode": true
+    },
+    "header": {
+      "template": "blue",
+      "title": {
+        "tag": "plain_text",
+        "content": "Feishu 表格渲染测试"
+      }
+    },
+    "body": {
+      "elements": [
+        {
+          "tag": "markdown",
+          "content": "| A | B |\n| --- | --- |\n| 1 | 2 |"
+        }
+      ]
+    }
+  }
+}
+```
+
+关键经验：`text` 不渲染表格，旧式 `div + lark_md` 也不渲染表格；要用 `interactive card + schema 2.0 + body.elements.markdown`。
+
 ## 最小发送
 
 ```bash
@@ -137,6 +179,130 @@ curl -X POST "[HOOK_URL]" \
 - 自定义机器人 webhook：通常顶层是 `card`。
 - 应用机器人消息 API：`content` 通常是转义后的 JSON 字符串。
 
+### Markdown 表格渲染
+
+自定义机器人要渲染 Markdown 表格，不能用普通 `text` 消息，也不要用旧式 `div + lark_md` 卡片。已验证可行的是 `schema: "2.0"` + `body.elements[].tag = "markdown"`。
+
+失败方式 1：普通 `text` 消息会发送成功，但只显示管道符，不渲染表格。
+
+```json
+{
+  "msg_type": "text",
+  "content": {
+    "text": "| A | B |\n| --- | --- |\n| 1 | 2 |"
+  }
+}
+```
+
+失败方式 2：旧式卡片 `div + lark_md` 会发送成功，但 Markdown 表格不渲染。
+
+```json
+{
+  "msg_type": "interactive",
+  "card": {
+    "config": {"wide_screen_mode": true},
+    "header": {"title": {"tag": "plain_text", "content": "标题"}},
+    "elements": [
+      {
+        "tag": "div",
+        "text": {
+          "tag": "lark_md",
+          "content": "| A | B |\n| --- | --- |\n| 1 | 2 |"
+        }
+      }
+    ]
+  }
+}
+```
+
+成功方式：使用 `schema: "2.0"`，并把表格放进 `body.elements` 中的 `markdown` 元素。
+
+```json
+{
+  "msg_type": "interactive",
+  "card": {
+    "schema": "2.0",
+    "config": {
+      "wide_screen_mode": true
+    },
+    "header": {
+      "template": "blue",
+      "title": {
+        "tag": "plain_text",
+        "content": "巡检报告"
+      }
+    },
+    "body": {
+      "elements": [
+        {
+          "tag": "markdown",
+          "content": "| 提交者 | 运行任务 | 占用资源 |\n| --- | --- | --- |\n| [USER] | 4 | 28 |"
+        }
+      ]
+    }
+  }
+}
+```
+
+发送函数建议保留为“标题 + Markdown 正文”的结构：
+
+```python
+def send_feishu_report(title: str, markdown: str) -> dict:
+    card_payload = {
+        "msg_type": "interactive",
+        "card": {
+            "schema": "2.0",
+            "config": {"wide_screen_mode": True},
+            "header": {
+                "template": "blue",
+                "title": {"tag": "plain_text", "content": title},
+            },
+            "body": {
+                "elements": [
+                    {"tag": "markdown", "content": trim_text(markdown, 18000)},
+                ]
+            },
+        },
+    }
+    return post_feishu(card_payload, webhook_url, secret=secret)
+```
+
+表格生成函数使用标准 Markdown 表格：
+
+```python
+def table(headers, rows):
+    if not rows:
+        return "无"
+    lines = [
+        "| " + " | ".join(headers) + " |",
+        "| " + " | ".join(["---"] * len(headers)) + " |",
+    ]
+    for row in rows:
+        lines.append("| " + " | ".join(str(cell) for cell in row) + " |")
+    return "\n".join(lines)
+```
+
+如果已有脚本以前用 `text` 或 `div + lark_md` 发送表格，把实现改成：
+
+```text
+interactive card
+schema 2.0
+body.elements markdown
+标准 Markdown 表格
+```
+
+注意：下面这类配置不像飞书自定义 webhook 的原生请求体，更像某个上层通知库的配置；直接发给飞书 webhook 没用。
+
+```json
+"feishu": {
+  "renderMode": "card",
+  "markdown": {
+    "tableMode": "native",
+    "mode": "native"
+  }
+}
+```
+
 ## 安全设置
 
 强烈建议至少开启一种安全策略。webhook 本身等同于“发消息密钥”。
@@ -190,8 +356,7 @@ import requests
 
 
 def make_sign(timestamp: str, secret: str) -> str:
-    string_to_sign = f"{timestamp}
-{secret}"
+    string_to_sign = f"{timestamp}\n{secret}"
     digest = hmac.new(string_to_sign.encode("utf-8"), b"", hashlib.sha256).digest()
     return base64.b64encode(digest).decode("utf-8")
 

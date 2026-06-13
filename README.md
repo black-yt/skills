@@ -22,7 +22,7 @@ skill-name/
 | `codex-history-sync` | [`codex-history-sync/SKILL.md`](codex-history-sync/SKILL.md) | 使用保守的一向同步脚本，把一个 `.codex` 的 Codex 会话记录、`history.jsonl`、`sessions/` 和 thread title 元数据同步到另一个用户或目录，默认排除敏感配置并要求先 dry-run。 |
 | `context-overlay` | [`context-overlay/SKILL.md`](context-overlay/SKILL.md) | 配置和验证 OpenAI-compatible context overlay proxy，覆盖 rule matching、prompt/context 注入、prompt patch、routing、reject、skill_dir 检索和转发安全。 |
 | `docx-splitting` | [`docx-splitting/SKILL.md`](docx-splitting/SKILL.md) | 在 Windows + Microsoft Word 环境中，通过 [`scripts/split_docx.py`](docx-splitting/scripts/split_docx.py) 按页无损拆分 `.docx` 文档。 |
-| `feishu-bot` | [`feishu-bot/SKILL.md`](feishu-bot/SKILL.md) | 创建、配置、调用和排查飞书/Lark 机器人，区分自定义机器人 webhook 单向群通知与应用机器人收发消息、事件订阅、卡片交互和资源上传。 |
+| `feishu-bot` | [`feishu-bot/SKILL.md`](feishu-bot/SKILL.md) | 创建、配置、调用和排查飞书/Lark 机器人，区分自定义机器人 webhook 单向群通知、Markdown 表格卡片渲染与应用机器人收发消息、事件订阅、卡片交互和资源上传。 |
 | `frontend-markdown-rendering` | [`frontend-markdown-rendering/SKILL.md`](frontend-markdown-rendering/SKILL.md) | 在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。 |
 | `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、GitHub 公式渲染、目录结构、quick start、联系方式、citation 和 star history。 |
 | `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
