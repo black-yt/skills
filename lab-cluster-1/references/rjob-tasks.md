@@ -1,5 +1,13 @@
 # Rjob Tasks
 
+## 目录
+
+- [rjob 工作流](#rjob-工作流)
+- [rjob 查询、事件与卡位巡检](#rjob-查询事件与卡位巡检)
+- [rjob CPU 任务](#rjob-cpu-任务)
+- [rjob GPU 任务](#rjob-gpu-任务)
+- [作业脚本骨架](#作业脚本骨架)
+
 ## rjob 工作流
 
 1. 在个人项目根目录下准备 `command.sh`，例如 `/mnt/shared-storage-user/xuwanghan/projects/<project>/jobs/<name>.sh`。
@@ -42,6 +50,249 @@ rjob submit --dry-run true \
   --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
   --host-network=true \
   -- bash -lc "echo dryrun"
+```
+
+## rjob 查询、事件与卡位巡检
+
+在开发机上做 rjob 查询时，先确保 `rjob` 环境已加载：
+
+```bash
+source /etc/profile.d/ssh-init.sh 2>/dev/null || true
+```
+
+常用只读查询命令：
+
+```bash
+# 列出指定 namespace 下的 rjob
+KUBEBRAIN_NAMESPACE=<namespace> rjob list
+
+# 查看某个 job 的状态、任务副本和调度信息
+KUBEBRAIN_NAMESPACE=<namespace> rjob get <job-name>
+
+# 查看排队、失败、quota、调度等事件原因
+KUBEBRAIN_NAMESPACE=<namespace> rjob events <job-name>
+
+# 查看已有日志；Pending/Inqueue 任务可能还没有日志
+KUBEBRAIN_NAMESPACE=<namespace> rjob logs job <job-name> --tail-lines 100
+```
+
+scieval 的 namespace 通常是 `ailab-scieval`。ai4sdata 通常不需要 namespace 前缀；如果某个命令查不到任务，先核对任务实际提交的 namespace 和 charged group。
+
+`rjob get` 有时会把 `Inqueue` 显示成 `Unknown`。自动巡检时不要只解析 CLI 文本，应优先读底层对象的 `status.phase`、`status.conditions` 和 replica 状态。
+
+结构化查询通常需要开发机系统 Python 中可用的 `brainpp.rjob`。不要默认使用 conda Python；先做只读 import 检查：
+
+```bash
+/usr/bin/python3 - <<'PY'
+from brainpp.rjob import RJobClient
+print("brainpp.rjob ok")
+PY
+```
+
+通用结构化查询入口：
+
+```python
+from brainpp.rjob import RJobClient
+
+client = RJobClient(
+    cluster_entry="[CLUSTER_ENTRY]",
+    namespace="[NAMESPACE]",
+    verifyssl=False,
+)
+```
+
+查询 GPU 节点时，按节点组 label 获取 node，并只读取调度和资源字段：
+
+```python
+nodes = client.corev1_api.list_node(
+    label_selector="nodeGroup=[GPU_NODE_GROUP]",
+    _request_timeout=30,
+).items
+
+for node in nodes:
+    name = node.metadata.name
+    gpu_type = node.metadata.labels.get("GPUType", "")
+    total_gpu = int(node.status.allocatable.get("nvidia.com/gpu", 0))
+    schedulable = not bool(node.spec.unschedulable)
+```
+
+可以得到：
+
+```text
+GPU 总卡数 = sum(node.status.allocatable["nvidia.com/gpu"])
+节点型号 = node.metadata.labels["GPUType"]
+节点是否可调度 = not node.spec.unschedulable
+```
+
+查询 GPU rjob 和 replica 时，用 rjob resource type 与 quota group label 做筛选：
+
+```python
+label_selector = (
+    "kubebrain.brainpp.cn/resourcetype=rjob,"
+    "quotagroup.brainpp.cn/quotagroup=[GPU_QUOTA_GROUP]"
+)
+
+rjobs = client.api.list_namespaced_custom_object(
+    group="rjob.brainpp.cn",
+    version="v1alpha1",
+    namespace="[NAMESPACE]",
+    plural="rjobs",
+    label_selector=label_selector,
+    resource_version="0",
+    _request_timeout=30,
+).get("items", [])
+
+replicas = client.api.list_namespaced_custom_object(
+    group="rjob.brainpp.cn",
+    version="v1alpha1",
+    namespace="[NAMESPACE]",
+    plural="replicas",
+    label_selector=label_selector,
+    resource_version="0",
+    _request_timeout=30,
+).get("items", [])
+```
+
+rjob 常用字段：
+
+```text
+metadata.name
+metadata.labels["kubebrain.brainpp.cn/creator"]
+metadata.labels["quotagroup.brainpp.cn/quotagroup"]
+metadata.annotations["kubebrain.brainpp.cn/showname"]
+metadata.annotations["rjob.brainpp.cn/job-command"]
+status.phase
+status.conditions
+spec.taskSpecs
+```
+
+replica 常用字段：
+
+```text
+metadata.name
+metadata.labels["rjob.brainpp.cn/rjob-name"]
+metadata.labels["kubebrain.brainpp.cn/creator"]
+status.phase
+status.nodeName
+status.podIP
+status.startTime
+spec.containers[].resources.limits["nvidia.com/gpu"]
+```
+
+计算申请 GPU 数时，排队任务可能还没有 running replica，所以必须从 rjob spec 计算：
+
+```text
+requested_gpu = sum(taskSpec.replicas * container.resources.limits["nvidia.com/gpu"])
+```
+
+也就是遍历：
+
+```text
+rjob.spec.taskSpecs[*].replicas
+rjob.spec.taskSpecs[*].template.spec.containers[*].resources.limits["nvidia.com/gpu"]
+```
+
+计算运行占用 GPU 时，用 running replica 计算：
+
+```text
+running_gpu = sum(replica_gpu for replica.status.phase == "Running")
+```
+
+计算节点卡位：
+
+```text
+node_occupied[nodeName] += replica_gpu
+node_free = node_total - node_occupied
+```
+
+整体卡位：
+
+```text
+总卡 = sum(GPU node allocatable gpu)
+占用卡 = sum(running replica gpu)
+空卡 = 总卡 - 占用卡
+卡位占用率 = 占用卡 / 总卡
+空卡率 = 空卡 / 总卡
+```
+
+注意：这是“卡位占用率”，不是 GPU 计算利用率。rjob/replica/node 结构化查询通常拿不到真实 GPU 利用率、显存占用、功率和温度；这些需要监控系统、DCGM/Prometheus、管理员权限或训练任务自上报。
+
+排队/启动中的 phase 建议按集合判断：
+
+```python
+QUEUE_PHASES = {
+    "Inqueue",
+    "Pending",
+    "Starting",
+    "Creating",
+    "Created",
+    "Queued",
+    "Queueing",
+}
+```
+
+排队任务数和排队 GPU 需求：
+
+```text
+queued_jobs = rjob.status.phase in QUEUE_PHASES
+queued_gpu = sum(rjob_requested_gpu(job) for queued jobs)
+```
+
+等待时长可以从 `status.conditions` 中找 `Inqueue`、`Pending`、`Starting` 等 condition，优先使用对应 `lastTransitionTime` 作为开始时间。
+
+成员维度汇总按 `kubebrain.brainpp.cn/creator` 聚合：
+
+```text
+提交者
+运行任务数
+运行占用 GPU
+排队任务数
+排队申请 GPU
+```
+
+排序建议：
+
+```text
+先按运行占用 GPU 降序
+再按排队 GPU 降序
+再按提交者名字
+```
+
+排队原因优先看：
+
+```bash
+KUBEBRAIN_NAMESPACE=<namespace> rjob events <job-name>
+```
+
+典型 quota 问题形如：
+
+```text
+insufficient group quota: cpu : <used>/<quota>
+insufficient group quota: nvidia.com/gpu : <used>/<quota>
+```
+
+这说明任务卡在资源 quota 或调度约束，不代表任务脚本本身已经执行失败。
+
+重要坑点：
+
+- `rjob logs` 对 Pending/Inqueue replica 可能报 `TypeError: 'NoneType' object is not iterable`；这通常是 CLI 在无日志时处理不好，不代表任务脚本错了。
+- 0 GPU 的 GPU 分区任务可能调度到 GPU 节点，但容器里没有 `nvidia-smi`、没有 `/dev/nvidia*`，`CUDA_VISIBLE_DEVICES` 为空；不能用 0 GPU 任务绕过隔离去查 GPU 利用率。
+- GPU 分区通常没有外网；外部 webhook/API 通知更适合放在开发机、CPU worker 或 CPU rjob。GPU 任务只写共享存储或提供内网数据，避免在 GPU 任务里依赖外网通知。
+
+可稳定得到的巡检信息：
+
+```text
+GPU 总卡数
+各节点总卡 / 占用卡 / 空卡
+运行中 GPU 任务
+排队或启动中 GPU 任务
+每个任务申请 GPU 数
+每个任务实际运行占用 GPU 数
+提交者 creator
+任务所在节点
+运行时长 / 排队时长
+排队原因 / 最近状态
+成员维度汇总
 ```
 
 ## rjob CPU 任务

@@ -1031,9 +1031,9 @@
       {
         name: 'wsl-bash-windows',
         path: 'wsl-bash-windows/SKILL.md',
-        tags: ['WSL', 'Windows', 'Bash', 'Shell'],
-        desc: '在 Windows + WSL 项目中坚持使用 WSL bash 执行命令，覆盖 /mnt/c、/mnt/d 路径、沙箱启动失败、提权执行和网络命令。',
-        content: '### Windows + WSL Bash\n- 用于在 /mnt/c 或 /mnt/d 项目里判断应使用 WSL bash，而不是切到 PowerShell、cmd、Windows Node 或浏览器 fetch。\n- 覆盖 codex-linux-sandbox 缺失、CreateProcess no such file、中文路径、路径大小写、curl/git/npm 等网络命令和提权执行。\n- 核心原则是：WSL 项目继续用 WSL bash；沙箱坏了就申请原生 WSL，不换 Windows 工具链。'
+        tags: ['WSL', 'Windows', 'Bash', 'Shell', 'Git', 'Hugging Face'],
+        desc: '在 Windows + WSL 项目中坚持使用 WSL bash 执行命令，覆盖 /mnt/c、/mnt/d 路径、沙箱启动失败、提权执行、push、DNS 和代理排障。',
+        content: '### Windows + WSL Bash\n- 用于在 /mnt/c 或 /mnt/d 项目里判断应使用 WSL bash，而不是切到 PowerShell、cmd、Windows Node 或浏览器 fetch。\n- 覆盖 codex-linux-sandbox 缺失、CreateProcess no such file、中文路径、路径大小写、curl/git/npm 等网络命令和提权执行。\n- 记录 GitHub 与 Hugging Face push 的区别、token 在交互 shell 中才存在、DNS 解析失败、坏代理、一次性 HTTP header 和 push 后状态验证。\n- 核心原则是：WSL 项目继续用 WSL bash；沙箱坏了就申请原生 WSL，不换 Windows 工具链。'
       }
     ];
 

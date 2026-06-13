@@ -27,7 +27,7 @@ skill-name/
 | `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、GitHub 公式渲染、目录结构、quick start、联系方式、citation 和 star history。 |
 | `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
 | `wave-mosaic-web-theme` | [`wave-mosaic-web-theme/SKILL.md`](wave-mosaic-web-theme/SKILL.md) | 复刻 black-yt 风格前端主题，覆盖 canvas wave-mosaic 动态方块背景、4 种背景颜色切换、Space Grotesk 字体和高级卡片/表格视觉。 |
-| `wsl-bash-windows` | [`wsl-bash-windows/SKILL.md`](wsl-bash-windows/SKILL.md) | 在 Windows + WSL 项目中坚持使用 WSL bash 执行命令，覆盖 `/mnt/c`/`/mnt/d` 路径、沙箱启动失败、提权执行、网络命令和避免误切 PowerShell/cmd。 |
+| `wsl-bash-windows` | [`wsl-bash-windows/SKILL.md`](wsl-bash-windows/SKILL.md) | 在 Windows + WSL 项目中坚持使用 WSL bash 执行命令，覆盖 `/mnt/c`/`/mnt/d` 路径、沙箱启动失败、提权执行、GitHub/Hugging Face push、DNS/代理排障和避免误切 PowerShell/cmd。 |
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |

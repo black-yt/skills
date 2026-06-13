@@ -1,9 +1,15 @@
 ---
 name: wsl-bash-windows
-description: "当在 Windows + WSL 项目中运行 shell 命令、排查 bash/沙箱启动失败、处理 /mnt/c 或 /mnt/d 路径、执行 curl/git/npm/python 等 Linux 命令、避免误切到 PowerShell/cmd/Windows Node/browser fetch 时使用。"
+description: "当在 Windows + WSL 项目中运行 shell 命令、排查 bash/沙箱启动失败、处理 /mnt/c 或 /mnt/d 路径、执行 curl/git/npm/python 等 Linux 命令、排查 GitHub/Hugging Face push、DNS、代理或 token 环境差异、避免误切到 PowerShell/cmd/Windows Node/browser fetch 时使用。"
 ---
 
 # WSL Bash on Windows
+
+## 文件导航
+
+| 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
+| --- | --- | --- | --- | --- |
+| 1 | 记录 WSL bash 中执行 GitHub 与 Hugging Face push 的安全流程，覆盖非交互/交互 shell token 差异、一次性 HTTP Basic header、DNS 解析失败、坏代理、沙箱网络、`.git/index.lock` 提权、LFS/Xet 边界和 push 后状态验证。 | WSL push、GitHub、Hugging Face、HF、git push、DNS、getent hosts、proxy、HTTP_PROXY、bash -ic、token env、http.extraheader、credential.helper、LFS、Xet、index.lock、Read-only file system、ahead 1 | 在 WSL 项目中 push GitHub 或 Hugging Face 前必须读取；排查 `Could not resolve host`、代理端口不可达、`You are not authorized to push to this repo` 前必须读取；发现 token 只在交互 shell 中存在、普通 shell 网络失败、`.git/index.lock` 写入失败、HF LFS/Xet 或大文件边界不清时必须读取 | [references/push-dns.md](references/push-dns.md) |
 
 ## 核心判断
 
@@ -245,6 +251,7 @@ curl -sS -X POST '[URL]' \
 - 示例里的 `[URL]` 必须替换为用户提供的真实地址，但不要把真实 webhook 写进仓库。
 - 如果调用飞书/Lark 自定义机器人，优先配合 `feishu-bot` skill 检查签名、关键词、IP 白名单和错误码。
 - 如果命令返回网络错误，先区分代理、DNS、证书、沙箱网络和服务端鉴权，不要立刻改代码。
+- 如果网络命令是 `git push`、Hugging Face push 或认证相关操作，先读取 [references/push-dns.md](references/push-dns.md)，区分 GitHub/HF 平台规则、token 所在 shell、DNS/代理状态和是否需要提权。
 
 ## 排查清单
 
