@@ -10,10 +10,16 @@
 
 ## 访问位置
 
-集群管理网站通常只在特定网络内可达。先判断执行位置，不要把网络不可达误判为登录脚本错误：
+lab-cluster-1 的集群管理网站入口是：
+
+```text
+https://h.pjlab.org.cn/
+```
+
+该网站通常只在特定网络内可达。先判断执行位置，不要把网络不可达误判为登录脚本错误：
 
 ```bash
-curl -I --max-time 10 "[PORTAL_BASE_URL]/"
+curl -I --max-time 10 "https://h.pjlab.org.cn/"
 ```
 
 通用判断：
@@ -33,12 +39,12 @@ curl -I --max-time 10 "[PORTAL_BASE_URL]/"
 
 ## 凭据与文件权限
 
-不要把账号密码、token、cookie 写入仓库、`.bashrc`、命令行参数、日志或最终回复。推荐放在 gitignored 的 secret 目录，并收紧权限：
+不要把账号密码、token、cookie 写入仓库、`.bashrc`、命令行参数、日志或最终回复。推荐放在当前项目自己的 gitignored `.secrets/` 目录，并收紧权限：
 
 ```bash
-mkdir -p "[SECRET_DIR]"
-chmod 700 "[SECRET_DIR]"
-chmod 600 "[SECRET_DIR]/portal_login.json"
+mkdir -p ".secrets"
+chmod 700 ".secrets"
+chmod 600 ".secrets/hpjlab_login.json"
 ```
 
 示例格式：
@@ -53,8 +59,8 @@ chmod 600 "[SECRET_DIR]/portal_login.json"
 token 文件示例：
 
 ```text
-[SECRET_DIR]/portal_oidc_token.json
-[SECRET_DIR]/portal_cookiejar.txt
+.secrets/hpjlab_oidc_token.json
+.secrets/hpjlab_cookiejar.txt
 ```
 
 规则：
@@ -67,16 +73,29 @@ token 文件示例：
 
 如果 password grant 返回 `unauthorized_client` 或平台没有启用密码授权，不要硬试。浏览器网页登录常见可行方式是 OIDC authorization code flow。
 
-通用配置项：
+`h.pjlab.org.cn` 的关键 OIDC 配置：
 
 ```text
-discovery_url = [PORTAL_BASE_URL]/[OIDC_DISCOVERY_PATH]
-authorization_endpoint = 从 discovery 读取
-token_endpoint = 从 discovery 读取
-client_id = [CLIENT_ID]
-client_secret = [CLIENT_SECRET]
-redirect_uri = [PORTAL_BASE_URL]/[OIDC_CALLBACK_PATH]
-scope = openid profile email
+discovery:
+https://h.pjlab.org.cn/kapi/auth/.well-known/openid-configuration?tenant=ailab
+
+authorization_endpoint:
+https://h.pjlab.org.cn/kapi/auth/auth
+
+token_endpoint:
+https://h.pjlab.org.cn/kapi/auth/token
+
+client_id:
+kubebrain
+
+client_secret:
+ooxx
+
+redirect_uri:
+https://h.pjlab.org.cn/oidc-callback
+
+scope:
+openid profile email
 ```
 
 流程：
@@ -97,7 +116,7 @@ from http.cookiejar import MozillaCookieJar
 from urllib.parse import urlencode, urlparse, parse_qs
 from urllib.request import build_opener, HTTPCookieProcessor
 
-cookiejar = MozillaCookieJar("[COOKIE_FILE]")
+cookiejar = MozillaCookieJar(".secrets/hpjlab_cookiejar.txt")
 opener = build_opener(HTTPCookieProcessor(cookiejar))
 
 # 1. discovery
@@ -142,6 +161,7 @@ client_secret=[CLIENT_SECRET]
 
 - 只访问自己有权限查看的页面和 API。
 - 不要绕过 SSO、OIDC、验证码、多因子认证或权限检查。
-- 不要把 token、cookie、用户名、真实 portal URL、真实 API URL、真实节点名写入公开 skill、README 或 issue。
+- 本 skill 可以记录 `h.pjlab.org.cn` 的固定入口、OIDC endpoint 和只读监控 API，因为这些是技能本身的操作对象；不要记录带 `code`、`state`、token、cookie、账号或临时查询参数的敏感 URL。
+- 不要把 token、cookie、用户名、密码、真实节点名或个人运行状态写入公开 skill、README 或 issue。
 - 自动化脚本默认只读；如果页面 API 支持写操作，除非用户明确要求，否则不要调用。
 - 对 API 探索设置短超时和小范围请求，避免对管理网站造成压力。

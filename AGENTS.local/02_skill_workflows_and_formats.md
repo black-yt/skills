@@ -11,6 +11,8 @@
 - 新增 skill 后，用 `find . -maxdepth 2 -name SKILL.md`、`README.md` 和 `docs/index.html` 互相对照，确认没有漏展示、漏链接或路径写错。
 - 提交前运行 `git diff --check`。
 - 若改了 `docs/index.html` 内联脚本，提取脚本或用现有方式做 JS 语法检查。
+- skill 默认面向“使用这个能力的用户”，不是面向“维护上游仓库的人”；除非 skill 本身就是维护类，否则不要写入上游 `.gitignore`、发布流程、仓库治理、内部维护习惯或其他与使用技能无关的细节。
+- 维护类 skill 例外，例如 `agents-md-maintenance` 可以记录维护流程、同步策略和文件拆分规则；普通库/工具 skill 应聚焦安装、配置、调用、调试、验证和安全边界。
 
 ## 拆分大 Skill 或 Reference
 

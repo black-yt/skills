@@ -178,6 +178,13 @@ rules:
 
 注意：对多模态 user message 使用 user transform 时，只有 text block 会被转换成 patched text message。多模态请求优先用 system transform。
 
+插入文本语义：
+
+- `insert_before` / `insert_after` 的 overlay content 按字面文本插入。
+- Markdown、LaTeX 反斜杠、Windows 路径反斜杠等不会被当作正则 replacement 语法解释。
+- `regex_replace` 会走 Python `re.sub` 的 replacement 语义；需要字面插入复杂文本时，优先用 `insert_before` / `insert_after`，或显式检查 replacement 中的反斜杠。
+- `regex_replace` 省略 `replacement` 时，会使用 resolved `content` 作为 replacement。
+
 ```yaml
 transforms:
   - type: regex_replace
@@ -325,6 +332,42 @@ context-overlay serve --config config.yaml --host 127.0.0.1 --port 8011
 cloudflared tunnel --url http://127.0.0.1:8011
 ```
 
+## Runtime Logs
+
+每个 `POST /v1/chat/completions` 请求都会在 uvicorn 日志中输出 overlay decision log。日志是 key-value 风格，便于排查“规则是否命中”和“命中了哪条规则”，但不会直接打印注入内容正文。
+
+未命中任何 rule：
+
+```text
+context_overlay timestamp=2026-06-07T10:20:30+08:00 event=no_rule_matched path=/v1/chat/completions model=gpt-5.5 rules_checked=40
+```
+
+命中 rule：
+
+```text
+context_overlay timestamp=2026-06-07T10:20:30+08:00 event=rule_matched path=/v1/chat/completions model=gpt-5.5 rule=inject_planning_skill transform_count=1 transforms=type=insert_before;target=system;pattern=yes;content=file:/path/to/rendered_skill.md
+```
+
+日志字段：
+
+- `timestamp`：本地时区 ISO-8601 时间，表示 overlay 决策日志生成时间，不是上游模型响应时间。
+- `event`：`rule_matched` 或 `no_rule_matched`。
+- `path`：请求路径。
+- `model`：请求 body 中的 model 字段。
+- `rule`：命中的 rule 名称，仅 `rule_matched` 有。
+- `rules_checked`：配置中的 rule 总数，仅 `no_rule_matched` 有。
+- `transform_count`：命中 rule 的 transform 数量。
+- `transforms`：结构化摘要，包含 type、target、是否有 pattern、是否 route upstream、content 来源。
+
+内容来源日志：
+
+- 内联字符串记录为 `content=inline_text`。
+- 文件记录为 `content=file:/path/to/file`。
+- skill 目录记录为 `content=skill_dir:/path:top_k=N`。
+- 缺失 content 记录为 `content=none`。
+
+如果一个请求命中多条 rule，会为每条命中的 rule 输出一行 `rule_matched`。如果没有任何 rule 命中，只输出一行 `no_rule_matched`。
+
 ## Echo 验证模板
 
 先用本地 echo upstream 验证 rule 是否真的改写了请求，再接真实模型。
@@ -408,6 +451,7 @@ hello test[skill] world
 - `/v1/models` 能通过 proxy 访问 upstream。
 - 未命中的请求保持原样。
 - 命中的请求按 rule 顺序应用 transform。
+- 日志中能看到 `rule_matched` / `no_rule_matched`，且 transform 摘要和预期一致。
 - `tools`、`image_url`、`response_format`、`stream` 等字段未被无意破坏。
 - 多模态请求优先注入 system，不轻易 patch user message。
 - 公网暴露前已设置 `auth.api_key`，且 upstream key 只保存在服务端。

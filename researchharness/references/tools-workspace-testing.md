@@ -31,21 +31,21 @@ Optional extra tool：
 | 工具 | 参数 | 返回 / 说明 |
 | --- | --- | --- |
 | `Glob` | `pattern`, `path?`, `include_dirs?`, `max_results?` | 返回 `root`、`match_count`、`truncated`、`results`；用于路径发现。 |
-| `Grep` | `pattern`, `path?`, `glob?`, `case_sensitive?`, `max_results?`, `max_chars?` | 返回匹配文件、行号、行文本；跳过明显二进制、图片、PDF。 |
-| `Read` | `path`, `start_line?`, `end_line?`, `max_chars?` | 读取文本文件；PDF/image 会提示转用 `ReadPDF` / `ReadImage`。 |
-| `ReadPDF` | `path`, `max_chars?`, `max_image_paths?` | 依赖 `structai` 和 `MINERU_TOKEN`；返回文本、`image_paths`、图片计数和截断信息。 |
+| `Grep` | `pattern`, `path?`, `glob?`, `case_sensitive?`, `max_results?`, `max_chars?` | 返回匹配文件、行号、行文本；跳过明显二进制、图片、PDF；`max_chars` 默认 `16384`。 |
+| `Read` | `path`, `start_line?`, `end_line?`, `max_chars?` | 读取文本文件；PDF/image 会提示转用 `ReadPDF` / `ReadImage`；`max_chars` 默认 `16384`。 |
+| `ReadPDF` | `path`, `max_chars?`, `max_image_paths?` | 依赖 `structai` 和 `MINERU_TOKEN`；返回文本、`image_paths`、图片计数和截断信息；`max_chars` 默认 `16384`。 |
 | `ReadImage` | `path` | 返回图片 metadata；运行时将压缩图像作为 `image_url` content part 发给模型。 |
 | `Write` | `path`, `content`, `overwrite?` | 创建文本文件；`overwrite=false` 时拒绝覆盖已有文件。 |
 | `Edit` | `path`, `patch` | 应用 unified-diff / hunk-style patch；基于上下文匹配，不是完整 `patch(1)`。 |
-| `Bash` | `command`, `timeout?`, `workdir?` | 一次性 shell 命令；返回 `stdout` / `stderr`；适合确定性本地处理。 |
+| `Bash` | `command`, `timeout?`, `workdir?`, `max_output_chars?` | 一次性 shell 命令；返回 `stdout` / `stderr`；适合确定性本地处理；`max_output_chars` 默认 `16384`。 |
 | `WebSearch` | `query` | Serper general search；单次一个 query。 |
 | `ScholarSearch` | `query` | Serper Scholar；返回论文标题、年份、摘要、citation 等。 |
-| `WebFetch` | `url`, `start_line?`, `end_line?`, `max_chars?` | Jina Reader；返回清洗后的网页文本和行/字符截断 metadata。 |
+| `WebFetch` | `url`, `start_line?`, `end_line?`, `max_chars?` | Jina Reader；返回清洗后的网页文本和行/字符截断 metadata；`max_chars` 默认且不能超过 `WEBFETCH_MAX_CHARS`，默认上限 `16384`。 |
 | `AskUser` | `question`, `context?` | 交互式向用户提问；无交互终端时返回 unavailable；benchmark 可禁用。 |
 | `TerminalStart` | `cwd?`, `shell?`, `rows?`, `cols?` | 启动持久 terminal，返回 `session_id`、`pid`、`cwd`、`alive` 等。 |
-| `TerminalWrite` | `session_id`, `input`, `append_newline?`, `yield_time_ms?`, `max_output_chars?` | 向 terminal 写入输入并读增量输出。 |
-| `TerminalRead` | `session_id`, `yield_time_ms?`, `max_output_chars?` | 读取 terminal 未读输出。 |
-| `TerminalInterrupt` | `session_id`, `max_output_chars?` | 发送 `Ctrl-C`，保留 session。 |
+| `TerminalWrite` | `session_id`, `input`, `append_newline?`, `yield_time_ms?`, `max_output_chars?` | 向 terminal 写入输入并读增量输出；`max_output_chars` 默认 `16384`。 |
+| `TerminalRead` | `session_id`, `yield_time_ms?`, `max_output_chars?` | 读取 terminal 未读输出；`max_output_chars` 默认 `16384`。 |
+| `TerminalInterrupt` | `session_id`, `max_output_chars?` | 发送 `Ctrl-C`，保留 session；`max_output_chars` 默认 `16384`。 |
 | `TerminalKill` | `session_id`, `force?` | 终止 session 并释放资源。 |
 | `str_replace_editor` | `command`, `path`, `file_text?`, `old_str?`, `new_str?`, `insert_line?`, `view_range?` | optional compatibility editor；默认不加载。 |
 
@@ -57,11 +57,50 @@ Optional extra tool：
 - 可并发 read-only tools：`Glob`、`Grep`、`Read`、`ReadImage`、`WebSearch`、`ScholarSearch`、`WebFetch`。
 - mutation / shell / terminal / PDF parsing / human interaction 不并发：`Write`、`Edit`、`Bash`、`ReadPDF`、`AskUser`、`Terminal*`、`str_replace_editor`。
 
+工具输出上限：
+
+- 本地文本工具的字符返回默认值已统一提高到 `16384`，包括 `Read`、`Grep`、`ReadPDF`、`Bash`、`TerminalWrite`、`TerminalRead`、`TerminalInterrupt`。
+- `WebFetch` 的默认 `max_chars` 和 `WEBFETCH_MAX_CHARS` 默认上限也是 `16384`。
+- 如果内容被截断，优先缩小读取范围、指定 line range 或分多次读取；不要盲目把一个工具调用调成超大返回。
+- 工具返回字符上限和模型 `MAX_OUTPUT_TOKENS` 是两套概念，不要混用。
+
+`Bash` 输出安全处理：
+
+- `Bash` 捕获 stdout/stderr bytes，再做截断和解码，避免二进制或非 UTF-8 输出直接终止 agent session。
+- 二进制输出会返回 `binary output omitted` 提示；需要读取 `.xlsx`、`.mat`、图片、模型权重等二进制文件时，应使用格式化 reader 或写脚本解析，不要直接 `cat`。
+- 非 UTF-8 输出会用 replacement character 解码，并带 `non-UTF-8 bytes decoded with replacement characters` 提示。
+- 大量重复行会折叠为 `previous line repeated ...`，超长输出会出现 `output truncated`。
+- 如果需要完整日志，应该写入 workspace 文件后分段 `Read`，不要依赖单次 `Bash` 返回全部内容。
+
 PDF 和图片：
 
 - `ReadPDF` 用 MinerU / `structai` 解析 PDF，返回文本和 `image_paths`。
 - 推荐 PDF figure workflow：先 `ReadPDF`，再挑选 `image_paths`，最后用 `ReadImage` 查看具体图片。
 - `ReadImage` 读取本地图片 metadata，并在 agent run 中把压缩图片作为 OpenAI-compatible `image_url` 发给模型。
+
+## 本地前端渲染与 AskUser
+
+Markdown 渲染：
+
+- 本地前端会把最终 assistant Markdown 渲染为 HTML，但工具过程、runtime 日志、错误日志仍应按纯文本/JSON 展示。
+- 渲染流程应保留成熟库组合：`marked` 解析 Markdown、`DOMPurify` 清洗 HTML、KaTeX 渲染公式、Mermaid 渲染图。
+- 整个输出如果被 `markdown` / `md` / `gfm` 代码围栏包住，前端会去掉最外层 fence 再渲染。
+- 公式渲染支持 `$$...$$`、`\[...\]`、`\(...\)`；公式片段需要先保护再交给 Markdown parser，避免反斜杠和下划线被改坏。
+- Mermaid 支持 `language-mermaid`、`lang-mermaid`、`language-mmd`、`lang-mmd` 代码块，并使用 `securityLevel: "strict"`。
+
+Workspace 图片：
+
+- Markdown 中的本地相对图片路径会通过 `/api/workspace-file?token=...&path=...` 重写后显示。
+- 远程/内联图片源如 `http(s):`、`data:`、`blob:`、`/api/`、`/static/` 保持原样。
+- 图片路径必须解析在当前 workspace 内，避免路径逃逸。
+- 可内联展示的 workspace 图片扩展名包括 `.png`、`.jpg`、`.jpeg`、`.gif`、`.webp`、`.bmp`、`.svg`。
+- 图片路径中有空格时，Markdown 目标会被规范为 `<...>` 形式，避免 parser 截断。
+
+AskUser：
+
+- 前端 `AskUser` 问题卡片不应自动折叠，即使内容较长也应保持可见。
+- 用户通过同一个输入框回复 AskUser；pending AskUser 存在时，发送按钮提交答案而不是启动新 run。
+- benchmark adapter 可禁用 `AskUser`，防止非交互评测中出现人工澄清。
 
 `str_replace_editor` 细节：
 

@@ -34,10 +34,10 @@ pod / replica / namespace 映射
 
 ## Prometheus/DCGM 查询
 
-网页登录后可访问的监控 API 常见形态是 Prometheus-compatible query endpoint：
+`h.pjlab.org.cn` 登录后可访问的有效监控信息主要来自 Prometheus-compatible query endpoint。真正有用的通常不是 HTML 页面本身，而是这个后端 API：
 
 ```text
-[PORTAL_BASE_URL]/[PROMETHEUS_QUERY_PATH]
+https://h.pjlab.org.cn/kapi/prom.monitoring.kubebrain.io/api/v1/query
 ```
 
 请求头：
@@ -93,7 +93,7 @@ Python 请求骨架：
 import requests
 
 response = requests.get(
-    "[PORTAL_BASE_URL]/[PROMETHEUS_QUERY_PATH]",
+    "https://h.pjlab.org.cn/kapi/prom.monitoring.kubebrain.io/api/v1/query",
     params={"query": 'avg_over_time(DCGM_FI_DEV_GPU_UTIL{Hostname=~"[HOST_REGEX]"}[5m])'},
     headers={
         "Authorization": "Bearer [ACCESS_TOKEN]",

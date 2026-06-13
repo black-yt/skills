@@ -108,6 +108,8 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 - `WEBFETCH_MAX_CHARS`
 - `MAX_OUTPUT_TOKENS`
 - `MAX_INPUT_TOKENS`
+- `RECENT_HISTORY_BUDGET_TOKENS`
+- `COMPACT_SUMMARY_MAX_TOKENS`
 - `MAX_RETRIES`
 - `TEMPERATURE`
 - `TOP_P`
@@ -131,15 +133,17 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 | `MAX_RUNTIME_SECONDS` | `10800` | 单次 run 最大秒数。 |
 | `TIMEOUT_SECONDS` | `1200` | 单次 chat-completions 请求 timeout。 |
 | `WEBFETCH_TIMEOUT_SECONDS` | `300` | 单次 WebFetch 总 timeout。 |
-| `WEBFETCH_MAX_CHARS` | `40960` | 单次 WebFetch 返回字符上限。 |
-| `MAX_OUTPUT_TOKENS` | `40960` | 请求模型输出 token 上限。 |
-| `MAX_INPUT_TOKENS` | `128000` | runtime token accounting 输入预算。 |
-| `MAX_RETRIES` | `10` | LLM API 瞬时错误最大重试次数。 |
+| `WEBFETCH_MAX_CHARS` | `16384` | 单次 WebFetch 返回字符上限。 |
+| `MAX_OUTPUT_TOKENS` | `16384` | 请求模型输出 token 上限。 |
+| `MAX_INPUT_TOKENS` | `131072` | runtime token accounting 输入预算。 |
+| `RECENT_HISTORY_BUDGET_TOKENS` | `8192` | compaction 后保留的最近原始历史 token 预算。 |
+| `COMPACT_SUMMARY_MAX_TOKENS` | `8192` | compaction summary 的最大输出 token 和默认 compaction reserve。 |
+| `MAX_RETRIES` | `5` | LLM API 瞬时错误最大重试次数。 |
 | `TEMPERATURE` | `0.6` | 主模型 temperature。 |
 | `TOP_P` | `0.95` | 主模型 top-p。 |
 | `PRESENCE_PENALTY` | `1.00` | provider 支持时使用。 |
 | `COMPACT_TRIGGER_TOKENS` | `96k` | 自动上下文压缩触发阈值。 |
-| `IMAGE_PART_TOKEN_ESTIMATE` | `1536` | 每个 image content part 的 token 估计。 |
+| `IMAGE_PART_TOKEN_ESTIMATE` | `2048` | 每个 image content part 的 token 估计。 |
 | `LLM_IMAGE_MAX_EDGE` | `1568` | 发送给多模态模型的图片最大边长。 |
 | `LLM_IMAGE_MAX_BYTES` | `524288` | 发送给多模态模型的压缩图片最大字节数。 |
 | `LLM_IMAGE_JPEG_QUALITY` | `85` | 图片压缩初始 JPEG 质量。 |
@@ -154,9 +158,14 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 
 - `.env` 只补齐缺失变量，不覆盖 shell 中已经 export 的进程环境变量。
 - Python 参数名对应大写环境变量，例如 `max_rounds` 对应 `MAX_ROUNDS`，`compact_trigger_tokens` 对应 `COMPACT_TRIGGER_TOKENS`。
+- `recent_history_budget_tokens` 对应 `RECENT_HISTORY_BUDGET_TOKENS`，`compact_summary_max_tokens` 对应 `COMPACT_SUMMARY_MAX_TOKENS`。
 - CLI 中 `--workspace-root` 优先于 `WORKSPACE_ROOT`。
 - API server 中，request-local `model`、`extra_body["workspace-root"]`、`extra_body["llm-extra-body"]` 只覆盖当前请求。
 - `--trace-dir` 没有环境变量等价项；只有显式传入时才写 trace/session state。
+- token budget 会在 run 开始前校验；无效配置会直接报错，不会被静默 clamp。
+- `MAX_OUTPUT_TOKENS + COMPACT_SUMMARY_MAX_TOKENS` 必须小于 `MAX_INPUT_TOKENS`。
+- 显式 `COMPACT_TRIGGER_TOKENS` 必须小于 `MAX_INPUT_TOKENS - MAX_OUTPUT_TOKENS`，为最终回复保留空间。
+- 如果未设置 `COMPACT_TRIGGER_TOKENS`，默认触发点按 `MAX_INPUT_TOKENS - MAX_OUTPUT_TOKENS - COMPACT_SUMMARY_MAX_TOKENS` 计算。
 
 Provider-specific `extra_body`：
 

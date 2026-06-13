@@ -159,7 +159,7 @@ test -d "$MODEL_PATH" || { echo "missing model: $MODEL_PATH"; exit 1; }
 只有用户明确要求迁移模型时，才考虑从公共目录复制到大模型目录。复制前必须检查源目录和目标父目录；如果目标已存在，不要重复复制：
 
 ```bash
-RCLONE="/mnt/shared-storage-user/xuwanghan/projects/rclone/rclone-v1.68.2-linux-amd64/rclone"
+RCLONE="${RCLONE:-/abs/path/to/rclone}"
 SRC="/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/zskj-hub/models-Qwen-Qwen3.5-35B-A3B"
 DST="/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/models/Qwen--Qwen3.5-35B-A3B"
 test -x "$RCLONE"
