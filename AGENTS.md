@@ -36,6 +36,12 @@
 - 用户没有明确要求时，不要 commit 或 push。
 - 拆分、移动或重命名文件后，必须检查旧路径引用是否已更新、内容是否丢失。
 
+## WSL Shell 规则
+
+- 本仓库位于 `/mnt/d/...` WSL 工作区，运行 shell 命令时坚持使用 WSL bash，不要因为一次失败就切到 PowerShell、cmd、Windows Node 或浏览器 fetch。
+- 需要 shell 初始化、`nvm`、conda、token、代理变量或联网环境的命令，优先使用交互式 WSL bash，例如 `bash -ic '...'`；只检查 prompt 时可用 `bash -i -c 'printf "%s\n" "$PS1"'`。
+- 联网任务失败时，先检查是否需要提权/原生 WSL 执行，再检查代理变量是否污染；必要时只对当前命令临时关闭代理，不要修改长期 shell 配置。
+
 ## Skill 核心规则
 
 - 每个 skill 目录必须包含 `SKILL.md`。

@@ -58,6 +58,35 @@ git status --short
 git diff --check
 ```
 
+## WSL Shell 与联网排障
+
+- 本仓库在 `/mnt/d/...` WSL 工作区中维护；shell 命令应继续使用 WSL bash，不要在 PowerShell、cmd、Windows Node、浏览器 fetch 之间切换。
+- 需要用户 shell 初始化、`nvm`、conda、token 或代理变量时，优先用交互式 WSL bash：
+
+```bash
+bash -ic 'pwd; command -v node || true; node -v || true'
+```
+
+- 检查交互 prompt 时，用 `bash -i -c` 读取 `PS1`；没有完整 TTY 时出现 job-control 警告不一定是异常：
+
+```bash
+bash -i -c 'printf "%s\n" "$PS1"'
+```
+
+- 联网任务失败时，先判断是不是沙箱/权限问题；如果普通命令因 DNS、网络或 `.git/index.lock` 写入失败受限，应申请提权或原生 WSL 执行同一命令，不要切到 Windows 工具链。
+- 如果联网错误像代理污染，分别检查普通 shell 和交互 shell 的代理变量：
+
+```bash
+env | grep -i proxy || true
+bash -ic 'env | grep -i proxy || true'
+```
+
+- 如果代理指向不可达端口，必要时只对当前命令临时关闭代理；不要把临时代理状态写进 `.bashrc`、shell 配置或仓库文档：
+
+```bash
+env -u http_proxy -u https_proxy -u HTTP_PROXY -u HTTPS_PROXY -u all_proxy -u ALL_PROXY <command>
+```
+
 ## Skill 列表对照
 
 ```bash
