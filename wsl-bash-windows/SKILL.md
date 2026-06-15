@@ -1,6 +1,6 @@
 ---
 name: wsl-bash-windows
-description: "当在 Windows + WSL 项目中运行 shell 命令、排查 bash/沙箱启动失败、处理 /mnt/c 或 /mnt/d 路径、执行 curl/git/npm/python 等 Linux 命令、排查 GitHub/Hugging Face push、DNS、代理或 token 环境差异、避免误切到 PowerShell/cmd/Windows Node/browser fetch 时使用。"
+description: "当在 Windows + WSL 项目中运行 shell 命令、排查 bash/沙箱启动失败、处理 /mnt/c 或 /mnt/d 路径、读取用户贴来的 Windows 图片/临时截图路径、执行 curl/git/npm/python 等 Linux 命令、排查 GitHub/Hugging Face push、DNS、代理或 token 环境差异、避免误切到 PowerShell/cmd/Windows Node/browser fetch 时使用。"
 ---
 
 # WSL Bash on Windows
@@ -123,6 +123,35 @@ WSL 路径：
 - 中文路径、空格路径或特殊字符路径要整体放在 `workdir` 中；如果命令里必须手写路径，使用引号。
 - 按当前环境给出的 `cwd` 为准，不要凭记忆改大小写。
 - 在大小写敏感或跨文件系统场景里，`Project`、`project`、`PROJECT` 可能不是同一个路径。
+
+## 用户图片路径读取
+
+用户贴来的 Windows 图片路径可能不能被 WSL 直接读取，例如：
+
+```text
+C:\Users\[USER]\AppData\Local\Temp\[IMAGE].png
+```
+
+先转换成 WSL 路径：
+
+```text
+/mnt/c/Users/[USER]/AppData/Local/Temp/[IMAGE].png
+```
+
+转换规则：
+
+- `C:\Users\...\file.png` 对应 `/mnt/c/Users/.../file.png`。
+- `D:\...\file.png` 对应 `/mnt/d/.../file.png`。
+- 反斜杠 `\` 改成正斜杠 `/`。
+- 不要把用户的真实临时路径写进仓库文档；skill 中使用 `[USER]`、`[IMAGE]` 等占位符。
+
+读取前先确认文件仍存在：
+
+```bash
+ls -l "/mnt/c/Users/[USER]/AppData/Local/Temp/[IMAGE].png"
+```
+
+如果文件存在，用转换后的 WSL 路径交给图片查看工具；如果不存在，通常是临时截图文件已经被清理，需要请用户重新上传或重新截图。
 
 ## 命令执行规则
 
