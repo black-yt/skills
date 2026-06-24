@@ -1001,6 +1001,13 @@
         content: '### Markdown 转 PDF\n- 使用本仓库脚本将 Markdown 转换为 PDF。\n- 覆盖命令行用法、Python 调用、图片路径、表格和基础 CSS。\n- 适合把 Markdown 报告、说明和实验记录转成可分享 PDF。'
       },
       {
+        name: 'overleaf-project-sync',
+        path: 'overleaf-project-sync/SKILL.md',
+        tags: ['Overleaf', 'LaTeX', '同步', 'Python'],
+        desc: '从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。',
+        content: '### Overleaf 项目同步\n- 用浏览器开发者工具从 Overleaf 网页端复制项目 ZIP 下载链接和当前登录 Cookie，不把凭据写进仓库。\n- 使用 bundled 脚本下载 ZIP 到临时目录，默认只做 check 对比，只有 update --overwrite 才写入本地。\n- 默认不会删除本地额外文件，并忽略 .git、agent 文档、脚本和 LaTeX 缓存等本地维护内容。'
+      },
+      {
         name: 'pdf-parsing',
         path: 'pdf-parsing/SKILL.md',
         tags: ['PDF', '解析', 'Markdown'],
