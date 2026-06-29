@@ -33,7 +33,7 @@ Optional extra tool：
 | `Glob` | `pattern`, `path?`, `include_dirs?`, `max_results?` | 返回 `root`、`match_count`、`truncated`、`results`；用于路径发现。 |
 | `Grep` | `pattern`, `path?`, `glob?`, `case_sensitive?`, `max_results?`, `max_chars?` | 返回匹配文件、行号、行文本；跳过明显二进制、图片、PDF；`max_chars` 默认 `16384`。 |
 | `Read` | `path`, `start_line?`, `end_line?`, `max_chars?` | 读取文本文件；PDF/image 会提示转用 `ReadPDF` / `ReadImage`；`max_chars` 默认 `16384`。 |
-| `ReadPDF` | `path`, `max_chars?`, `max_image_paths?` | 依赖 `structai` 和 `MINERU_TOKEN`；返回文本、`image_paths`、图片计数和截断信息；`max_chars` 默认 `16384`。 |
+| `ReadPDF` | `path`, `max_chars?`, `max_image_paths?` | 依赖 `structai` 和 `MINERU_TOKEN`；返回文本、`image_paths`、图片计数和截断信息；`max_chars` 默认 `16384`；`READPDF_TIMEOUT_SECONDS` 默认 `300`。 |
 | `ReadImage` | `path` | 返回图片 metadata；运行时将压缩图像作为 `image_url` content part 发给模型。 |
 | `Write` | `path`, `content`, `overwrite?` | 创建文本文件；`overwrite=false` 时拒绝覆盖已有文件。 |
 | `Edit` | `path`, `patch` | 应用 unified-diff / hunk-style patch；基于上下文匹配，不是完整 `patch(1)`。 |
@@ -64,6 +64,14 @@ Optional extra tool：
 - 如果内容被截断，优先缩小读取范围、指定 line range 或分多次读取；不要盲目把一个工具调用调成超大返回。
 - 工具返回字符上限和模型 `MAX_OUTPUT_TOKENS` 是两套概念，不要混用。
 
+工具超时保护：
+
+- `WEBFETCH_TIMEOUT_SECONDS` 保护单次 `WebFetch`，默认 `300` 秒。
+- `READPDF_TIMEOUT_SECONDS` 保护单次 `ReadPDF`，默认 `300` 秒。
+- `ReadPDF` 超时不会终止整个 agent run；它会返回普通工具结果，提示 PDF parser 超时，让 agent 决定重试、检查文件 metadata 或继续使用其他证据。
+- Python embedding 的自定义函数工具可用 `@tool(timeout_seconds=...)` 声明协作式 timeout；该值会缩短传入的 `runtime_deadline`，不是强杀 in-process Python 的通用隔离机制。
+- timeout 设得过短会导致误判，尤其是大 PDF、外部解析服务、慢网络或自定义工具第一次加载模型/索引时。
+
 `Bash` 输出安全处理：
 
 - `Bash` 捕获 stdout/stderr bytes，再做截断和解码，避免二进制或非 UTF-8 输出直接终止 agent session。
@@ -77,6 +85,7 @@ PDF 和图片：
 - `ReadPDF` 用 MinerU / `structai` 解析 PDF，返回文本和 `image_paths`。
 - 推荐 PDF figure workflow：先 `ReadPDF`，再挑选 `image_paths`，最后用 `ReadImage` 查看具体图片。
 - `ReadImage` 读取本地图片 metadata，并在 agent run 中把压缩图片作为 OpenAI-compatible `image_url` 发给模型。
+- 如果 `ReadPDF` 返回 timeout，先确认 `MINERU_TOKEN`、网络、代理和 PDF 文件本身是否正常；必要时缩小任务、换文件检查方式，或调大 `READPDF_TIMEOUT_SECONDS` 后重试。
 
 ## 本地前端渲染与 AskUser
 

@@ -105,6 +105,7 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 - `MAX_RUNTIME_SECONDS`
 - `TIMEOUT_SECONDS`
 - `WEBFETCH_TIMEOUT_SECONDS`
+- `READPDF_TIMEOUT_SECONDS`
 - `WEBFETCH_MAX_CHARS`
 - `MAX_OUTPUT_TOKENS`
 - `MAX_INPUT_TOKENS`
@@ -133,6 +134,7 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 | `MAX_RUNTIME_SECONDS` | `10800` | 单次 run 最大秒数。 |
 | `TIMEOUT_SECONDS` | `1200` | 单次 chat-completions 请求 timeout。 |
 | `WEBFETCH_TIMEOUT_SECONDS` | `300` | 单次 WebFetch 总 timeout。 |
+| `READPDF_TIMEOUT_SECONDS` | `300` | 单次 ReadPDF 工具调用总 timeout；解析超时会返回普通工具结果。 |
 | `WEBFETCH_MAX_CHARS` | `16384` | 单次 WebFetch 返回字符上限。 |
 | `MAX_OUTPUT_TOKENS` | `16384` | 请求模型输出 token 上限。 |
 | `MAX_INPUT_TOKENS` | `131072` | runtime token accounting 输入预算。 |
@@ -166,6 +168,8 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 - `MAX_OUTPUT_TOKENS + COMPACT_SUMMARY_MAX_TOKENS` 必须小于 `MAX_INPUT_TOKENS`。
 - 显式 `COMPACT_TRIGGER_TOKENS` 必须小于 `MAX_INPUT_TOKENS - MAX_OUTPUT_TOKENS`，为最终回复保留空间。
 - 如果未设置 `COMPACT_TRIGGER_TOKENS`，默认触发点按 `MAX_INPUT_TOKENS - MAX_OUTPUT_TOKENS - COMPACT_SUMMARY_MAX_TOKENS` 计算。
+- `READPDF_TIMEOUT_SECONDS` 是工具级保护；PDF 解析超时时，`ReadPDF` 返回可读 timeout 工具结果，让 agent 决定重试、改用 `Bash/file` 检查文件，或继续使用其他证据。
+- `WEBFETCH_TIMEOUT_SECONDS` 和 `READPDF_TIMEOUT_SECONDS` 只保护对应工具调用，不等价于全局 agent runtime 限制。
 
 Provider-specific `extra_body`：
 
@@ -325,6 +329,8 @@ answer = run_agent(
 - `extra_tools=[...]`：在默认工具集上追加 optional compatibility tools。
 - `tools` 和 `extra_tools` 不能同时传。
 - 自定义 tool function 必须有唯一合法名称、docstring 或 description、JSON-compatible 参数类型，不能有 `*args`、`**kwargs` 或 positional-only 参数。
+- 长耗时自定义 tool 可用 `@tool(timeout_seconds=...)` 设置协作式超时；它会缩短传给 tool 的 `runtime_deadline`，并在 deadline 已耗尽时直接返回 timeout 信息。
+- `timeout_seconds` 必须是正数；它不是强杀任意 Python 代码的沙箱，只适合让遵守 `runtime_deadline` 的函数尽快停止或避免开始执行。
 
 schema 检查：
 
@@ -338,6 +344,19 @@ def add_numbers(a: int, b: int) -> int:
 
 schemas = available_tool_schemas([Read, Bash, add_numbers])
 print([schema["function"]["name"] for schema in schemas])
+```
+
+带 timeout 的自定义工具：
+
+```python
+from researchharness import create_agent, tool
+
+@tool(timeout_seconds=5)
+def slow_lookup(query: str, *, runtime_deadline) -> str:
+    """Run a bounded lookup and stop before the runtime deadline."""
+    return f"lookup={query}, deadline={runtime_deadline}"
+
+agent = create_agent(tools=[slow_lookup])
 ```
 
 ## 本地前端 UI

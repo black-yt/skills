@@ -26,6 +26,27 @@ pip install -r requirements.txt
 pip install -e . --no-deps
 ```
 
+依赖版本经验：
+
+- 新版本 `requirements.txt` 使用下限约束，不再假设每个依赖都是精确 pin。
+- 典型形式是 `fastapi>=...`、`openai>=...`、`structai>=0.1.23`、`uvicorn>=...`。
+- 排查依赖问题时，先看当前 checkout 的 `requirements.txt` 和当前环境安装版本，不要套用旧的固定版本经验。
+- 不要在共享环境里随手升级依赖；需要升级时先创建独立环境或征得用户同意。
+
+检查当前安装版本：
+
+```bash
+python - <<'PY'
+import importlib.metadata as md
+
+for name in ["researchharness", "openai", "structai", "fastapi", "uvicorn"]:
+    try:
+        print(name, md.version(name))
+    except md.PackageNotFoundError:
+        print(name, "not installed")
+PY
+```
+
 PyPI 安装后可用 console entrypoints：
 
 ```bash
