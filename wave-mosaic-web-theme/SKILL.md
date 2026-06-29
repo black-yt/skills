@@ -1,9 +1,14 @@
 ---
 name: wave-mosaic-web-theme
-description: "当需要为网页复刻 black-yt 风格的高级前端主题时使用；覆盖 canvas wave-mosaic 动态方块背景、Pure White/Warm Yellow/Cool Blue/Dark 四种背景颜色切换、Space Grotesk 字体、CSS 变量、floating background dots、卡片/表格/按钮主题化和性能细节。"
+description: "当需要为网页复刻 black-yt 风格的高级前端主题时使用；覆盖 canvas wave-mosaic 动态方块背景、Pure White/Warm Yellow/Cool Blue/Dark 四种背景颜色切换、Space Grotesk 字体、CSS 变量、floating background dots、顶部圆角导航栏、论文筛选滑块、卡片/表格/按钮主题化和性能细节。"
 ---
 
 # Wave Mosaic Web Theme
+
+## 设计来源
+
+- 核心视觉和源头设计参考 [black-yt/black-yt.github.io](https://github.com/black-yt/black-yt.github.io)。
+- 这个 skill 记录的是当前可复用的设计模式和实现骨架；源站后续可能继续演进，复刻时应保留动态方块背景、4 种背景颜色切换、`Space Grotesk` 字体和轻量透明卡片质感这些核心特征，再按目标页面的信息架构做适配。
 
 ## 文件导航
 
@@ -11,6 +16,7 @@ description: "当需要为网页复刻 black-yt 风格的高级前端主题时�
 | --- | --- | --- | --- | --- |
 | 1 | 说明 Wave Mosaic 主题的视觉目标和约束，覆盖固定全屏 canvas 动态方块、4 种背景颜色、CSS 变量、Space Grotesk 字体、透明卡片、低噪声 hover/glow 和性能参数。 | wave mosaic、canvas background、dynamic tiles、4 backgrounds、CSS variables、Space Grotesk、theme switcher、transparent cards、hover glow、performance、24fps、mosaic grid | 触发本 skill 后默认读取；设计页面视觉方向前；判断是否需要 canvas 背景或 4 色切换前；调整动态方块参数、字体、透明质感或组件风格前读取 | `SKILL.md` |
 | 2 | 提供可直接复刻的 HTML/CSS/JS 实现，包含 `<head>` 字体和 favicon、固定 canvas、主题按钮、`data-theme` 切换、CSS 变量、背景绘制脚本和页面结构骨架。 | HTML、CSS、JavaScript、`<head>`、favicon、Google Fonts、`#wave-canvas`、`data-theme`、theme dots、canvas draw loop、responsive、copyable template | 需要生成完整页面文件前；复刻一模一样的背景和主题切换前；迁移到 GitHub Pages 前；检查 favicon/字体/canvas/主题按钮是否缺失时必须读取 | [references/theme-implementation.md](references/theme-implementation.md) |
+| 3 | 提供源站同款顶部圆角导航栏和论文筛选滑块的可复制实现，覆盖居中横向导航、移动端横向滚动、scroll-spy 高亮、anchor 跳转、active link 自动入视、core/collab 论文切换、滑块 indicator 定位和主题变量复用。 | top nav、masthead、site-nav、anchor navigation、scroll-spy、smooth scroll、nav-active、seg-control、seg-indicator、paper filter、core papers、collaboration papers、data-paper-type、offsetLeft、rounded tabs | 需要复刻顶部导航栏前；需要页面内锚点跳转和当前章节高亮前；需要核心论文/合作论文筛选滑块前；调整圆角、边框、字体、滑块动画、移动端横向滚动或 active 状态时必须读取 | [references/navigation-and-segmented-controls.md](references/navigation-and-segmented-controls.md) |
 
 ## 使用原则
 
@@ -25,7 +31,7 @@ description: "当需要为网页复刻 black-yt 风格的高级前端主题时�
 
 ## 必读实现
 
-完整可复制实现见 [references/theme-implementation.md](references/theme-implementation.md)。
+完整背景和主题实现见 [references/theme-implementation.md](references/theme-implementation.md)。顶部导航栏和论文筛选滑块见 [references/navigation-and-segmented-controls.md](references/navigation-and-segmented-controls.md)。
 
 需要写页面时：
 
@@ -34,7 +40,8 @@ description: "当需要为网页复刻 black-yt 风格的高级前端主题时�
 3. 复制 `#theme-switcher` 和 `.theme-dot` 样式。
 4. 复制 canvas wave-mosaic 背景脚本。
 5. 复制 background color switcher 脚本。
-6. 再按页面需求添加卡片、表格、accordion 或导航。
+6. 需要顶部导航、页面跳转或论文筛选滑块时，复制导航与 segmented control reference。
+7. 再按页面需求添加卡片、表格、accordion 或内容区。
 
 ## 动态方块背景
 
