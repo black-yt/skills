@@ -175,3 +175,32 @@ python3 codex-history-sync/scripts/sync_codex_history.py \
 - 不要在公开文档里写真实用户名、真实本机路径、真实项目路径或凭据。
 - 如果目标是另一个真实用户的 `.codex`，同步前让对方关闭正在运行的 Codex，避免同时写同一批历史文件。
 - 如需共享给第三方，优先使用 `--filter` 限定项目，并先 dry-run 检查敏感文件是否被排除。
+
+## 外部备选工具
+
+本 skill 自带脚本适合保守的单向同步；如果需求变成 provider 切换、Desktop 可见性修复、会话导入导出或跨 provider 克隆，可以先了解下面两个外部项目，再决定是否使用。
+
+### Dailin521/codex-provider-sync
+
+- GitHub：https://github.com/Dailin521/codex-provider-sync
+- 定位：同步 Codex session provider metadata，主要解决切换 `model_provider` 后旧会话在 Codex Desktop 或 `/resume` 中不可见的问题。
+- 覆盖范围：`~/.codex/sessions`、`~/.codex/archived_sessions`、`~/.codex/state_5.sqlite`、`.codex-global-state.json` 中的项目根路径缓存。
+- 常见能力：`status` 检查 provider/rollout/SQLite/项目可见性；`sync` 把历史会话 metadata 同步到当前 provider；`switch <provider-id>` 修改 `config.toml` 后同步；`restore <backup-dir>` 从工具备份恢复。
+- 边界：它只修复历史会话可见性相关 metadata，不修改消息正文、会话标题、登录态、认证或 `auth.json`。
+- 注意：含 `encrypted_content` 的旧会话跨 provider/account 后，通常只能恢复列表可见性，继续对话或 compact 仍可能失败。
+
+### goodnightzsj/codex-session-cloner
+
+- GitHub：https://github.com/goodnightzsj/codex-session-cloner
+- 定位：`AI CLI Kit (aik)` 中的 Codex Session Toolkit，面向本地 Codex 会话浏览、迁移、导入导出、跨 provider 克隆和 Desktop 可见性修复。
+- 常见能力：`aik codex list` 查看本机会话；`aik codex export <session_id>` 导出 bundle；`aik codex import <session_id>` 导入 bundle；`aik codex clone-provider` 在切换 provider 后克隆会话；`aik codex watch-provider` 持续监听 provider 变化并自动克隆；`aik codex repair-desktop` 修复 Desktop 可见性/索引。
+- 运行方式：可在项目目录直接运行 `./aik`，也可按 upstream README 使用安装脚本或 `python -m ai_cli_kit`。
+- 边界：这是外部工具箱，不是本 skill bundled script；实际使用前必须阅读 upstream README 和 `--help`，确认当前版本命令、备份策略和清理范围。
+- 注意：涉及清理、覆盖、修复 SQLite 或归档会话时，先 dry-run 或选择预览命令；真实删除或覆盖必须征得用户确认。
+
+选择建议：
+
+- 只想把一个 `.codex` 的会话记录保守同步到另一个目录：优先用本 skill 自带脚本。
+- 切换 provider 后历史会话不可见：优先了解 `codex-provider-sync`。
+- 需要会话 bundle 导入导出、跨 provider 克隆、watch provider 或 Desktop 修复：优先了解 `codex-session-cloner` / `aik codex`。
+- 使用任何外部工具前，都要先备份 `.codex`，关闭正在运行的 Codex Desktop，并确认不会同步或泄露 `auth.json`、凭据、token、私有路径和不该共享的会话内容。
