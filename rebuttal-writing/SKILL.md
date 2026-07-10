@@ -15,6 +15,7 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 ## 总体原则
 
 - 先感谢，再回答；先承认 reviewer 的有效关注点，再给证据。
+- 每个 reviewer-specific response 都必须以 `Dear Reviewer [ID],` 或 `Dear Reviewer,` 开始；不要省略称呼。
 - 所有 `Q1/Q2/...` 标题都要写成中性陈述式主题，而不是复述 reviewer 的质问。
 - 问题摘要要弱化尖锐措辞，但不能偷换问题或删掉核心 concern。
 - reviewer 提到的弱点、concern 和 question 都要一对一回应；即使原文不是问句，也要转成正式的 `Q1/Q2/...` 来回答。
@@ -81,9 +82,9 @@ We hope this summary helps clarify the main issues raised during review. We are 
 
 ## 开头段写法
 
-开头段一般包含四件事：
+每个审稿人的回复都必须单独有开头段，不要多个 reviewer 合并后只写一次总称呼。开头段一般包含四件事：
 
-- **称呼**：`Dear Reviewer,`、`Dear Reviewers,` 或 `Dear Area Chair and Reviewers,`。
+- **称呼**：单个 reviewer 用 `Dear Reviewer [ID],` 或 `Dear Reviewer,`；全局/AC 汇总才用 `Dear Reviewers,` 或 `Dear Area Chair and Reviewers,`。
 - **感谢**：感谢认真审阅和建设性意见。
 - **正向锚点**：点名 reviewer 认可的地方，例如 writing quality、novel task、strong experiments、broad benchmark。
 - **过渡**：说明剩余疑问会在下面逐条回答。
@@ -305,6 +306,7 @@ We hope these responses clarify your concerns. If they address your questions, w
 ## 快速检查清单
 
 - 第一段是否感谢 reviewer 并点出认可点？
+- 每个 reviewer-specific response 是否都以 `Dear Reviewer [ID],` 或 `Dear Reviewer,` 开始？
 - 每个问题是否用 `> **Qx: ...**`？
 - Q 标题是否是中性陈述式主题，而不是疑问句或缺陷复述？
 - reviewer 的弱点、concern 和非问句批评是否也被逐条转成 Q 并回答？
