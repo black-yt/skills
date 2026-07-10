@@ -20,6 +20,7 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 - reviewer 提到的弱点、concern 和 question 都要一对一回应；即使原文不是问句，也要转成正式的 `Q1/Q2/...` 来回答。
 - 回答要具体，优先使用数据、补充实验、ablation、case study、统计检验、表格和真实引用。
 - 新增实验不能只报数值；必须用一句话简介实验 setting，例如数据集/子集、模型或方法、指标、对照项和改变的变量。
+- rebuttal 中的结论、数值、指标方向和术语必须与原论文一致；不要为了回应 reviewer 临时写出和正文相反的结论。
 - 少写空泛套话，例如 “we will improve” 或 “this is interesting”；必须说清楚改什么、结果是什么、支持什么结论。
 - rebuttal 通常有严格字数限制；每个回答先给核心结论，再给最强证据。
 - 整体回复应该是高信息密度的纯文本 Q&A，不要把 reviewer response 整体改成表格。
@@ -156,6 +157,31 @@ Thank you for your careful review and constructive comments. We are pleased that
 - 风险控制：不要把一个 reviewer 的其他负面意见引入另一个 reviewer 的视野；不要制造 reviewer 之间对立；不要暗示某个 reviewer “错了”。
 - 默认不用：如果没有明确积极 reviewer，或引用会让读者注意到更多问题，就不要跨 reviewer 引用。
 
+## 原文一致性与短板承认
+
+一致性规则：
+
+- 回复前先核对原论文中的 main claim、实验表格、figure、appendix、metric 定义和数值，不要凭记忆回答。
+- rebuttal 中新增的数值必须和原文已有数值、指标方向、dataset split、setting 名称一致。
+- 如果使用新实验，必须说明它是 `additional experiment`，并避免让它推翻正文的主实验叙述。
+- 如果原文中的某个表述确实不够严谨，要把它包装成 “we will clarify / qualify the statement”，不要写成 “our conclusion was wrong”。
+- 如果 reviewer 指出的是局部短板，可以诚恳承认范围、表达或补充实验不足；不要承认成原则性错误、方法无效或与原论文主结论相反。
+- 如果某个结论有潜在不妥，先在保持原结论方向一致的前提下加限定词，例如 `in this setting`、`under the evaluated benchmark`、`for the tested model family`。
+- 修订承诺应是补充说明、补充实验、补充限制讨论或更谨慎措辞，而不是重写核心贡献边界。
+
+推荐表达：
+
+```md
+**Response.** Our conclusion remains consistent with the submitted paper: [core claim]. We agree that the current wording can better specify [scope/setting], and will revise it to emphasize that the conclusion holds under [bounded condition].
+```
+
+避免：
+
+- “This contradicts our original conclusion.”
+- “The main claim does not hold.”
+- “The result in the paper is wrong.”
+- 为了显得诚恳而主动扩大 reviewer 的 concern。
+
 ## 回答写法
 
 每个回答按证据强度组织：
@@ -286,6 +312,8 @@ We hope these responses clarify your concerns. If they address your questions, w
 - 问题间引用是否只用于减少重复，且没有替代当前 Q 的直接回答？
 - 跨 reviewer 引用是否只在明确积极 reviewer 存在时使用，且没有引入额外负面信息？
 - Q 标题和摘要是否中性、可回答、不过度暴露或强化缺点？
+- 回复中的结论、数值、metric、setting 是否和原论文一致？
+- 短板承认是否控制在范围、表达、补充实验或限制讨论层面，而不是推翻主结论？
 - 每个 response 第一段是否直接回答？
 - 每段第一句话是否给出核心点？
 - 新增实验是否简介了 setting，而不是只报数值？
