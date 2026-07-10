@@ -16,7 +16,9 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 
 - 先感谢，再回答；先承认 reviewer 的有效关注点，再给证据。
 - 问题摘要要弱化尖锐措辞，但不能偷换问题。
+- reviewer 提到的弱点、concern 和 question 都要一对一回应；即使原文不是问句，也要转成正式的 `Q1/Q2/...` 来回答。
 - 回答要具体，优先使用数据、补充实验、ablation、case study、统计检验、表格和真实引用。
+- 新增实验不能只报数值；必须用一句话简介实验 setting，例如数据集/子集、模型或方法、指标、对照项和改变的变量。
 - 少写空泛套话，例如 “we will improve” 或 “this is interesting”；必须说清楚改什么、结果是什么、支持什么结论。
 - rebuttal 通常有严格字数限制；每个回答先给核心结论，再给最强证据。
 - 整体回复应该是高信息密度的纯文本 Q&A，不要把 reviewer response 整体改成表格。
@@ -123,6 +125,31 @@ Thank you for your careful review and constructive comments. We are pleased that
 | The experiments are insufficient. | `> **Q1: Request for additional evidence on experimental coverage.**` |
 | The metric is questionable. | `> **Q1: Clarification on the rationale and robustness of the metric.**` |
 
+## 问题覆盖与引用策略
+
+覆盖规则：
+
+- **弱点也算问题**：reviewer 写成 `Weaknesses`、`Concerns`、`Limitations` 或普通陈述时，也要逐条抽取成 `Q1/Q2/...`。
+- **默认一对一**：每个 reviewer 的每个实质性弱点或疑问默认单独回答，不要只挑显式 question 回答。
+- **谨慎合并**：只有两个点内容高度相似、证据完全相同或一个点明显是另一个点的子问题时，才合并成一个 Q。
+- **合并要透明**：合并后在 Q 摘要或首句说明覆盖两个 concerns，避免 reviewer 觉得某个点被跳过。
+- **不要过度合并**：同一 reviewer 的 novelty、metric、experiment、writing、scope 等不同维度问题通常应分开回答。
+
+同一 reviewer 内可以做问题间引用：
+
+- 后面的回答可以引用前面已经解释过的证据，例如 “As discussed in Q2, ...”。
+- 引用应尽量从后文指向前文，不要让读者先看到一个尚未解释的 future reference。
+- 引用只能减少重复背景，不能替代当前 Q 的直接回答；每个 Q 仍要有自己的第一句核心结论。
+- 如果 Q4 依赖 Q2 的 ablation，Q4 中只复述与当前问题直接相关的结论和数值。
+
+跨 reviewer 引用是高风险技巧，只在特定情况下使用：
+
+- 适用场景：有明确积极或高分 reviewer，且低分 reviewer 批评的点正好被积极 reviewer 明确认可。
+- 写法要克制：只写 reviewer ID 和被认可的具体点，例如 “Reviewer 2 also recognized the robustness of our metric, which supports that the evaluation design is practically meaningful.”
+- 作用边界：跨 reviewer 引用只能辅助说明某个设计有外部认可，不能替代数据、实验或 case 证据。
+- 风险控制：不要把一个 reviewer 的其他负面意见引入另一个 reviewer 的视野；不要制造 reviewer 之间对立；不要暗示某个 reviewer “错了”。
+- 默认不用：如果没有明确积极 reviewer，或引用会让读者注意到更多问题，就不要跨 reviewer 引用。
+
 ## 回答写法
 
 每个回答按证据强度组织：
@@ -137,7 +164,9 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 - 每段第一句先给结论，例如 “The gain mainly comes from the framework rather than the base LLM.”
 - 后续句子再写数据、实验设置、case 或修订承诺。
+- 如果补充新实验，先用一句短句交代 setting，再给结果；不要让 reviewer 猜实验条件。
 - 一段只服务一个论点；如果有多个并列证据，再考虑分点。
+- 一段中如果出现多个设置、多个指标或多个数值对比，优先改成小表格，而不是塞进长句。
 - 不要用很多短 bullet 替代论证；bullet 只适合并列证据、步骤、维度或明确 checklist。
 - 字数紧张时优先删铺垫、感谢重复句和低信息量形容词，保留数值、对比和结论。
 
@@ -172,6 +201,8 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 - 控制在 2-5 列、2-6 行。
 - 只展示能直接回答问题的指标。
+- 如果一个段落里需要同时报告多个数据点、多个模型、多个 setting 或多个 metric，优先用小表格。
+- 新增实验表格至少要包含 setting 或 notes，让读者知道比较条件；不要只放裸数值。
 - 用 `**bold**` 标最好结果，不要塞大 leaderboard。
 - 表格前后各用一句话解释，不要让表格自己说话。
 - 表格适合展示新实验、ablation、metric 对比、评分维度、错误类型分布。
@@ -243,11 +274,17 @@ We hope these responses clarify your concerns. If they address your questions, w
 
 - 第一段是否感谢 reviewer 并点出认可点？
 - 每个问题是否用 `> **Qx: ...**`？
+- reviewer 的弱点、concern 和非问句批评是否也被逐条转成 Q 并回答？
+- 同一 reviewer 的不同维度问题是否避免了不必要合并？
+- 问题间引用是否只用于减少重复，且没有替代当前 Q 的直接回答？
+- 跨 reviewer 引用是否只在明确积极 reviewer 存在时使用，且没有引入额外负面信息？
 - Q 摘要是否中性、可回答、不过度暴露缺点？
 - 每个 response 第一段是否直接回答？
 - 每段第一句话是否给出核心点？
+- 新增实验是否简介了 setting，而不是只报数值？
 - 是否至少用一个强证据回答核心 concern？
 - 是否保持整体纯文本 Q&A，而不是把回复主体表格化？
+- 一段中多个数据点是否已考虑改成小表格？
 - 表格是否只用于数据或更适合结构化表达的内容？
 - 分点是否只用于并列证据、步骤或维度，且每个 bullet 都有具体信息？
 - 是否删除了冗余、空话和刻意堆信息量的内容？
