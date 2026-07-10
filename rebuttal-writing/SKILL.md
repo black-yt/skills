@@ -1,6 +1,6 @@
 ---
 name: rebuttal-writing
-description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、reviewer response 或 AC response 时使用；覆盖匿名性、开头感谢、问题弱化改写、Markdown Q&A 格式、强证据回答、小表格、引用和礼貌结尾。"
+description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、reviewer response 或 AC response 时使用；覆盖匿名性、开头感谢、陈述式 Q 标题、问题弱化改写、Markdown Q&A 格式、强证据回答、小表格、引用和礼貌结尾。"
 ---
 
 # Rebuttal Writing
@@ -15,7 +15,8 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 ## 总体原则
 
 - 先感谢，再回答；先承认 reviewer 的有效关注点，再给证据。
-- 问题摘要要弱化尖锐措辞，但不能偷换问题。
+- 所有 `Q1/Q2/...` 标题都要写成中性陈述式主题，而不是复述 reviewer 的质问。
+- 问题摘要要弱化尖锐措辞，但不能偷换问题或删掉核心 concern。
 - reviewer 提到的弱点、concern 和 question 都要一对一回应；即使原文不是问句，也要转成正式的 `Q1/Q2/...` 来回答。
 - 回答要具体，优先使用数据、补充实验、ablation、case study、统计检验、表格和真实引用。
 - 新增实验不能只报数值；必须用一句话简介实验 setting，例如数据集/子集、模型或方法、指标、对照项和改变的变量。
@@ -35,7 +36,7 @@ Dear Reviewer,
 
 Thank you for your careful review and constructive comments. We are pleased that you recognized [认可点1] and [认可点2]. Regarding your remaining concerns about [主题A], [主题B], and [主题C], we respond below.
 
-> **Q1: Clarification on [弱化后的问题简述].**
+> **Q1: [中性陈述式主题].**
 
 **Response.** [一句话直接回答核心疑问。]
 
@@ -51,7 +52,7 @@ Thank you for your careful review and constructive comments. We are pleased that
 | [baseline] | [metric] | [value] |
 | [ours] | [metric] | **[value]** |
 
-> **Q2: Concern regarding [弱化后的问题简述].**
+> **Q2: [另一个中性陈述式主题].**
 
 **Response.** [直接回答。] [如需引用，用 `[1]`。]
 
@@ -103,27 +104,32 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 ## 问题摘要写法
 
-每个问题用 Markdown blockquote：
+每个回复项用 Markdown blockquote；下面的 `Qx` 表示任意编号，实际写作时替换成 `Q1/Q2/...`：
 
 ```md
-> **Q1: Clarification on [topic].**
+> **Qx: Ablation of the [module] module.**
 ```
 
 改写规则：
 
-- 把 “fatal flaw / not novel / invalid / missing” 改成 “clarification / concern / request for details / relation to prior work”。
+- 每一个 Q 标题都遵守陈述式主题规则，不只是 `Q1`。
+- 把 reviewer 的问题改写成陈述式主题、名词短语或短句，例如 “Ablation of the routing module”。
+- 避免在 Q 标题里使用 `why`、`whether`、`missing`、`insufficient`、`questionable`、`fatal flaw`、`concern about`、`request for` 等会强化攻击感或缺陷感的词。
+- 把 “fatal flaw / not novel / invalid / missing” 改成中性主题，例如 “Novelty relative to prior work” 或 “Ablation of [module]”。
 - 把宽泛批评收窄成可回答的问题。
 - 把攻击性表述转成中性学术表述。
 - 保留 reviewer 的核心疑问，不要篡改为完全不同的问题。
+- 如果 reviewer 问 “the paper does not compare the impact of [module]”，Q 标题写成 `> **Qx: Ablation of the [module] module.**`，不要写成 `> **Qx: Missing comparison of [module].**`。
 
 示例：
 
-| 原始尖锐问题 | 推荐 Q 摘要 |
+| 原始尖锐问题 | 推荐 Q 标题 |
 | --- | --- |
-| The method is not novel. | `> **Q1: Clarification on novelty relative to prior work.**` |
-| The benchmark may be biased because GPT-4o was used. | `> **Q1: Concern about potential construction bias from LLM-assisted data generation.**` |
-| The experiments are insufficient. | `> **Q1: Request for additional evidence on experimental coverage.**` |
-| The metric is questionable. | `> **Q1: Clarification on the rationale and robustness of the metric.**` |
+| The method is not novel. | `> **Qx: Novelty relative to prior work.**` |
+| The benchmark may be biased because GPT-4o was used. | `> **Qx: Construction bias analysis for LLM-assisted data generation.**` |
+| The experiments are insufficient. | `> **Qx: Additional evidence on experimental coverage.**` |
+| The metric is questionable. | `> **Qx: Metric rationale and robustness.**` |
+| The paper does not compare the impact of the XXX module. | `> **Qx: Ablation of the XXX module.**` |
 
 ## 问题覆盖与引用策略
 
@@ -132,7 +138,7 @@ Thank you for your careful review and constructive comments. We are pleased that
 - **弱点也算问题**：reviewer 写成 `Weaknesses`、`Concerns`、`Limitations` 或普通陈述时，也要逐条抽取成 `Q1/Q2/...`。
 - **默认一对一**：每个 reviewer 的每个实质性弱点或疑问默认单独回答，不要只挑显式 question 回答。
 - **谨慎合并**：只有两个点内容高度相似、证据完全相同或一个点明显是另一个点的子问题时，才合并成一个 Q。
-- **合并要透明**：合并后在 Q 摘要或首句说明覆盖两个 concerns，避免 reviewer 觉得某个点被跳过。
+- **合并要透明**：合并后在 Q 标题或首句说明覆盖两个 closely related points，避免 reviewer 觉得某个点被跳过。
 - **不要过度合并**：同一 reviewer 的 novelty、metric、experiment、writing、scope 等不同维度问题通常应分开回答。
 
 同一 reviewer 内可以做问题间引用：
@@ -274,11 +280,12 @@ We hope these responses clarify your concerns. If they address your questions, w
 
 - 第一段是否感谢 reviewer 并点出认可点？
 - 每个问题是否用 `> **Qx: ...**`？
+- Q 标题是否是中性陈述式主题，而不是疑问句或缺陷复述？
 - reviewer 的弱点、concern 和非问句批评是否也被逐条转成 Q 并回答？
 - 同一 reviewer 的不同维度问题是否避免了不必要合并？
 - 问题间引用是否只用于减少重复，且没有替代当前 Q 的直接回答？
 - 跨 reviewer 引用是否只在明确积极 reviewer 存在时使用，且没有引入额外负面信息？
-- Q 摘要是否中性、可回答、不过度暴露缺点？
+- Q 标题和摘要是否中性、可回答、不过度暴露或强化缺点？
 - 每个 response 第一段是否直接回答？
 - 每段第一句话是否给出核心点？
 - 新增实验是否简介了 setting，而不是只报数值？
