@@ -19,6 +19,9 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 - 回答要具体，优先使用数据、补充实验、ablation、case study、统计检验、表格和真实引用。
 - 少写空泛套话，例如 “we will improve” 或 “this is interesting”；必须说清楚改什么、结果是什么、支持什么结论。
 - rebuttal 通常有严格字数限制；每个回答先给核心结论，再给最强证据。
+- 整体回复应该是高信息密度的纯文本 Q&A，不要把 reviewer response 整体改成表格。
+- 每个段落第一句话必须简短清楚地给出该段核心点，后文再展开证据或解释。
+- 只有当内容天然适合结构化表达时才用分点或表格；不要为了显得充足而加入低信息量表格或空泛 bullet。
 - 只承诺实际可以放进 revised version / appendix 的内容；不要编造实验、数据、引用或未来开源链接。
 
 ## 推荐结构
@@ -34,8 +37,12 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 **Response.** [一句话直接回答核心疑问。]
 
-- **Evidence 1.** [数据/实验/case/修订位置。]
-- **Evidence 2.** [机制解释或对比。]
+[用一段高密度文本解释核心证据。段首第一句先给结论，随后展开实验、case 或修订位置。]
+
+[只有在多个证据点天然并列时才用分点。]
+
+- **Ablation.** [具体设置和数值变化。]
+- **Case study.** [具体 failure mode 和改进。]
 
 | Setting | Metric | Result |
 | --- | --- | --- |
@@ -60,10 +67,7 @@ Dear Area Chair and Reviewers,
 
 We sincerely thank all reviewers for their time, careful evaluation, and constructive feedback. We are grateful that the reviews recognized [共同认可点]. Below, we summarize the major concerns and the evidence we added to address them.
 
-| Concern | Response | Evidence |
-| --- | --- | --- |
-| [concern A] | [one-line answer] | [metric/table/appendix] |
-| [concern B] | [one-line answer] | [case/statistical test] |
+The main concerns are [A], [B], and [C]. We address them with [new experiment/statistical test/case analysis], and provide reviewer-specific details below.
 
 - **Concern A.** [2-3 sentences with concrete evidence.]
 - **Concern B.** [2-3 sentences with concrete evidence.]
@@ -129,6 +133,14 @@ Thank you for your careful review and constructive comments. We are pleased that
 4. **修订承诺**：会在 revised paper 的哪个部分补充。
 5. **引用**：必要时用 `[1]`，最后集中列 reference。
 
+段落规则：
+
+- 每段第一句先给结论，例如 “The gain mainly comes from the framework rather than the base LLM.”
+- 后续句子再写数据、实验设置、case 或修订承诺。
+- 一段只服务一个论点；如果有多个并列证据，再考虑分点。
+- 不要用很多短 bullet 替代论证；bullet 只适合并列证据、步骤、维度或明确 checklist。
+- 字数紧张时优先删铺垫、感谢重复句和低信息量形容词，保留数值、对比和结论。
+
 推荐模板：
 
 ```md
@@ -154,7 +166,7 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 ## 表格和数据
 
-小表格非常适合 rebuttal，因为它能在短字数内制造证据密度。
+小表格只能用于数据或天然结构化内容。不要直接用表格作为回复 reviewer 的主体结构；主体仍应是 `> **Qx: ...**` 后接文本回答。
 
 表格规则：
 
@@ -162,6 +174,14 @@ Thank you for your careful review and constructive comments. We are pleased that
 - 只展示能直接回答问题的指标。
 - 用 `**bold**` 标最好结果，不要塞大 leaderboard。
 - 表格前后各用一句话解释，不要让表格自己说话。
+- 表格适合展示新实验、ablation、metric 对比、评分维度、错误类型分布。
+- 表格不适合展示空泛承诺、普通文字解释、reviewer 问题清单或为了“看起来充足”而造的信息量低的内容。
+
+分点规则：
+
+- 分点适合多个并列证据、多个质量控制步骤、多个实验设置或多个修订位置。
+- 分点不适合把连续论证切碎；如果 2-3 句话能讲清楚，就用普通段落。
+- 每个 bullet 必须有具体信息，最好包含设置、数值、机制或修订位置。
 
 模板：
 
@@ -225,8 +245,12 @@ We hope these responses clarify your concerns. If they address your questions, w
 - 每个问题是否用 `> **Qx: ...**`？
 - Q 摘要是否中性、可回答、不过度暴露缺点？
 - 每个 response 第一段是否直接回答？
+- 每段第一句话是否给出核心点？
 - 是否至少用一个强证据回答核心 concern？
-- 表格是否小而有用？
+- 是否保持整体纯文本 Q&A，而不是把回复主体表格化？
+- 表格是否只用于数据或更适合结构化表达的内容？
+- 分点是否只用于并列证据、步骤或维度，且每个 bullet 都有具体信息？
+- 是否删除了冗余、空话和刻意堆信息量的内容？
 - 引用是否真实、紧跟 claim、最后有 `References`？
 - 最后一段是否礼貌请求更新评分并表示愿意继续沟通？
 - 全文是否匿名、无外部链接、无身份线索？
