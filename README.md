@@ -36,6 +36,7 @@ skill-name/
 | `overleaf-project-sync` | [`overleaf-project-sync/SKILL.md`](overleaf-project-sync/SKILL.md) | 从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
+| `rebuttal-writing` | [`rebuttal-writing/SKILL.md`](rebuttal-writing/SKILL.md) | 撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名性、开头感谢、问题弱化改写、Markdown Q&A、强证据回答、小表格、引用和礼貌结尾。 |
 | `researchharness` | [`researchharness/SKILL.md`](researchharness/SKILL.md) | 使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。 |
 | `structai` | [`structai/SKILL.md`](structai/SKILL.md) | 使用 StructAI Python 工具箱搭建 LLM workflow，覆盖 `LLMAgent`、结构化输出、Judge、并发、文件/PDF 工具、文本解析、私网 no_proxy 和 timeout。 |
 | `wave-mosaic-web-theme` | [`wave-mosaic-web-theme/SKILL.md`](wave-mosaic-web-theme/SKILL.md) | 复刻 black-yt 风格前端主题，覆盖 canvas wave-mosaic 动态方块背景、4 种背景颜色切换、Space Grotesk 字体、顶部圆角导航栏、论文筛选滑块和高级卡片/表格视觉。 |
