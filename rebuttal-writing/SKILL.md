@@ -1,6 +1,6 @@
 ---
 name: rebuttal-writing
-description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、reviewer response 或 AC response 时使用；覆盖匿名性、开头感谢、陈述式 Q 标题、问题弱化改写、Markdown Q&A 格式、强证据回答、小表格、引用和礼貌结尾。"
+description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、reviewer response、AC response 或给 AC 的私密审稿问题说明时使用；覆盖匿名性、开头感谢、陈述式 Q 标题、问题弱化改写、Markdown Q&A 格式、强证据回答、小表格、引用和礼貌结尾。"
 ---
 
 # Rebuttal Writing
@@ -8,6 +8,7 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 ## 使用场景
 
 - 为 AI/ML conference 写 reviewer rebuttal、author response、discussion reply 或 AC summary。
+- 当某个低分 reviewer 存在明显事实错误、可能偏见或严重误读时，起草给 AC 的私密说明。
 - 把零散实验、case、修订承诺和 reviewer comment 整理成紧凑 Markdown。
 - 在字数限制下，把尖锐问题转写成可回答、对作者有利但不歪曲原意的 `Q1/Q2/...`。
 - 回答必须完全匿名，不能出现作者身份、外部链接、GitHub、主页、机构、项目私有路径或任何可反查身份的信息。
@@ -25,6 +26,7 @@ description: "当需要撰写、重构或压缩 AI/ML conference rebuttal、revi
 - 少写空泛套话，例如 “we will improve” 或 “this is interesting”；必须说清楚改什么、结果是什么、支持什么结论。
 - rebuttal 通常有严格字数限制；每个回答先给核心结论，再给最强证据。
 - 整体回复应该是高信息密度的纯文本 Q&A，不要把 reviewer response 整体改成表格。
+- 给 AC 的私密说明要低姿态、证据化、克制；不要直接指责 reviewer，只说明可能存在的 factual misunderstanding、evaluation inconsistency 或 unsupported claim。
 - 每个段落第一句话必须简短清楚地给出该段核心点，后文再展开证据或解释。
 - 只有当内容天然适合结构化表达时才用分点或表格；不要为了显得充足而加入低信息量表格或空泛 bullet。
 - 只承诺实际可以放进 revised version / appendix 的内容；不要编造实验、数据、引用或未来开源链接。
@@ -78,6 +80,19 @@ The main concerns are [A], [B], and [C]. We address them with [new experiment/st
 - **Concern B.** [2-3 sentences with concrete evidence.]
 
 We hope this summary helps clarify the main issues raised during review. We are grateful for the reviewers' feedback and would be happy to provide further clarification if needed.
+```
+
+### Private note to AC
+
+```md
+Dear Area Chair,
+
+Thank you for coordinating the review process. We appreciate Reviewer [ID]'s time and feedback. However, we would like to respectfully note several points that may affect how this review should be weighed.
+
+- **Factual mismatch.** Reviewer [ID] states that [claim], but the submitted paper explicitly includes [evidence] in [Section/Table/Figure/Appendix].
+- **Evaluation inconsistency.** Reviewer [ID]'s concern about [topic] appears inconsistent with [paper evidence / other reviewer's explicit recognition / benchmark result].
+
+We do not intend to dismiss the reviewer's feedback. We only hope these factual issues can be considered when assessing the review, because they may have contributed to an unusually low score or an inaccurate interpretation of the paper.
 ```
 
 ## 开头段写法
@@ -157,6 +172,53 @@ Thank you for your careful review and constructive comments. We are pleased that
 - 作用边界：跨 reviewer 引用只能辅助说明某个设计有外部认可，不能替代数据、实验或 case 证据。
 - 风险控制：不要把一个 reviewer 的其他负面意见引入另一个 reviewer 的视野；不要制造 reviewer 之间对立；不要暗示某个 reviewer “错了”。
 - 默认不用：如果没有明确积极 reviewer，或引用会让读者注意到更多问题，就不要跨 reviewer 引用。
+
+## AC 私密信与审稿问题申诉
+
+适用场景：
+
+- reviewer 给分明显偏低，且意见中存在可证实的事实错误。
+- reviewer 声称论文没有某个实验、模块、数据或讨论，但原文中明确写在某个 section、table、figure 或 appendix。
+- reviewer 的主要批评和原文证据明显不一致，或和其他 reviewer 的明确正面认可形成强烈冲突。
+- reviewer 的措辞显示可能没有认真阅读关键部分，但不要直接写 “the reviewer did not read the paper”。
+
+写作姿态：
+
+- 使用私密 AC 通道，不要把这类投诉写进公开 rebuttal。
+- 开头仍然感谢 AC 和该 reviewer 的审稿投入。
+- 用 “we respectfully note” / “may affect how this review should be weighed” / “possible factual misunderstanding” 这类低姿态表达。
+- 目标是让 AC 在参考该 reviewer 意见时降低权重，而不是要求 AC 惩罚 reviewer 或直接删除该 review。
+- 只陈述可验证事实：原文位置、表格编号、figure 编号、appendix 位置、明确数值和 reviewer 原话。
+- 如果说 reviewer 可能有偏见，也要写成 “possible bias / unsupported assumption / evaluation inconsistency”，不要直接指责人格、动机或能力。
+
+证据组织：
+
+- 每个问题用一个短 bullet，先写 reviewer 的具体说法，再写原文证据。
+- 原文证据必须具体到 `Section X`、`Table Y`、`Figure Z`、`Appendix A` 或 rebuttal 中已有补充实验。
+- 如果 reviewer 说 “no XXX comparison”，证据应写 “Table X reports XXX ablation under [setting]”，不要只说 “we already included it”。
+- 如果引用其他 reviewer 的正面意见，只写 reviewer ID 和对应认可点；不要把其他 reviewer 的负面意见带进来。
+- 只列最强的 2-4 个问题；不要把所有不满都写成投诉。
+
+推荐模板：
+
+```md
+Dear Area Chair,
+
+Thank you for coordinating the review process. We appreciate Reviewer [ID]'s time and feedback. However, we would like to respectfully note several factual issues that may affect how this review should be weighed.
+
+- **[Neutral issue label].** Reviewer [ID] states that [reviewer claim]. In the submitted paper, [Section/Table/Figure/Appendix] explicitly reports [paper evidence], including [specific result or statement].
+- **[Neutral issue label].** Reviewer [ID] suggests [reviewer claim]. This appears inconsistent with [paper evidence / another reviewer ID's positive recognition], which shows [specific supported point].
+
+We do not intend to dismiss the reviewer's feedback. We only hope these factual issues can be considered when assessing the review, because they may have contributed to an unusually low score or an inaccurate interpretation of the paper.
+```
+
+避免：
+
+- “Reviewer [ID] is biased / unfair / incompetent.”
+- “The review should be ignored.”
+- “The reviewer clearly did not read the paper.”
+- 没有原文位置或具体证据的主观抱怨。
+- 把普通 disagreement、审美偏好或可接受的 critical opinion 写成投诉。
 
 ## 原文一致性与短板承认
 
@@ -302,6 +364,7 @@ We hope these responses clarify your concerns. If they address your questions, w
 - 没有引用未公开补充材料中的外部链接。
 - 没有过度承诺无法在 revised version 中实现的实验。
 - 没有攻击 reviewer 的语气。
+- 如果给 AC 写私密信，没有直接指责 reviewer，只用事实证据说明 possible factual misunderstanding 或 evaluation inconsistency。
 
 ## 快速检查清单
 
@@ -313,6 +376,8 @@ We hope these responses clarify your concerns. If they address your questions, w
 - 同一 reviewer 的不同维度问题是否避免了不必要合并？
 - 问题间引用是否只用于减少重复，且没有替代当前 Q 的直接回答？
 - 跨 reviewer 引用是否只在明确积极 reviewer 存在时使用，且没有引入额外负面信息？
+- 如果需要给 AC 写私密信，是否只列出有原文证据支持的 2-4 个最强问题？
+- AC 私密信是否保持低姿态，只请求 AC 考虑这些事实问题对 review 权重的影响？
 - Q 标题和摘要是否中性、可回答、不过度暴露或强化缺点？
 - 回复中的结论、数值、metric、setting 是否和原论文一致？
 - 短板承认是否控制在范围、表达、补充实验或限制讨论层面，而不是推翻主结论？
