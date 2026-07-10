@@ -60,7 +60,7 @@ Thank you for your careful review and constructive comments. We are pleased that
 
 **Response.** [直接回答。] [如需引用，用 `[1]`。]
 
-We hope these responses clarify your concerns. If they address your questions, we would be grateful if you could consider updating your score. If any concern remains, we would be happy to continue the discussion.
+We hope these responses clarify your concerns. If they address your questions, we would be grateful if you could consider [updating / raising] your score. If any concern remains, we would be happy to continue the discussion.
 
 ### References
 
@@ -345,12 +345,14 @@ This setting follows common practice in agent benchmark evaluation `[1]`.
 结尾要礼貌、简洁、可继续沟通：
 
 ```md
-We hope these responses clarify your concerns. If they address your questions, we would be grateful if you could consider updating your score. If any concern remains, we would be happy to continue the discussion. Thank you again for your time and feedback.
+We hope these responses clarify your concerns. If they address your questions, we would be grateful if you could consider [updating / raising] your score. If any concern remains, we would be happy to continue the discussion. Thank you again for your time and feedback.
 ```
 
 注意：
 
-- 可以请求更新评分，但语气要克制。
+- 可以请求调整评分，但语气要克制。
+- 如果 reviewer 原始分数还可以，用 `consider updating your score`。
+- 如果 reviewer 原始分数较低，用 `consider raising your score` 或 `consider improving your score`。
 - 不要施压、抱怨或暗示 reviewer 不公平。
 - 不要泄露身份或附外部链接。
 
@@ -391,5 +393,5 @@ We hope these responses clarify your concerns. If they address your questions, w
 - 分点是否只用于并列证据、步骤或维度，且每个 bullet 都有具体信息？
 - 是否删除了冗余、空话和刻意堆信息量的内容？
 - 引用是否真实、紧跟 claim、最后有 `References`？
-- 最后一段是否礼貌请求更新评分并表示愿意继续沟通？
+- 最后一段是否根据原始分数选择了 `updating your score` 或 `raising/improving your score`，并表示愿意继续沟通？
 - 全文是否匿名、无外部链接、无身份线索？
