@@ -15,6 +15,26 @@
 - skill 默认面向“使用这个能力的用户”，不是面向“维护上游仓库的人”；除非 skill 本身就是维护类，否则不要写入上游 `.gitignore`、发布流程、仓库治理、内部维护习惯或其他与使用技能无关的细节。
 - 维护类 skill 例外，例如 `agents-md-maintenance` 可以记录维护流程、同步策略和文件拆分规则；普通库/工具 skill 应聚焦安装、配置、调用、调试、验证和安全边界。
 
+## 上游版本锚点
+
+- 如果 skill 的核心就是一个会持续更新的上游 GitHub/PyPI 包、自研工具库或具体仓库，必须记录当前 skill 对照的上游版本。
+- 版本锚点至少包含 package version 或仓库 `VERSION`，以及 GitHub HEAD commit。
+- 如果没有 `VERSION` 文件，优先读取 `pyproject.toml`、`package.json`、release tag 或当前安装包 `__version__`。
+- 版本锚点应放在主 `SKILL.md` 的默认可见位置；如果有安装/源码 reference，也在该 reference 中给出核对命令。
+- 维护这类 skill 前，先重新核对上游版本和 HEAD；如果任一变化，必须阅读 README、官方教程、CLI help、配置示例和相关源码后再更新。
+- 不需要给通用稳定依赖或偶然示例包记录版本锚点，例如 `torch`、`numpy`、`requests`、`beautifulsoup4`、`python-docx` 这类非 skill 核心的通用包。
+- 外部备选工具只需记录链接和能力范围；除非该工具就是当前 skill 的核心，不强制记录版本。
+
+推荐写法：
+
+```md
+## 上游版本锚点
+
+- 当前 skill 对照 [PACKAGE_OR_REPO] version：`[VERSION]`。
+- 当前 skill 对照 GitHub HEAD：`[COMMIT_SHA]`。
+- 维护本 skill 前，先重新检查上游 version 和 HEAD；如果任一变化，必须阅读 README、配置示例、官方教程和相关源码后再更新。
+```
+
 ## 拆分大 Skill 或 Reference
 
 - 主 `SKILL.md` 接近 500 行或难以导航时，应把低频细节拆到 `references/`。

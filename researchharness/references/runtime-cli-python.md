@@ -209,6 +209,31 @@ python3 tests/test_tool_availability.py
 - 如果 `WebSearch`、`ScholarSearch`、`WebFetch` 或 `ReadPDF` 出现 network、TLS、upload、download、PDF parsing 错误，优先尝试关闭 VPN/proxy 后重试。
 - 如果源码 checkout 里需要机器可读结果，可运行 `python3 tests/test_tool_availability.py --json`。
 
+最新源码 checkout 中常用测试入口：
+
+| 检查对象 | 命令 |
+| --- | --- |
+| 工具 key、依赖和外部服务可用性 | `python3 tests/test_tool_availability.py --json` |
+| 本地工具 schema、路径边界和基础行为 | `python3 tests/test_local_tools_validation.py` |
+| 直接工具链验证 | `python3 tests/test_toolchain_validation.py` |
+| optional extra tool | `python3 tests/test_extra_tools.py` |
+| Python import API 和 custom tool | `python3 tests/test_python_api_tools.py` |
+| OpenAI-compatible API server | `python3 tests/test_openai_api_checks.py` |
+| benchmark README server/example smoke test | `python3 tests/test_sgi_benchmark_readmes.py` |
+| 本地前端 | `python3 tests/test_frontend_checks.py` |
+| token counting、model profile 和 compaction budget | `python3 tests/test_token_counting.py` |
+| 多工具端到端 | `python3 tests/test_end_to_end_multitool.py` |
+| 本地文件发现端到端 | `python3 tests/test_end_to_end_glob_grep.py` |
+| 写入/编辑端到端 | `python3 tests/test_end_to_end_write_edit.py` |
+| persistent terminal 端到端 | `python3 tests/test_end_to_end_terminal.py` |
+| 在线 PDF 第一张图端到端 | `python3 tests/test_end_to_end_pdf_image.py` |
+
+如果希望测试子进程使用指定解释器：
+
+```bash
+RESEARCHHARNESS_TEST_PYTHON="/path/to/python" python3 tests/test_local_tools_validation.py
+```
+
 ## CLI 运行
 
 基本运行：

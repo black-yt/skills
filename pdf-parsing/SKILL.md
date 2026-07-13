@@ -11,6 +11,12 @@ description: "当需要用 structai.read_pdf 将 PDF 文档解析成本地 Markd
 
 ## 依赖安装
 
+当前 skill 对照的关键解析依赖：
+
+- `structai` package version：`0.1.24`。
+- `structai` GitHub HEAD：`d20df602578bee124a9c93b293493e63212d0aab`。
+- 更新本 skill 前，先确认 `structai.read_pdf` 行为是否变化；如果上游版本或 HEAD 变化，必须重新阅读 `read_pdf` 源码和 `structai_skill()` 输出。
+
 ```bash
 pip install structai
 ```

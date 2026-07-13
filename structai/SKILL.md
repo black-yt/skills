@@ -23,6 +23,12 @@ export MINERU_TOKEN="[MINERU_TOKEN]"  # 仅 PDF 解析需要
 - PyPI 安装：`pip install structai`
 - GitHub 源码：https://github.com/black-yt/structai
 
+## 上游版本锚点
+
+- 当前 skill 对照 structai `pyproject.toml` package version：`0.1.24`。
+- 当前 skill 对照 GitHub HEAD：`d20df602578bee124a9c93b293493e63212d0aab`。
+- 维护本 skill 前，先重新检查上游 `pyproject.toml` 版本和 HEAD；如果任一变化，必须阅读 README、`pyproject.toml`、`structai_skill()` 输出和相关源码后再更新。
+
 安装模板：
 
 ```bash
@@ -63,6 +69,13 @@ python - <<'PY'
 import structai
 print(structai.__file__)
 PY
+```
+
+核对上游版本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/black-yt/structai/main/pyproject.toml | sed -n '1,80p'
+git ls-remote https://github.com/black-yt/structai.git HEAD
 ```
 
 ## 内置文档与 Prompt

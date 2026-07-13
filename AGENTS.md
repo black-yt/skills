@@ -49,6 +49,7 @@
 - `SKILL.md` 负责触发范围、核心规则、引用哪些 reference。
 - `references/` 放详细模板、示例和较长流程说明；`assets/` 放会被输出复用的静态资源；`scripts/` 放可执行辅助脚本。
 - 不要随意增加额外说明文件；只有直接服务 skill 功能时才新增。
+- 如果某个 skill 的核心就是一个会持续更新的上游 GitHub/PyPI 包或自研仓库，必须在 skill 中记录当前对照的上游 package version 或 `VERSION`，以及 GitHub HEAD commit；通用稳定依赖或偶然示例包不需要版本锚点。
 - 新增或大改 skill 后，必须同步检查 `README.md` 和 `docs/index.html`。
 - 新增、删除或重命名 skill 后，`README.md` 和 `docs/index.html` 不仅要同步名称、链接和数量，还要按当前仓库展示顺序重新排序；重命名后的条目不能停留在旧名称所在位置。
 - 维护任何 `AGENTS.md`、`CLAUDE.md` 或同类默认加载的 agent 指南时，主入口文件必须包含项目或工作空间的整体描述，让 agent 默认理解项目目标、主要结构、关键产物和维护边界；这些总览信息不要拆到 local 文件。

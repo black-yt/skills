@@ -16,6 +16,7 @@
 
 - 记录第三方库经验时，优先推荐官方教程、官方文档、recipe、API reference 和当前环境 CLI help；源码阅读应放在官方文档之后。
 - 文档链接必须与当前安装版本匹配。不要把 `stable`、`latest` 或某个历史版本链接写成固定答案；如果只能给模板，使用 `<matched-version>` 这类占位符。
+- 当 skill 绑定某个会更新的核心上游仓库或包时，必须用该 skill 中记录的 package version / `VERSION` / GitHub HEAD 作为漂移检查锚点；发现上游版本变化后，不要只改版本号，必须重新审 README、配置示例、CLI help 和相关源码。
 - 源码追溯用于确认当前安装版本的真实行为、参数名、默认值、兼容分支、错误路径和边界条件，不用于替代官方教程学习推荐用法。
 - 源码必须只读。不要修改 `site-packages`、pip 安装目录、共享 checkout、editable checkout 或共享环境。
 - 如果确实需要改第三方库，必须先向用户说明风险、改动范围和安装方式；只有用户明确同意后，才 clone 独立副本并 editable install。

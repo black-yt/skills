@@ -5,7 +5,20 @@
 - PyPI 安装：`pip install researchharness`
 - GitHub 源码：https://github.com/InternScience/ResearchHarness
 - 在线体验：https://huggingface.co/spaces/InternScience/ResearchHarness
+- 官方教程：`docs/tutorial_en.md` 和 `docs/tutorial_zh.md`
 - Python 版本：Python 3.10+
+
+当前 skill 对照的上游版本：
+
+- ResearchHarness GitHub `VERSION`：`v0.0.51`。
+- GitHub HEAD：`9b39676809759e3d898a04a2cc4f8455fcf3b6af`。
+
+核对上游版本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/InternScience/ResearchHarness/main/VERSION
+git ls-remote https://github.com/InternScience/ResearchHarness.git HEAD
+```
 
 PyPI 安装模板：
 
@@ -70,13 +83,17 @@ python3 run_frontend.py
 - `run_agent.py`：直接运行 agent 的薄 CLI 入口。
 - `run_frontend.py`：本地浏览器 UI 启动入口。
 - `run_server.py`：OpenAI-compatible API server 入口。
+- `docs/tutorial_en.md` / `docs/tutorial_zh.md`：官方中英文教程；新用户优先读这里，覆盖安装、环境变量、CLI、API server、workspace、测试和排错。
 - `api/openai_server.py`：`/v1/chat/completions`、wrapper、per-request run 目录、health check。
 - `frontend/`：WebSocket UI、静态资源、浏览器侧 AskUser bridge。
 - `agent_base/react_agent.py`：主 ReAct loop、模型调用、tool-call 处理、trace/session state。
 - `agent_base/base.py`：可扩展 base agent hooks 和 benchmark adapter 基础。
+- `agent_base/model_profiles.py`：模型族识别、context window、compaction trigger、recent history budget 和 token budget 校验。
+- `agent_base/provider_compat.py`：按模型/provider 兼容性决定是否发送 `temperature`、`top_p`、`presence_penalty` 等 sampling 参数。
 - `agent_base/prompt.py`：base system prompt 组合。
 - `agent_base/trace_utils.py`：flat JSONL trace writer。
 - `agent_base/console_utils.py`：CLI event 输出。
+- `agent_base/tools/README.md`：内置工具 surface 的官方说明；不确定工具参数、返回字段或 timeout 语义时优先阅读。
 - `agent_base/tools/tool_file.py`：`Glob`、`Grep`、`Read`、`ReadPDF`、`ReadImage`、`Write`、`Edit`。
 - `agent_base/tools/tool_runtime.py`：`Bash` 和 persistent terminal tools。
 - `agent_base/tools/tool_web.py`：`WebSearch`、`ScholarSearch`、`WebFetch`。

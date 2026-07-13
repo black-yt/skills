@@ -20,6 +20,12 @@ description: Use when configuring or debugging the context-overlay OpenAI-compat
 - PyPI 安装：`pip install context-overlay`
 - GitHub 源码：https://github.com/black-yt/context-overlay
 
+## 上游版本锚点
+
+- 当前 skill 对照 context-overlay GitHub `VERSION`：`0.0.5`。
+- 当前 skill 对照 GitHub HEAD：`e7a7c83924a225c443c454c80aab0735ca1bbe6c`。
+- 维护本 skill 前，先重新检查上游 `VERSION` 和 HEAD；如果任一变化，必须阅读 README、`pyproject.toml`、CLI help 和相关源码后再更新。
+
 安装模板：
 
 ```bash
@@ -116,6 +122,13 @@ python -m context_overlay.cli serve --config config.yaml --host 127.0.0.1 --port
 import context_overlay
 
 print(context_overlay.__version__)
+```
+
+核对上游版本：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/black-yt/context-overlay/main/VERSION
+git ls-remote https://github.com/black-yt/context-overlay.git HEAD
 ```
 
 OpenAI SDK 调用：
