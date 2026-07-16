@@ -109,6 +109,29 @@ response = client.chat.completions.create(
 - ResearchHarness 不解释 provider-specific key；字段是否有效由上游 provider 决定。
 - thinking / reasoning 模式通常会占用更多 completion token，必要时同步调高 `MAX_OUTPUT_TOKENS` 或请求的 `max_completion_tokens`。
 
+省略 provider 不支持的 sampling 参数：
+
+```python
+from openai import OpenAI
+
+client = OpenAI(api_key="unused", base_url="http://127.0.0.1:8686/v1")
+
+response = client.chat.completions.create(
+    model="RH",
+    messages=[{"role": "user", "content": "Answer briefly."}],
+    extra_body={"omit-generate-params": ["presence_penalty"]},
+)
+```
+
+`omit-generate-params` 要求：
+
+- 通过 OpenAI SDK 的 `extra_body` 传给 ResearchHarness API server。
+- 允许值只有 `temperature`、`top_p`、`presence_penalty`。
+- 值可以是 JSON array；上游底层配置中会规范化为 tuple。
+- 非法字段会在 agent run 开始前返回 400，且不应创建有效 run。
+- 这个字段用于让 ResearchHarness 不发送某些默认 sampling 参数；它不是 provider-specific `extra_body`，不会转发给底层模型。
+- 如果 provider 拒绝某个字段本身，应该使用此机制省略字段，不要把字段设置成 `0`。
+
 自定义 workspace：
 
 ```python
@@ -145,8 +168,8 @@ response = client.chat.completions.create(
 
 - 当前 API 是 conversation-level stateless；每个 HTTP request 是一次隔离 run。
 - 需要多轮 API 对话时，客户端自己管理历史并传入 messages。
-- `extra_body["workspace-root"]` 和 `extra_body["llm-extra-body"]` 都是 request-local 控制字段。
-- `workspace-root` 用于选择 agent workspace；`llm-extra-body` 才会转发给底层模型。
+- `extra_body["workspace-root"]`、`extra_body["llm-extra-body"]` 和 `extra_body["omit-generate-params"]` 都是 request-local 控制字段。
+- `workspace-root` 用于选择 agent workspace；`llm-extra-body` 才会转发给底层模型；`omit-generate-params` 用于省略 ResearchHarness 默认 sampling 参数。
 - `stream` 必须不存在或为 `false`。
 - `n` 必须不存在或为 `1`。
 - 支持 `system`、`user`、`assistant` role；不支持 `tool` role。
@@ -200,4 +223,6 @@ API 请求校验要点：
 - `stream=true` 会被拒绝。
 - `n != 1` 会被拒绝。
 - `model` 必须是 `RH`、`researchharness` 或 `RH--<backend-model>`。
+- `extra_body["llm-extra-body"]` 必须是 JSON object。
+- `extra_body["omit-generate-params"]` 只能包含 `temperature`、`top_p`、`presence_penalty`。
 - API response 是 OpenAI-compatible 形状，但目前不含 token usage 统计。

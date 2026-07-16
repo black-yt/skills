@@ -10,8 +10,8 @@
 
 当前 skill 对照的上游版本：
 
-- ResearchHarness GitHub `VERSION`：`v0.0.51`。
-- GitHub HEAD：`9b39676809759e3d898a04a2cc4f8455fcf3b6af`。
+- ResearchHarness GitHub `VERSION`：`v0.0.52`。
+- GitHub HEAD：`72e8a44737aadabc8c3f9e5c7ea76883b9c7032f`。
 
 核对上游版本：
 
@@ -89,7 +89,7 @@ python3 run_frontend.py
 - `agent_base/react_agent.py`：主 ReAct loop、模型调用、tool-call 处理、trace/session state。
 - `agent_base/base.py`：可扩展 base agent hooks 和 benchmark adapter 基础。
 - `agent_base/model_profiles.py`：模型族识别、context window、compaction trigger、recent history budget 和 token budget 校验。
-- `agent_base/provider_compat.py`：按模型/provider 兼容性决定是否发送 `temperature`、`top_p`、`presence_penalty` 等 sampling 参数。
+- `agent_base/provider_compat.py`：按模型/provider 兼容性决定是否发送 `temperature`、`top_p`、`presence_penalty` 等 sampling 参数，并校验 `omit_generate_params`。
 - `agent_base/prompt.py`：base system prompt 组合。
 - `agent_base/trace_utils.py`：flat JSONL trace writer。
 - `agent_base/console_utils.py`：CLI event 输出。

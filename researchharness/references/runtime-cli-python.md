@@ -115,6 +115,7 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 - `TEMPERATURE`
 - `TOP_P`
 - `PRESENCE_PENALTY`
+- `OMIT_GENERATE_PARAMS`
 - `COMPACT_TRIGGER_TOKENS`
 - `IMAGE_PART_TOKEN_ESTIMATE`
 - `LLM_IMAGE_MAX_EDGE`
@@ -144,6 +145,7 @@ MINERU_TOKEN="[MINERU_TOKEN]"
 | `TEMPERATURE` | `0.6` | 主模型 temperature。 |
 | `TOP_P` | `0.95` | 主模型 top-p。 |
 | `PRESENCE_PENALTY` | `1.00` | provider 支持时使用。 |
+| `OMIT_GENERATE_PARAMS` | 空字符串 | 逗号分隔的 sampling 参数省略列表；允许 `temperature`、`top_p`、`presence_penalty`。 |
 | `COMPACT_TRIGGER_TOKENS` | `96k` | 自动上下文压缩触发阈值。 |
 | `IMAGE_PART_TOKEN_ESTIMATE` | `2048` | 每个 image content part 的 token 估计。 |
 | `LLM_IMAGE_MAX_EDGE` | `1568` | 发送给多模态模型的图片最大边长。 |
@@ -162,7 +164,7 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 - Python 参数名对应大写环境变量，例如 `max_rounds` 对应 `MAX_ROUNDS`，`compact_trigger_tokens` 对应 `COMPACT_TRIGGER_TOKENS`。
 - `recent_history_budget_tokens` 对应 `RECENT_HISTORY_BUDGET_TOKENS`，`compact_summary_max_tokens` 对应 `COMPACT_SUMMARY_MAX_TOKENS`。
 - CLI 中 `--workspace-root` 优先于 `WORKSPACE_ROOT`。
-- API server 中，request-local `model`、`extra_body["workspace-root"]`、`extra_body["llm-extra-body"]` 只覆盖当前请求。
+- API server 中，request-local `model`、`extra_body["workspace-root"]`、`extra_body["llm-extra-body"]`、`extra_body["omit-generate-params"]` 只覆盖当前请求。
 - `--trace-dir` 没有环境变量等价项；只有显式传入时才写 trace/session state。
 - token budget 会在 run 开始前校验；无效配置会直接报错，不会被静默 clamp。
 - `MAX_OUTPUT_TOKENS + COMPACT_SUMMARY_MAX_TOKENS` 必须小于 `MAX_INPUT_TOKENS`。
@@ -170,6 +172,33 @@ explicit Python/API/CLI arguments > process environment variables > .env > code 
 - 如果未设置 `COMPACT_TRIGGER_TOKENS`，默认触发点按 `MAX_INPUT_TOKENS - MAX_OUTPUT_TOKENS - COMPACT_SUMMARY_MAX_TOKENS` 计算。
 - `READPDF_TIMEOUT_SECONDS` 是工具级保护；PDF 解析超时时，`ReadPDF` 返回可读 timeout 工具结果，让 agent 决定重试、改用 `Bash/file` 检查文件，或继续使用其他证据。
 - `WEBFETCH_TIMEOUT_SECONDS` 和 `READPDF_TIMEOUT_SECONDS` 只保护对应工具调用，不等价于全局 agent runtime 限制。
+
+Sampling 参数省略：
+
+- 如果某个 OpenAI-compatible provider 拒绝 `presence_penalty` 等字段，应该省略字段本身，不要把它设成 `0`。
+- 可省略字段只有 `temperature`、`top_p`、`presence_penalty`；未知字段会在 run 开始前被拒绝。
+- 环境变量 / `.env`：`OMIT_GENERATE_PARAMS="presence_penalty"`。
+- Python API：`create_agent(..., omit_generate_params=["presence_penalty"])` 或 `run_agent(..., omit_generate_params=["presence_penalty"])`。
+- CLI：`--omit-generate-param presence_penalty`，可重复传多个字段。
+- API server：OpenAI SDK 请求中写 `extra_body={"omit-generate-params": ["presence_penalty"]}`。
+- 这和 provider-specific `extra_body` 是两套机制；`omit-generate-params` 是 ResearchHarness request-local 控制字段，不会转发给底层模型。
+
+CLI 示例：
+
+```bash
+rh-agent "Answer briefly." \
+  --omit-generate-param presence_penalty
+```
+
+Python 示例：
+
+```python
+agent = create_agent(
+    model_name="[MODEL_ID]",
+    omit_generate_params=["presence_penalty"],
+    require_env=False,
+)
+```
 
 Provider-specific `extra_body`：
 
@@ -285,6 +314,13 @@ rh-agent "Answer briefly." \
   --llm-extra-body-json '{"enable_thinking": false}'
 ```
 
+省略 provider 不支持的 sampling 参数：
+
+```bash
+rh-agent "Answer briefly." \
+  --omit-generate-param presence_penalty
+```
+
 常用 CLI 参数：
 
 | 参数 | 必需 | 说明 |
@@ -300,6 +336,7 @@ rh-agent "Answer briefly." \
 | `--tool NAME` | 否，可重复 | 定义完整工具全集；不能和 `--extra-tool` 同用。 |
 | `--extra-tool NAME` | 否，可重复 | 启用 optional compatibility tool，例如 `str_replace_editor`。 |
 | `--llm-extra-body-json JSON` | 否 | provider-specific OpenAI-compatible request `extra_body` object。 |
+| `--omit-generate-param NAME` | 否，可重复 | 不向 provider 发送指定 sampling 参数；允许 `temperature`、`top_p`、`presence_penalty`。 |
 
 交互式终端中，CLI 默认在 final answer 后等待 follow-up，并保留消息、工具结果和图片路径提示。脚本或 benchmark 需要一问一答时使用 `--no-chat`。
 
@@ -323,6 +360,7 @@ agent = create_agent(
     max_input_tokens=131072,
     max_output_tokens=4096,
     compact_trigger_tokens="96k",
+    omit_generate_params=["presence_penalty"],
     extra_body={"enable_thinking": False},
 )
 
@@ -342,6 +380,7 @@ answer = run_agent(
     workspace_root="./workspace",
     role_prompt="Be concise.",
     images=["/abs/path/to/image-1.png"],
+    omit_generate_params=["presence_penalty"],
     extra_body={"enable_thinking": False},
 )
 ```
