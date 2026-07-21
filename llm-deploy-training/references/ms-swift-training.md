@@ -2,6 +2,13 @@
 
 ## 训练：ms-swift SFT / DPO / GRPO
 
+### 版本锚点
+
+- 当前记录对照官方 `latest` 文档版本：`swift 4.5.0.dev0`。
+- message 级 `loss_scale` 需要 `ms-swift>=4.2.0`；数据集级 `chat_template_kwargs` 需要 `ms-swift>=4.3.0`。
+- 使用前先运行 `python -c 'import swift; print(swift.__version__)'` 和 `swift sft --help` / `swift rlhf --help`；如果本地版本低于上述门槛，不要直接照搬相关字段。
+- 官方文档入口：`https://swift.readthedocs.io/zh-cn/latest/`；loss/loss_scale 细节见 `https://swift.readthedocs.io/zh-cn/latest/Customization/Architecture.html#loss` 和自定义数据集文档。
+
 ### 训练核心原则
 
 - 9B 级 full training 默认使用 `bf16 + DeepSpeed zero3 + save_only_model`。
@@ -173,12 +180,107 @@ DPO JSONL 常见格式二：
 
 实际字段以当前 ms-swift 文档和已跑通脚本为准。关键是训练前写 validator，不要等训练跑起来才发现格式错。
 
+### Messages Loss 与工具返回 Loss Mask
+
+ms-swift 对 messages 的 loss 控制分两层：
+
+- `loss`：控制某段模型回复是否参与损失计算。官方自定义数据集文档说明，该字段主要作用于 `role="assistant"` 的模型回复部分；默认值为 `None`，`true` 表示该 assistant content 计算损失，`false` 表示不计算损失。
+- `loss_scale`：控制某段模型回复或 token 片段的权重。SFT/pretrain 可用它控制 token 是否参与训练以及权重大小；RLHF 场景通常只用于控制是否参与训练。若数据里出现大于 `1` 的 loss scale，训练参数需要确认是否设置 `--is_binary_loss_scale false`。
+- 命令行 `--loss_scale`：控制 template 层面的整体策略，例如 `default`、`last_round`、`all` 或额外的 ignore/regex 策略。数据中的 `loss` / `loss_scale` 优先级高，但仍会受到 template 和其他 loss_scale 策略的影响。
+
+常见 SFT 训练目标：
+
+- 只训练最后一轮答案：使用 `--loss_scale last_round`，或只给最后一个 assistant 设置 `loss: true`，其他 assistant 设置 `loss: false`。
+- 训练多轮 assistant：使用默认 assistant-only 策略，或按每个 assistant turn 显式设置 `loss`。
+- 提高关键段权重：对某个 assistant message 设置 `loss_scale`，例如 reasoning 设 `1.0`、final answer 设 `2.0`；同时确认 `--is_binary_loss_scale false`。
+- 忽略空 thinking 或特定模板片段：优先使用当前版本内置的 `--loss_scale` 策略；内置策略不满足时，再考虑自定义 `LossScale`。
+
+SFT 示例。第一轮 assistant 不训练，第二轮 assistant 训练；第二个样本把 reasoning 和最终回答拆成两个 assistant 片段，并给最终回答更高权重：
+
+```json
+{"messages":[{"role":"user","content":"你好"},{"role":"assistant","content":"你好，有什么可以帮助你的吗？","loss":false},{"role":"user","content":"1+1等于几？"},{"role":"assistant","content":"等于2","loss":true}]}
+{"messages":[{"role":"user","content":"请解题"},{"role":"assistant","content":"<think>\n...\n</think>\n","loss_scale":1.0},{"role":"assistant","content":"最终答案是 A。","loss_scale":2.0}]}
+```
+
+工具调用数据要先区分三类文本：
+
+- `user` / `system`：输入条件，不应训练为模型输出。
+- `tool_call`：通常是模型要学会生成的工具调用内容；如果训练目标包含函数名和参数生成，需要监督它。
+- `tool` / `tool_response`：工具或环境返回的观察结果，不是模型自己生成的文本，默认应被 mask，不应训练模型复述工具返回。
+- `assistant`：模型读完工具返回后的自然语言最终回答，通常需要训练。
+
+官方 agent template 支持 `tool_call` 和 `tool`/`tool_response` 格式化。当前文档还提醒：如果对连续的 `tool_call` 设置 `loss` / `loss_scale`，只有最前面的 `tool_call` 配置生效。因此，连续工具调用要么拆清楚样本结构，要么用当前 template debug 后再决定是否需要自定义 template/loss_scale。
+
+工具返回 mask 的推荐策略：
+
+- 保持工具返回使用 `role="tool"` 或 `role="tool_response"`，不要把工具返回伪装成 assistant 回复。
+- 不要使用会把非 assistant 文本也纳入训练的全局策略，除非已经确认 tool_response 仍然被 mask。
+- 如果数据转换器把工具返回写进了 assistant content，必须拆回 `tool_response`，或对对应 assistant 段设置 `"loss": false`。
+- 如果某个模型模板会把 tool_response 序列化到 assistant label 中，使用内置/自定义 `loss_scale` 或自定义 template，把工具返回 span 的 loss scale 置为 `0`。
+- 训练前抽样检查 `labels` 解码内容；如果工具返回中的 JSON、日志、检索结果或 observation 文本出现在 `labels` 里，说明 mask 没有生效，不能启动训练。
+
+Agent SFT 示例。这里训练模型生成工具调用和最终回答，但工具返回本身应由 template/loss mask 排除；实际是否排除必须用后面的 debug 脚本确认：
+
+```json
+{"tools":"[{\"type\":\"function\",\"function\":{\"name\":\"get_weather\",\"description\":\"Get weather by city\",\"parameters\":{\"type\":\"object\",\"properties\":{\"city\":{\"type\":\"string\"}},\"required\":[\"city\"]}}}]","messages":[{"role":"user","content":"北京和上海今天的天气情况"},{"role":"tool_call","content":"{\"name\":\"get_weather\",\"arguments\":{\"city\":\"北京\"}}","loss":true},{"role":"tool_call","content":"{\"name\":\"get_weather\",\"arguments\":{\"city\":\"上海\"}}"},{"role":"tool_response","content":"{\"city\":\"北京\",\"weather\":\"sunny\"}"},{"role":"tool_response","content":"{\"city\":\"上海\",\"weather\":\"rainy\"}"},{"role":"assistant","content":"北京今天晴，上海今天有雨。","loss":true}]}
+```
+
+Loss mask debug 必须使用当前模型、当前 template 和当前 ms-swift 版本，不要只看 JSONL：
+
+```python
+from swift import get_processor, get_template
+
+data = {
+    "tools": "[{\"type\":\"function\",\"function\":{\"name\":\"get_weather\",\"description\":\"Get weather by city\",\"parameters\":{\"type\":\"object\",\"properties\":{\"city\":{\"type\":\"string\"}},\"required\":[\"city\"]}}}]",
+    "messages": [
+        {"role": "user", "content": "北京和上海今天的天气情况"},
+        {"role": "tool_call", "content": "{\"name\":\"get_weather\",\"arguments\":{\"city\":\"北京\"}}", "loss": True},
+        {"role": "tool_call", "content": "{\"name\":\"get_weather\",\"arguments\":{\"city\":\"上海\"}}"},
+        {"role": "tool_response", "content": "{\"city\":\"北京\",\"weather\":\"sunny\"}"},
+        {"role": "tool_response", "content": "{\"city\":\"上海\",\"weather\":\"rainy\"}"},
+        {"role": "assistant", "content": "北京今天晴，上海今天有雨。", "loss": True},
+    ],
+}
+
+processor = get_processor("/abs/path/to/model")
+template = get_template(processor, loss_scale="default")
+# 如果当前模型需要 agent_template，按官方文档和已跑通脚本指定：
+# template = get_template(processor, agent_template="qwen3_5", loss_scale="default")
+template.set_mode("train")
+inputs = template.encode(data)
+
+print("[INPUT_IDS]")
+print(template.safe_decode(inputs["input_ids"]))
+print("[LABELS]")
+print(template.safe_decode(inputs["labels"]))
+print("[LOSS_SCALE]")
+print(inputs.get("loss_scale"))
+```
+
+检查标准：
+
+- `LABELS` 中应出现需要学习的 assistant answer。
+- 若要训练 tool call，`LABELS` 中应出现目标 tool call 的函数名和参数。
+- `LABELS` 中不应出现 tool_response 的原始 JSON、日志、网页内容、检索结果或 observation。
+- 如果 `LOSS_SCALE` 中有大于 `1` 的权重，训练脚本同步设置 `--is_binary_loss_scale false`。
+- 切换 `--loss_scale default`、`last_round`、`all` 或自定义策略后，重新跑 debug；不要复用旧结论。
+
+如果内置策略不够，需要自定义 loss scale：
+
+- 自定义 `LossScale.get_loss_scale(context, **kwargs)`，返回切分后的字符串列表和每段权重。
+- 简单关键词或正则匹配可参考官方 `ConfigLossScale` 的 JSON 配置思路。
+- 对工具返回做 mask 时，应匹配 template 序列化后的工具返回边界，而不是原始 JSONL 中的字段名。
+- 自定义后必须抽样打印 `labels` 与 `loss_scale`，确认 tool_response span 权重为 `0`。
+- 不要直接修改 ms-swift 源码或共享环境；需要插件化扩展时，使用项目目录里的外置插件，并先征得用户同意。
+
 ### 数据校验与过滤
 
 至少校验：
 
 - 每行是合法 JSON。
 - SFT 有 `messages`，role 顺序和内容非空。
+- 如果使用 `loss` / `loss_scale`，确认它们只出现在当前 ms-swift 版本和 template 支持的位置。
+- Agent 数据中 `tool_response` / `tool` 不应被转换成需要训练的 assistant 文本，除非明确就是要让模型复述工具结果。
 - DPO 有 prompt、chosen 和 rejected，chosen/rejected 不为空且不相同。
 - GRPO 有 reward/plugin 所需字段。
 - 文本长度不超过计划的 `max_length` 或可控过滤阈值。
@@ -206,6 +308,36 @@ with open(path, "r", encoding="utf-8") as f:
 if bad:
     raise SystemExit(f"invalid lines: {bad}")
 print("jsonl ok")
+```
+
+Agent/tool 数据额外检查：
+
+```python
+import json
+import sys
+
+path = sys.argv[1]
+bad = 0
+
+for i, line in enumerate(open(path, "r", encoding="utf-8"), 1):
+    obj = json.loads(line)
+    messages = obj.get("messages", [])
+    for j, message in enumerate(messages):
+        role = message.get("role")
+        content = message.get("content", "")
+        if role in {"tool", "tool_response"} and message.get("loss") is True:
+            print(f"line={i} msg={j}: tool response should not set loss=true")
+            bad += 1
+        if role in {"tool", "tool_response"} and not content:
+            print(f"line={i} msg={j}: empty tool response")
+            bad += 1
+        if role == "assistant" and "TOOL_RESULT:" in content and message.get("loss") is not False:
+            print(f"line={i} msg={j}: assistant contains tool result but is not masked")
+            bad += 1
+
+if bad:
+    raise SystemExit(f"invalid agent/tool rows: {bad}")
+print("agent/tool rows ok")
 ```
 
 ### 训练前检查
@@ -237,6 +369,8 @@ dry-run 输出必须能看到：
 - output dir 不存在或为空；失败输出目录不要复用。
 - `NPROC_PER_NODE`、`CUDA_VISIBLE_DEVICES`、rjob `--gpu` 数一致。
 - 脚本不含代理、API key、LoRA 参数或环境修改命令。
+- 对含 `loss` / `loss_scale` / tool messages 的数据，至少抽样 3-5 条跑 template debug，确认 labels 和 loss_scale 符合预期。
+- 对工具返回 mask，必须确认 tool_response 原文没有出现在 labels 中。
 
 ### 训练后检查
 
