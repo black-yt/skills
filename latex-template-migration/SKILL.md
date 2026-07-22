@@ -1,6 +1,6 @@
 ---
 name: latex-template-migration
-description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、全匿名投稿检查、页数约束、图表公式排版、PDF 可视化检查、文本 diff 守恒、模板标准文件守恒和最终压页。"
+description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、全匿名投稿检查、页数约束、图表公式排版、PDF 可视化检查、文本/图片/表格/公式守恒、模板标准文件守恒和最终压页。"
 ---
 
 # LaTeX Template Migration
@@ -9,9 +9,9 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 
 - 先把论文工程从源模板迁移到目标投稿模板，并确保能稳定编译、PDF 美观、图表公式不重叠。
 - 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述。
-- 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许隐藏内容丢失。
+- 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
-- 全程用 diff、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容或破坏模板。
+- 全程用 diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
 
 ## 硬性边界
 
@@ -19,9 +19,11 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 投稿版本必须全匿名，除非目标明确是 camera-ready 或用户明确要求非匿名版本；submission 阶段默认删除或模板化作者、单位、邮箱、ORCID、主页、funding、acknowledgement 和 PDF metadata 中的身份信息。
 - 投稿版本不能包含外部链接，包括 project page、GitHub、Hugging Face、OpenReview 外链、demo/video、个人主页、机构页面、匿名性不足的数据下载链接和脚注 URL；如目标 venue 允许匿名补充链接，也必须先得到用户确认。
 - 自引必须使用第三人称正常引用，不写“our previous work”“we previously proposed”“we build on our ...”这类暗示身份的句子。
+- 所有阶段默认保留正文中的文本、图片、表格、公式、算法、case、proof、重要脚注和关键引用；这些内容是论文信息密度和说服力的一部分，不应为了压页直接删除。
+- 只有在用户明确同意时，才能把正文中的图表、公式、算法、case、proof 或大段内容移动到 appendix/supplement；移动前必须说明会移动什么、为什么、对主文证据链有什么影响。
 - 第一阶段不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
 - 第一阶段可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
-- 不为了压页删除数据、实验、图表证据、重要 citation 或方法定义。
+- 不为了压页删除数据、实验、图片、表格、公式、算法、图表证据、重要 citation 或方法定义。
 - 不在用户未授权时 commit 或 push；可以用 git diff 做检查，但不要把阶段性调整提交成历史。
 - 如果目标模板规则不明确，先查看官方 author kit、sample paper、submission checklist 和页数/匿名/补充材料要求，不凭印象猜。
 
@@ -30,6 +32,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 确认源工程入口：主 `.tex`、`bib`、figures、tables、appendix/supplement、custom `.sty`、Makefile 或 latexmk 配置。
 - 确认目标模板：官方 author kit、`.cls`、`.sty`、sample `.tex`、bibliography style、compiler 要求、单双栏、匿名设置和页数限制。
 - 确认投稿阶段：submission、camera-ready、journal revision 或 arXiv。若是 submission，默认执行全匿名检查；若用户没有明确说明，按匿名投稿处理。
+- 清点源版本正文内容：section 输入文件、`\includegraphics`、`figure`/`table`/`equation`/`align`/`algorithm` 环境、关键 footnote、appendix/supplement 引用和 bibliography。后续每个阶段都用这份清单检查有没有丢失。
 - 先编译源版本，保存源 PDF 页数、日志和可视化截图；源版本不能编译时，先记录原因，再决定是否先修源工程。
 - 保留一份目标模板官方原件目录，用于后续 `diff -ru` 检查模板文件是否被改。
 - 尽量把输出放入项目内可清理的 build 目录，例如 `build/template-migration/`，不要把中间文件散在源码目录。
@@ -38,6 +41,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 
 ```bash
 git status --short
+rg -n "\\\\input|\\\\include|\\\\includegraphics|\\\\begin\\{figure\\*?\\}|\\\\begin\\{table\\*?\\}|\\\\begin\\{equation\\*?\\}|\\\\begin\\{align\\*?\\}|\\\\begin\\{algorithm\\*?\\}|\\\\footnote|\\\\bibliography|\\\\printbibliography" .
 latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/source paper.tex
 pdfinfo build/source/paper.pdf | sed -n '1,80p'
 pdftoppm -png -r 180 build/source/paper.pdf build/source/page
@@ -82,6 +86,7 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 ## 阶段一：只换模板
 
 阶段一的验收目标是“模板 B 下排版正常”，不是“页数已经合格”。
+阶段一还必须做到内容完整：文本、图片、表格、公式、算法、case、proof、关键脚注和引用都不能少。
 
 执行顺序：
 
@@ -92,8 +97,9 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 5. 对公式做宽度适配：长公式可用 `aligned`、`split`、`multline` 或局部缩放，但不能改变数学含义。
 6. 对表格做宽度适配：优先调整 `tabcolsep`、字号、列宽、`resizebox`/`adjustbox`，不要删列、删数据或改数字。
 7. 对图片做宽度适配：单栏通常用 `0.95\linewidth` 到 `\linewidth`，跨栏通常用 `0.85\textwidth` 到 `\textwidth`，以不越界和清晰为准。
-8. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
-9. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
+8. 对照启动前内容清单，确认目标模板下仍包含全部正文 section、图片、表格、公式、算法、case/proof、关键脚注和引用。
+9. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
+10. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无图表缺失、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
 
 阶段一允许做的排版调整：
 
@@ -107,7 +113,7 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 
 - 改写段落、句子、摘要、conclusion 或 related work。
 - 改实验结果、数据、指标、模型名、表格数值或 caption 含义。
-- 删除图表、公式、引用、脚注、算法、appendix 内容。
+- 删除图片、表格、公式、引用、脚注、算法、case、proof、appendix/supplement 指针或正文 section。
 - 改目标模板官方 `.cls`、`.sty` 或官方 sample 的模板文件。
 
 阶段一 diff 检查：
@@ -117,6 +123,7 @@ git diff --check
 git diff --stat
 git diff --word-diff -- '*.tex'
 diff -ru target-template-pristine/ target-template-current/ || true
+rg -n "\\\\includegraphics|\\\\begin\\{figure\\*?\\}|\\\\begin\\{table\\*?\\}|\\\\begin\\{equation\\*?\\}|\\\\begin\\{align\\*?\\}|\\\\begin\\{algorithm\\*?\\}|\\\\footnote|\\\\cite" .
 ```
 
 如果源版本和目标版本入口文件不同，额外做展开文本对比。优先用 `latexpand` 展开 `\input`，再用 `detex` 或同等工具抽取正文文本；工具不可用时，至少对所有正文 section 文件做 `diff -u`：
@@ -133,7 +140,7 @@ diff -u build/template-migration-diff/source-text.txt build/template-migration-d
 检查时按语义分类：
 
 - 允许：preamble、模板命令、float placement、figure/table/equation wrapper、尺寸参数、文件组织变化。
-- 不允许：正文 prose 改写、数字变化、claim 变化、citation 意图变化、公式等价性无法确认的改写。
+- 不允许：正文 prose 改写、数字变化、claim 变化、citation 意图变化、图片/表格/公式/算法丢失、公式等价性无法确认的改写。
 - 如果必须改文字才能适配模板要求，例如匿名作者信息或 mandatory statement，单独记录，不和正文改写混在一起。
 - 如果修改文字是为了匿名化，例如删除作者、外链、acknowledgement 或自引暗示，这属于投稿安全改动；必须单独列出，不计入正文内容优化。
 
@@ -164,6 +171,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 ## 阶段二：不改文字压缩
 
 如果超页，第二阶段只做排版压缩，不改正文文字。
+第二阶段仍必须保留正文中的图片、表格、公式、算法和关键证据；压缩只能改变排版位置、尺寸和间距，不能删除内容。
 
 优先顺序：
 
@@ -186,10 +194,12 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 页数减少或空隙减少。
 - 没有文字重叠、图表越界、caption 撞图、页脚撞内容。
 - `git diff --word-diff -- '*.tex'` 中没有正文文本改写。
+- 内容清单数量和位置合理：图片、表格、公式、算法、case/proof 没有缺失，除非用户明确同意移动到 appendix/supplement。
 
 ## 阶段三：轻微文字压缩
 
 如果排版压缩后仍超页，才进入文字压缩。
+第三阶段也不能删除正文图表、公式、算法和关键证据；只能压缩对正文信息量影响极小的文字表达。
 
 允许优先压缩：
 
@@ -204,6 +214,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 核心方法定义。
 - 实验设置中影响复现的细节。
 - 关键数据、指标、误差、显著性、模型名称和 dataset 名称。
+- 图片、表格、公式、算法、case、proof 和支撑核心 claim 的多模态证据。
 - 主要 claim、contribution、limitation 和 conclusion 的实质内容。
 - 会改变审稿人理解的定语、边界条件或风险控制表述。
 
@@ -271,6 +282,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 单栏转双栏后公式是否越界。
 - 宽表是否可读，表格线和数字是否清楚。
 - 图片是否清晰，子图标签是否可见。
+- 源版本中的图片、表格、公式、算法、case/proof 是否都仍在正文或经用户同意后移动到 appendix/supplement。
 - 页眉、页脚、页码、line number、匿名标记是否符合投稿阶段。
 - references、appendix、supplement 起止位置是否符合要求。
 
@@ -280,7 +292,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 关键 warning 已排查，剩余 warning 不影响投稿 PDF。
 - 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
-- 第一阶段文字 diff 已确认没有正文语义改动。
+- 第一阶段文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
 - 最终 PDF 页数满足目标要求，并尽量写满最后一页。
 - PDF 转图片逐页检查通过，没有重叠、越界、异常空白和短尾明显问题。
 - 生成物、中间文件和 build 缓存没有污染源码目录。
