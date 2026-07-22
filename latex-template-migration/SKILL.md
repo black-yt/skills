@@ -1,6 +1,6 @@
 ---
 name: latex-template-migration
-description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、页数约束、图表公式排版、PDF 可视化检查、文本 diff 守恒、模板标准文件守恒和最终压页。"
+description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、全匿名投稿检查、页数约束、图表公式排版、PDF 可视化检查、文本 diff 守恒、模板标准文件守恒和最终压页。"
 ---
 
 # LaTeX Template Migration
@@ -8,6 +8,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 ## 核心目标
 
 - 先把论文工程从源模板迁移到目标投稿模板，并确保能稳定编译、PDF 美观、图表公式不重叠。
+- 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述。
 - 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许隐藏内容丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
 - 全程用 diff、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容或破坏模板。
@@ -15,6 +16,9 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 ## 硬性边界
 
 - 不修改目标会议/期刊提供的标准 class/style/template 文件；如必须加宏或长度调整，放在主 `.tex` 或项目自有 preamble 文件中，并能和官方模板包 diff 区分。
+- 投稿版本必须全匿名，除非目标明确是 camera-ready 或用户明确要求非匿名版本；submission 阶段默认删除或模板化作者、单位、邮箱、ORCID、主页、funding、acknowledgement 和 PDF metadata 中的身份信息。
+- 投稿版本不能包含外部链接，包括 project page、GitHub、Hugging Face、OpenReview 外链、demo/video、个人主页、机构页面、匿名性不足的数据下载链接和脚注 URL；如目标 venue 允许匿名补充链接，也必须先得到用户确认。
+- 自引必须使用第三人称正常引用，不写“our previous work”“we previously proposed”“we build on our ...”这类暗示身份的句子。
 - 第一阶段不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
 - 第一阶段可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
 - 不为了压页删除数据、实验、图表证据、重要 citation 或方法定义。
@@ -25,6 +29,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 
 - 确认源工程入口：主 `.tex`、`bib`、figures、tables、appendix/supplement、custom `.sty`、Makefile 或 latexmk 配置。
 - 确认目标模板：官方 author kit、`.cls`、`.sty`、sample `.tex`、bibliography style、compiler 要求、单双栏、匿名设置和页数限制。
+- 确认投稿阶段：submission、camera-ready、journal revision 或 arXiv。若是 submission，默认执行全匿名检查；若用户没有明确说明，按匿名投稿处理。
 - 先编译源版本，保存源 PDF 页数、日志和可视化截图；源版本不能编译时，先记录原因，再决定是否先修源工程。
 - 保留一份目标模板官方原件目录，用于后续 `diff -ru` 检查模板文件是否被改。
 - 尽量把输出放入项目内可清理的 build 目录，例如 `build/template-migration/`，不要把中间文件散在源码目录。
@@ -40,6 +45,40 @@ pdftoppm -png -r 180 build/source/paper.pdf build/source/page
 
 如果项目使用 `xelatex`、`lualatex`、`bibtex`、`biber` 或官方脚本，以目标模板要求为准。
 
+## 匿名投稿安全检查
+
+匿名检查优先级高于排版美观。只要是投稿版本，先保证不会泄漏身份，再处理页数和视觉细节。
+
+必须移除或匿名化：
+
+- `\author{...}`、`\affiliation{...}`、`\institute{...}`、`\email{...}`、`\orcid{...}`、`\thanks{...}` 中的真实身份。
+- Acknowledgement、funding、grant number、project name、lab name、institution name 和 internal system name。
+- 个人主页、项目主页、GitHub、Hugging Face、demo、video、leaderboard、dataset page、supplement download、Google Drive、Dropbox、OSF、Zenodo 等外部链接。
+- PDF metadata 中的 author、creator、subject、keywords、producer 之外的身份信息。
+- 文件名、图片名、注释、supplement 路径、附录标题中能暴露团队或项目身份的内容。
+- “our previous work”“we previously released”“we build on our benchmark”“as proposed by us”“in our earlier paper” 这类一眼能暴露自引身份的表达。
+
+允许保留：
+
+- 目标模板要求的匿名占位，例如 `Anonymous Author(s)`、`Anonymous Institution` 或官方 `anonymous` option。
+- 正常的第三人称引用，例如 `Smith et al. introduced ...`，即使该论文实际来自作者团队，也不要暗示这是自己的工作。
+- 参考文献条目本身，除非目标 venue 明确要求匿名化尚未公开的 submission、code、data 或 supplemental material。
+
+匿名检查命令：
+
+```bash
+rg -n "\\\\author|\\\\affiliation|\\\\institute|\\\\email|\\\\orcid|\\\\thanks|acknowledg|funding|grant|homepage|project page|github|huggingface|demo|video|leaderboard|our previous|we previously|our earlier|as proposed by us|we released|we build on our|http://|https://|\\\\url\\{|\\\\href\\{" .
+pdfinfo build/target/paper.pdf | sed -n '1,80p'
+```
+
+处理原则：
+
+- 对身份字段，使用目标模板的匿名开关或匿名占位，不要手写真实信息。
+- 对外部链接，submission 版本默认删除链接和 URL；如必须说明资源，将其改成匿名提交系统允许的描述，并让用户确认。
+- 对自引表述，改为第三人称普通相关工作描述，不改变技术 claim。
+- 对尚未公开或会暴露身份的 code/data，写成“will be released upon acceptance”这类 venue 允许的中性表达；如果 venue 禁止该表述，按 venue 规则删除。
+- 对注释和源码内部路径也要检查，因为部分投稿系统可能要求上传 source zip。
+
 ## 阶段一：只换模板
 
 阶段一的验收目标是“模板 B 下排版正常”，不是“页数已经合格”。
@@ -54,7 +93,7 @@ pdftoppm -png -r 180 build/source/paper.pdf build/source/page
 6. 对表格做宽度适配：优先调整 `tabcolsep`、字号、列宽、`resizebox`/`adjustbox`，不要删列、删数据或改数字。
 7. 对图片做宽度适配：单栏通常用 `0.95\linewidth` 到 `\linewidth`，跨栏通常用 `0.85\textwidth` 到 `\textwidth`，以不越界和清晰为准。
 8. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
-9. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无异常大空白、无标题/作者/页眉错误。
+9. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
 
 阶段一允许做的排版调整：
 
@@ -96,6 +135,7 @@ diff -u build/template-migration-diff/source-text.txt build/template-migration-d
 - 允许：preamble、模板命令、float placement、figure/table/equation wrapper、尺寸参数、文件组织变化。
 - 不允许：正文 prose 改写、数字变化、claim 变化、citation 意图变化、公式等价性无法确认的改写。
 - 如果必须改文字才能适配模板要求，例如匿名作者信息或 mandatory statement，单独记录，不和正文改写混在一起。
+- 如果修改文字是为了匿名化，例如删除作者、外链、acknowledgement 或自引暗示，这属于投稿安全改动；必须单独列出，不计入正文内容优化。
 
 ## 页数判断
 
@@ -226,6 +266,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 可视化重点：
 
 - 首页 title、author、affiliation、abstract、keywords 是否符合模板。
+- submission 版本首页、页眉、脚注、PDF metadata 和 source zip 是否完全匿名。
 - 双栏正文是否有跨栏图表压住文字。
 - 单栏转双栏后公式是否越界。
 - 宽表是否可读，表格线和数字是否清楚。
@@ -237,6 +278,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 
 - `latexmk` 无 fatal error。
 - 关键 warning 已排查，剩余 warning 不影响投稿 PDF。
+- 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
 - 第一阶段文字 diff 已确认没有正文语义改动。
 - 最终 PDF 页数满足目标要求，并尽量写满最后一页。
