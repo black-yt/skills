@@ -30,7 +30,7 @@ skill-name/
 | `lab-cluster-1-web-portal` | [`lab-cluster-1-web-portal/SKILL.md`](lab-cluster-1-web-portal/SKILL.md) | 访问、登录和只读查询 lab-cluster-1 的 `h.pjlab.org.cn` 集群管理网站，覆盖 OIDC 会话、token 安全、Prometheus/DCGM 监控、pod/rjob 映射和报告数据分层。 |
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
 | `latex-template-migration` | [`latex-template-migration/SKILL.md`](latex-template-migration/SKILL.md) | 将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标投稿模板，覆盖全匿名检查、只换模板、页数判断、压页、压行、文本/图表/公式守恒和 PDF 可视化检查。 |
-| `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training 和 messages loss/loss mask。 |
+| `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、Megatron 长序列训练和 messages loss/loss mask。 |
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-docx` | [`markdown-to-docx/SKILL.md`](markdown-to-docx/SKILL.md) | 使用 [`scripts/build_docx.py`](markdown-to-docx/scripts/build_docx.py) 将 Markdown 文档转为 Word `.docx`，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |

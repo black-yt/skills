@@ -1,6 +1,6 @@
 ---
 name: llm-deploy-training
-description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、messages loss/loss_scale、数据校验、显存排错和训练检查。"
+description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、Megatron 长序列训练、messages loss/loss_scale、数据校验、显存排错和训练检查。"
 ---
 
 # LLM Deploy And Training
@@ -11,7 +11,7 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 | --- | --- | --- | --- | --- |
 | 1 | 规定 LLM/VLM 部署和训练的共通安全边界，说明不要改共享环境、如何匹配 vLLM/ms-swift/transformers/torch 版本、何时读官方文档、何时只读追溯源码，并记录 ms-swift 官方文档入口。 | LLM deploy、VLM deploy、training、shared env、conda、version match、official docs、CLI help、source tracing、site-packages、vLLM、ms-swift、loss、loss_scale、transformers、torch | 触发本 skill 后默认读取；部署或训练前；准备安装/升级依赖前；参数不确定要查文档或源码前；涉及共享 conda、CUDA、torch/vLLM/ms-swift 环境时读取 | `SKILL.md` |
 | 2 | 记录 vLLM OpenAI-compatible 服务的完整部署和验证经验，覆盖 `vllm serve` 参数、多模态 `limit-mm-per-prompt`、Qwen3.5 工具调用、thinking/reasoning、35B 2 卡、CUDA Graph、`extra_body`、内网访问和 SSH local port forwarding。 | vLLM、OpenAI-compatible server、`vllm serve`、multimodal、`limit-mm-per-prompt`、auto tool choice、`qwen3_coder`、Qwen thinking、reasoning parser、35B、tensor parallel、CUDA Graph、`extra_body`、SSH forwarding、`/v1/models` | 写或审查 vLLM 部署脚本前；验证 `/v1/models`/短文本/工具调用/图片输入前；配置 Qwen thinking 开关或 35B 服务前；排查 CUDA Graph、OOM、多模态报错、工具调用失败或本地访问内网服务时必须读取 | [references/vllm-deployment.md](references/vllm-deployment.md) |
-| 3 | 记录 ms-swift SFT/DPO/GRPO full training 的完整训练经验，覆盖默认超参、bf16/zero3/save_only_model、messages 的 `loss`/`loss_scale`、工具调用与工具返回的 loss mask、JSONL validator、max length 过滤、显存排错、dry-run、训练后检查和 rjob 资源模板。 | ms-swift、SFT、DPO、GRPO、full training、bf16、DeepSpeed zero3、save_only_model、save_safetensors、messages、loss、loss_scale、loss mask、tool_call、tool_response、agent template、JSONL、validator、max_length、OOM、dry-run、rjob、checkpoint、consumed data | 编写/审查 SFT、DPO 或 GRPO 脚本前；准备 full training 超参前；设计 messages 训练目标前；给不同 assistant 回复段设置 loss/loss_scale 前；处理 tool_call/tool_response 数据前；训练数据格式校验前；排查 OOM、LoRA/full 混用、checkpoint 膨胀、`save_safetensors` 参数解析失败、训练失败或 consumed 标记问题时必须读取 | [references/ms-swift-training.md](references/ms-swift-training.md) |
+| 3 | 记录 ms-swift SFT/DPO/GRPO full training 的完整训练经验，覆盖默认超参、bf16/zero3/save_only_model、messages 的 `loss`/`loss_scale`、工具调用与工具返回的 loss mask、Megatron TP/CP/SP/TE fused CE 长序列训练、JSONL validator、max length 过滤、显存排错、dry-run、训练后检查和 rjob 资源模板。 | ms-swift、SFT、DPO、GRPO、full training、Megatron、TP、CP、PP、EP、sequence_parallel、fused attention、TE fused CE、cross_entropy_loss_fusion、optimizer_cpu_offload、bf16、DeepSpeed zero3、save_only_model、save_safetensors、messages、loss、loss_scale、loss mask、tool_call、tool_response、agent template、JSONL、validator、max_length、OOM、dry-run、rjob、checkpoint、consumed data | 编写/审查 SFT、DPO 或 GRPO 脚本前；普通 HF Trainer/ms-swift + DeepSpeed ZeRO 在长样本 forward/loss/activation/logits OOM 时；准备 full training 超参前；设计 messages 训练目标前；给不同 assistant 回复段设置 loss/loss_scale 前；处理 tool_call/tool_response 数据前；训练数据格式校验前；排查 OOM、LoRA/full 混用、checkpoint 膨胀、`save_safetensors` 参数解析失败、训练失败或 consumed 标记问题时必须读取 | [references/ms-swift-training.md](references/ms-swift-training.md) |
 
 ## 核心原则
 
@@ -24,6 +24,7 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 - 训练输出目录不要放在代码仓库里；放到 base checkpoint 同级或专用的大容量模型目录。
 - 训练数据先做 JSONL 格式校验、字段校验和 max length 过滤，再启动训练。
 - 设计 ms-swift messages 训练数据时，必须明确哪些 assistant/tool_call/tool_response 片段参与 loss；训练前用当前 template 解码 `labels` 和 `loss_scale` 验证，不凭 JSON 外观看。
+- 普通 ZeRO 只能切 optimizer、grad 和参数状态；当单个样本本身太长、监督 token 太多、vocab 太大，导致 attention/activation/logits/loss OOM 时，按 `ms-swift` Megatron 路线评估 TP/CP/SP/fused CE，而不是只增加 data parallel 卡。
 - 失败、skip、OOM 或 dry-run 不应标记数据已消费；只有训练成功后才归档或标记 consumed。
 - 如必须补包，先询问；确需安装单包时优先 `pip install --no-deps <pkg>`。
 

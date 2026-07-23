@@ -984,8 +984,8 @@
         name: 'llm-deploy-training',
         path: 'llm-deploy-training/SKILL.md',
         tags: ['LLM', '部署', '训练', 'GPU'],
-        desc: '部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO 全参数训练和 messages loss/loss mask。',
-        content: '### LLM 部署与训练\n- 部署部分覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 请求侧控制、CUDA Graph 策略和 SSH local port forwarding。\n- 训练部分覆盖 ms-swift SFT/DPO/GRPO、bf16、DeepSpeed zero3、save_only_model、messages loss/loss_scale、工具返回 loss mask、数据校验和显存排错。\n- 对 vLLM/ms-swift 等成熟库先按当前版本选择官方教程/文档，再只读追溯源码；不擅自升级共享 conda 或核心包。'
+        desc: '部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO 全参数训练、Megatron 长序列训练和 messages loss/loss mask。',
+        content: '### LLM 部署与训练\n- 部署部分覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 请求侧控制、CUDA Graph 策略和 SSH local port forwarding。\n- 训练部分覆盖 ms-swift SFT/DPO/GRPO、bf16、DeepSpeed zero3、save_only_model、messages loss/loss_scale、工具返回 loss mask、数据校验和显存排错。\n- 长序列训练部分覆盖 Megatron TP/CP/SP、TE fused CE、optimizer CPU offload、最长样本 profile 和 NaN/LR 排查，区分 ZeRO 与 Megatron 的适用边界。\n- 对 vLLM/ms-swift 等成熟库先按当前版本选择官方教程/文档，再只读追溯源码；不擅自升级共享 conda 或核心包。'
       },
       {
         name: 'llm-image-generation',
