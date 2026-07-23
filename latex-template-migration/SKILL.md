@@ -20,6 +20,8 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 投稿版本不能包含外部链接，包括 project page、GitHub、Hugging Face、OpenReview 外链、demo/video、个人主页、机构页面、匿名性不足的数据下载链接和脚注 URL；如目标 venue 允许匿名补充链接，也必须先得到用户确认。
 - 自引必须使用第三人称正常引用，不写“our previous work”“we previously proposed”“we build on our ...”这类暗示身份的句子。
 - 所有阶段默认保留正文中的文本、图片、表格、公式、算法、case、proof、重要脚注和关键引用；这些内容是论文信息密度和说服力的一部分，不应为了压页直接删除。
+- 实验部分的主结果表、消融表、实验设置表、分析图、case/qualitative example 图表是核心证据，优先保留在正文中；不要为了压缩页数删除、弱化成一句话、改成普通列表，或未经用户同意移入 appendix/supplement。
+- 表格必须保持表格形态；不能为了省空间把 main result、ablation、setting、comparison、analysis 等表格改写成 prose、bullet list 或纯文本 summary。可以压缩字号、列宽、`tabcolsep`、`arraystretch`、caption 和布局，但不能让结构化证据消失。
 - 如果某段文字被删除、压缩或匿名化后又需要加回，优先从源论文、源 LaTeX、原始 arXiv/技术报告或用户提供的原稿中恢复第一手文本；不要凭记忆重写，也不要让模型重新生成近似文本，避免删除后再添加导致 claim、术语、数值或语气漂移。
 - 只有在用户明确同意时，才能把正文中的图表、公式、算法、case、proof 或大段内容移动到 appendix/supplement；移动前必须说明会移动什么、为什么、对主文证据链有什么影响。
 - 首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方、abstract 前的模板预留区域不能用负 `\vspace` 压缩。很多匿名投稿模板会给非匿名版本作者列表预留空间；submission 里即使显示 Anonymous，也必须保留官方模板的作者区域版式。压掉这块空白属于破坏模板规范，可能触发 desk reject。
@@ -175,6 +177,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 
 如果超页，第二阶段只做排版压缩，不改正文文字。
 第二阶段仍必须保留正文中的图片、表格、公式、算法和关键证据；压缩只能改变排版位置、尺寸和间距，不能删除内容。
+实验图表和表格仍按正文证据处理：main result、ablation、setting、comparison、analysis table 应保持 table 环境和可读结构，不能改成正文句子、普通列表或压缩到无法核对数字的形式。
 
 优先顺序：
 
@@ -218,6 +221,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 核心方法定义。
 - 实验设置中影响复现的细节。
 - 关键数据、指标、误差、显著性、模型名称和 dataset 名称。
+- 把实验表格、主结果表、消融表、超参表、对比表或分析表改写成 prose、bullet list 或纯文本摘要。
 - 图片、表格、公式、算法、case、proof 和支撑核心 claim 的多模态证据。
 - 主要 claim、contribution、limitation 和 conclusion 的实质内容。
 - 会改变审稿人理解的定语、边界条件或风险控制表述。
@@ -299,6 +303,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
 - 第一阶段文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
+- 实验部分的主结果、消融、设置、对比和分析表仍保留表格形态；相关图表没有被删除、散文化或未经用户同意移动到 appendix/supplement。
 - 若发生过文字删除、压缩后回填或匿名化后恢复，已确认回填文本来自源论文/源 LaTeX/原始版本/用户原稿，而不是重新生成的近似文本。
 - 首页 title、`\maketitle`、匿名 author block 和 abstract 前区域没有用负 `\vspace` 压缩，保留目标投稿模板的官方首页结构。
 - 最终 PDF 页数满足目标要求，并尽量写满最后一页。
