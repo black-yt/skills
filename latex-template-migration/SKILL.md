@@ -8,7 +8,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 ## 核心目标
 
 - 先把论文工程从源模板迁移到目标投稿模板，并确保能稳定编译、PDF 美观、图表公式不重叠。
-- 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述。
+- 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述；即使源版本来自 arXiv、camera-ready 或技术报告，submission 版本也默认按匿名稿处理。
 - 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
 - 全程用 diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
@@ -16,11 +16,13 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 ## 硬性边界
 
 - 不修改目标会议/期刊提供的标准 class/style/template 文件；如必须加宏或长度调整，放在主 `.tex` 或项目自有 preamble 文件中，并能和官方模板包 diff 区分。
-- 投稿版本必须全匿名，除非目标明确是 camera-ready 或用户明确要求非匿名版本；submission 阶段默认删除或模板化作者、单位、邮箱、ORCID、主页、funding、acknowledgement 和 PDF metadata 中的身份信息。
+- 投稿版本必须全匿名，除非目标明确是 camera-ready 或用户明确要求非匿名版本；submission 阶段默认删除或模板化作者、单位、邮箱、ORCID、主页、funding、acknowledgement 和 PDF metadata 中的身份信息。不要因为源稿是 arXiv、旧 camera-ready、技术报告或内部版本，就保留任何身份痕迹。
 - 投稿版本不能包含外部链接，包括 project page、GitHub、Hugging Face、OpenReview 外链、demo/video、个人主页、机构页面、匿名性不足的数据下载链接和脚注 URL；如目标 venue 允许匿名补充链接，也必须先得到用户确认。
 - 自引必须使用第三人称正常引用，不写“our previous work”“we previously proposed”“we build on our ...”这类暗示身份的句子。
 - 所有阶段默认保留正文中的文本、图片、表格、公式、算法、case、proof、重要脚注和关键引用；这些内容是论文信息密度和说服力的一部分，不应为了压页直接删除。
+- 如果某段文字被删除、压缩或匿名化后又需要加回，优先从源论文、源 LaTeX、原始 arXiv/技术报告或用户提供的原稿中恢复第一手文本；不要凭记忆重写，也不要让模型重新生成近似文本，避免删除后再添加导致 claim、术语、数值或语气漂移。
 - 只有在用户明确同意时，才能把正文中的图表、公式、算法、case、proof 或大段内容移动到 appendix/supplement；移动前必须说明会移动什么、为什么、对主文证据链有什么影响。
+- 首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方、abstract 前的模板预留区域不能用负 `\vspace` 压缩。很多匿名投稿模板会给非匿名版本作者列表预留空间；submission 里即使显示 Anonymous，也必须保留官方模板的作者区域版式。压掉这块空白属于破坏模板规范，可能触发 desk reject。
 - 第一阶段不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
 - 第一阶段可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
 - 不为了压页删除数据、实验、图片、表格、公式、算法、图表证据、重要 citation 或方法定义。
@@ -52,6 +54,7 @@ pdftoppm -png -r 180 build/source/paper.pdf build/source/page
 ## 匿名投稿安全检查
 
 匿名检查优先级高于排版美观。只要是投稿版本，先保证不会泄漏身份，再处理页数和视觉细节。
+投稿版默认全匿名：源版本是否公开、是否有作者、是否含项目链接，都不能作为 submission 保留身份信息的理由。
 
 必须移除或匿名化：
 
@@ -188,6 +191,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 每处改动尽量小，例如 `-0.2em`、`-0.4em`、`-0.6em`；避免连续堆叠大负值。
 - 每次加完都重新编译并可视化检查上下文，不允许文字、caption、图表互相压住。
 - 不修改目标模板 `.cls` / `.sty` 中的全局 spacing。
+- 不在首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方或 abstract 前使用负 `\vspace`。这块空白通常是投稿模板为非匿名作者列表预留的结构空间，不是普通可压缩空白；submission 版本也应保留官方模板版式。
 
 阶段二验收：
 
@@ -224,6 +228,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 2. 用 `git diff --word-diff` 复核没有改变 claim 或数据。
 3. 编译并检查页数和视觉效果。
 4. 记录压缩来源，例如 caption、table header、method detail。
+5. 如果后续需要补回被删或被压缩的文字，先从源论文、源 LaTeX、原始 arXiv/技术报告或用户提供原稿中复制第一手文本，再做最小必要适配；不要直接新写一段替代文本。
 
 ## 阶段四：仍超页时询问
 
@@ -278,6 +283,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 
 - 首页 title、author、affiliation、abstract、keywords 是否符合模板。
 - submission 版本首页、页眉、脚注、PDF metadata 和 source zip 是否完全匿名。
+- 首页 title/author/abstract 前后的空白是否来自官方模板；不要把匿名 author block 的预留空间当作普通空白压掉。
 - 双栏正文是否有跨栏图表压住文字。
 - 单栏转双栏后公式是否越界。
 - 宽表是否可读，表格线和数字是否清楚。
@@ -293,6 +299,8 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
 - 第一阶段文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
+- 若发生过文字删除、压缩后回填或匿名化后恢复，已确认回填文本来自源论文/源 LaTeX/原始版本/用户原稿，而不是重新生成的近似文本。
+- 首页 title、`\maketitle`、匿名 author block 和 abstract 前区域没有用负 `\vspace` 压缩，保留目标投稿模板的官方首页结构。
 - 最终 PDF 页数满足目标要求，并尽量写满最后一页。
 - PDF 转图片逐页检查通过，没有重叠、越界、异常空白和短尾明显问题。
 - 生成物、中间文件和 build 缓存没有污染源码目录。
