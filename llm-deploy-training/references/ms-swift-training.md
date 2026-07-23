@@ -7,13 +7,14 @@
 - 当前记录对照官方 `latest` 文档版本：`swift 4.5.0.dev0`。
 - message 级 `loss_scale` 需要 `ms-swift>=4.2.0`；数据集级 `chat_template_kwargs` 需要 `ms-swift>=4.3.0`。
 - 使用前先运行 `python -c 'import swift; print(swift.__version__)'` 和 `swift sft --help` / `swift rlhf --help`；如果本地版本低于上述门槛，不要直接照搬相关字段。
+- 已知兼容性提醒：当前 `swift==4.3.1` 配置里不要写 `save_safetensors`；该字段会被参数解析拒绝。需要控制 checkpoint 体积时继续使用已验证的 `--save_only_model true`，不要把 `save_safetensors` 加进 YAML、JSON 配置或命令行。
 - 官方文档入口：`https://swift.readthedocs.io/zh-cn/latest/`；loss/loss_scale 细节见 `https://swift.readthedocs.io/zh-cn/latest/Customization/Architecture.html#loss` 和自定义数据集文档。
 
 ### 训练核心原则
 
 - 9B 级 full training 默认使用 `bf16 + DeepSpeed zero3 + save_only_model`。
 - 不要把 LoRA 参数混进 full training；full training 不写 LoRA rank/alpha/target modules。
-- 版本参数以当前环境的 `swift sft --help`、`swift rlhf --help` 和项目已跑通脚本为准。旧版本不支持 `--train_type full` 时再确认是否应使用 `--tuner_type full`，不要盲目同时写两个。
+- 版本参数以当前环境的 `swift sft --help`、`swift rlhf --help` 和项目已跑通脚本为准。旧版本不支持 `--train_type full` 时再确认是否应使用 `--tuner_type full`，不要盲目同时写两个；当前环境若是 `swift==4.3.1`，也不要加入 `save_safetensors`。
 
 ### 训练类型选择
 

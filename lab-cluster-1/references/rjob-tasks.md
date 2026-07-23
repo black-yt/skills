@@ -423,6 +423,8 @@ rjob delete "$JOB"
 
 1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。
 
+增量备注：有用户反馈 scieval 2 GPU 训练在一些场景下不能加 `--host-network=true`。下面历史模板里的 `--host-network=true` 行先保留，不做全局替换；正式训练前按当前任务做 `--dry-run true` 和最小短任务验证。如果 scieval 2 GPU 训练出现调度、网络或容器启动异常，优先尝试去掉 `--host-network=true`，并记录本次任务实际可用的提交参数。
+
 ai4sdata 1 GPU dry-run 模板，历史模板；2026-06-05 当前 ai4sdata 无 CPU/GPU 资源时不要作为默认模板：
 
 ```bash
