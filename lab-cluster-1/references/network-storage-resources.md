@@ -143,6 +143,59 @@ find /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface -maxdepth 3 -type
 find /mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface -maxdepth 3 -type d \( -name "*Qwen3.5-9B*" -o -name "*Qwen3.5-35B*" \)
 ```
 
+有些公共模型路径是 Hugging Face hub cache 格式，不是可以直接作为 `MODEL_PATH` 的标准 ckpt/model 文件夹。典型 cache 目录长这样：
+
+```text
+models--Org--Model/
+├── blobs/
+├── refs/
+│   └── main
+└── snapshots/
+    └── <commit>/
+```
+
+判断规则：
+
+- 标准模型目录通常在根目录能看到 `config.json`、tokenizer 文件、`*.safetensors` 或模型分片，可直接作为 `MODEL_PATH`。
+- cache 顶层通常只有 `blobs/`、`refs/`、`snapshots/`，不能直接当成标准 ckpt 目录传给 vLLM/Transformers。
+- cache 里的 `snapshots/<commit>/` 经常是指向 `blobs/` 的 symlink；在 rjob/worker 或跨挂载场景下，最好先转换成标准目录。
+
+转换脚本放在本 skill 的 `scripts/hf_cache_to_model_dir.py`。使用前先做 dry-run，确认输入 cache、输出目录和 revision 正确；输出目录应放在大模型目录下，不要放到项目目录、`/tmp` 或 worker 本地盘：
+
+```bash
+SCRIPT="/abs/path/to/skills/lab-cluster-1/scripts/hf_cache_to_model_dir.py"
+CACHE_DIR="/mnt/shared-storage-gpfs2/gpfs2-shared-public/huggingface/hub/models--Org--Model"
+OUT_DIR="/mnt/shared-storage-gpfs2/sciprismax2/xuwanghan/models/Org--Model"
+
+python3 "$SCRIPT" \
+  --cache-dir "$CACHE_DIR" \
+  --out-dir "$OUT_DIR" \
+  --revision main \
+  --link-mode hardlink \
+  --dry-run
+```
+
+dry-run 确认无误后再执行真实转换：
+
+```bash
+python3 "$SCRIPT" \
+  --cache-dir "$CACHE_DIR" \
+  --out-dir "$OUT_DIR" \
+  --revision main \
+  --link-mode hardlink
+
+test -f "$OUT_DIR/config.json"
+find "$OUT_DIR" -maxdepth 2 -type f \( -name "*.safetensors" -o -name "*.bin" -o -name "tokenizer*" \) | sed -n '1,20p'
+```
+
+转换边界：
+
+- 优先用 `--link-mode hardlink` 节省空间；如果跨文件系统硬链接失败，脚本会自动 fallback 到 copy。
+- 如果明确需要复制独立副本，用 `--link-mode copy`，但必须先确认目标盘容量。
+- 目标目录非空时脚本默认拒绝写入；只有确认路径无误且允许清空时才加 `--overwrite`。
+- 不要把 cache 转换结果写回公共 `huggingface/hub` 或 `zskj-hub` 目录；输出到个人大模型目录。
+- 转换只是整理文件布局，不会下载模型；如果 cache 不完整或 `refs/main` 指向的 snapshot 缺文件，需要先在可联网 CPU 节点补齐 cache 或换已有完整模型目录。
+
 迁移前检查：
 
 - 不要假设用户给出的迁移源路径一定存在。先 `test -d` 或 `find` 确认源目录，再 `rclone copy`。
