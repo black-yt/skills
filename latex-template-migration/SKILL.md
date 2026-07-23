@@ -11,11 +11,13 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述；即使源版本来自 arXiv、camera-ready 或技术报告，submission 版本也默认按匿名稿处理。
 - 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
+- 写满、空隙、短尾和最终压行要求默认只针对 references 之前的正文部分；参考文献不按正文审美处理，不要求最后一行写满，也不因 references 区域空隙判断论文是否认真。
 - 全程用 diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
 
 ## 硬性边界
 
 - 不修改目标会议/期刊提供的标准 class/style/template 文件；如必须加宏或长度调整，放在主 `.tex` 或项目自有 preamble 文件中，并能和官方模板包 diff 区分。
+- 不改全文行间距、正文字体、页边距、正文区域大小或模板全局版式；不要通过 `\linespread`、`\baselinestretch`、`\setstretch`、全局 `\small`/`\footnotesize`、`geometry`、`\textwidth`、`\textheight`、`\oddsidemargin`、`\evensidemargin`、`\topmargin`、`\footskip` 等方式压缩全文。这类改动属于投稿模板敏感项，可能触发 desk reject；除非是官方模板选项或 venue 明确要求，否则不要使用。
 - 投稿版本必须全匿名，除非目标明确是 camera-ready 或用户明确要求非匿名版本；submission 阶段默认删除或模板化作者、单位、邮箱、ORCID、主页、funding、acknowledgement 和 PDF metadata 中的身份信息。不要因为源稿是 arXiv、旧 camera-ready、技术报告或内部版本，就保留任何身份痕迹。
 - 投稿版本不能包含外部链接，包括 project page、GitHub、Hugging Face、OpenReview 外链、demo/video、个人主页、机构页面、匿名性不足的数据下载链接和脚注 URL；如目标 venue 允许匿名补充链接，也必须先得到用户确认。
 - 自引必须使用第三人称正常引用，不写“our previous work”“we previously proposed”“we build on our ...”这类暗示身份的句子。
@@ -28,6 +30,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 第一阶段不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
 - 第一阶段可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
 - 不为了压页删除数据、实验、图片、表格、公式、算法、图表证据、重要 citation 或方法定义。
+- 所有“写满页面”“减少大空隙”“最后一行超过半行”“短尾修正”的要求都只看 references 之前的正文；references、appendix 和 supplement 不适用正文压行标准。若目标 venue 将 references 计入总页数，仍需遵守总页数，但不要为了 references 的视觉短尾改全局版式或非合规 bibliography style。
 - 不在用户未授权时 commit 或 push；可以用 git diff 做检查，但不要把阶段性调整提交成历史。
 - 如果目标模板规则不明确，先查看官方 author kit、sample paper、submission checklist 和页数/匿名/补充材料要求，不凭印象猜。
 
@@ -161,8 +164,9 @@ diff -u build/template-migration-diff/source-text.txt build/template-migration-d
 
 页数目标：
 
-- 在目标页数内尽量写满，不留明显空白。
-- 最后一页最后一行应尽量接近页面底部；大面积空白会显得不认真。
+- 正文在目标页数内尽量写满，不留明显空白；这里的正文指 references 之前的内容。
+- 正文最后一页最后一行应尽量接近页面底部；references 页不需要按这个标准处理，可以自然结束。
+- References 的长短由真实引用数量和目标模板 bibliography style 自然决定，不作为正文填充或正文压缩对象。
 - 如果少很多页，不要靠废话填充；需要询问用户是否补实验、补分析、把 supplement 内容移入正文或调整论文结构。
 
 判断命令：
@@ -194,6 +198,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 每处改动尽量小，例如 `-0.2em`、`-0.4em`、`-0.6em`；避免连续堆叠大负值。
 - 每次加完都重新编译并可视化检查上下文，不允许文字、caption、图表互相压住。
 - 不修改目标模板 `.cls` / `.sty` 中的全局 spacing。
+- 不修改全文行距、正文字体、页边距、正文 text block 或全局字号；压缩只能做局部 float、caption、table、list、algorithm 间距调整，不能动模板敏感项。
 - 不在首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方或 abstract 前使用负 `\vspace`。这块空白通常是投稿模板为非匿名作者列表预留的结构空间，不是普通可压缩空白；submission 版本也应保留官方模板版式。
 
 阶段二验收：
@@ -258,11 +263,12 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 
 检查目标：
 
-- 每个段落最后一行尽量超过半行。
+- references 之前的正文段落最后一行尽量超过半行。
 - 避免一行只有几个单词或一个短短 citation。
 - 避免图表页前后出现大块空白。
 - 避免 section 标题孤立在页底。
 - 避免公式单独撑出大片空白。
+- 不检查 references 的最后一行、参考文献条目短尾或 bibliography 区域空隙；这些自然由模板和 `.bst`/BibTeX/BibLaTeX 控制。
 
 处理方式：
 
@@ -288,6 +294,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 首页 title、author、affiliation、abstract、keywords 是否符合模板。
 - submission 版本首页、页眉、脚注、PDF metadata 和 source zip 是否完全匿名。
 - 首页 title/author/abstract 前后的空白是否来自官方模板；不要把匿名 author block 的预留空间当作普通空白压掉。
+- 全文没有改全局行间距、正文字体、页边距、正文 text block、模板字号或 bibliography style 来压缩空间。
 - 双栏正文是否有跨栏图表压住文字。
 - 单栏转双栏后公式是否越界。
 - 宽表是否可读，表格线和数字是否清楚。
@@ -306,7 +313,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 实验部分的主结果、消融、设置、对比和分析表仍保留表格形态；相关图表没有被删除、散文化或未经用户同意移动到 appendix/supplement。
 - 若发生过文字删除、压缩后回填或匿名化后恢复，已确认回填文本来自源论文/源 LaTeX/原始版本/用户原稿，而不是重新生成的近似文本。
 - 首页 title、`\maketitle`、匿名 author block 和 abstract 前区域没有用负 `\vspace` 压缩，保留目标投稿模板的官方首页结构。
-- 最终 PDF 页数满足目标要求，并尽量写满最后一页。
-- PDF 转图片逐页检查通过，没有重叠、越界、异常空白和短尾明显问题。
+- 最终 PDF 页数满足目标要求，并尽量写满 references 之前的正文最后一页；references 不要求最后一行占满，不用按正文短尾标准修。
+- PDF 转图片逐页检查通过；正文区域没有重叠、越界、异常空白和短尾明显问题。
 - 生成物、中间文件和 build 缓存没有污染源码目录。
 - 最终说明中列出：使用的目标模板、编译命令、页数、主要排版调整、是否发生文字压缩、仍需用户确认的问题。
