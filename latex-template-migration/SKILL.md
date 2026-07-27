@@ -1,6 +1,6 @@
 ---
 name: latex-template-migration
-description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、全匿名投稿检查、页数约束、图表公式排版、PDF 可视化检查、文本/图片/表格/公式守恒、模板标准文件守恒和最终压页。"
+description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标会议/期刊投稿模板；用于模板 A 到模板 B 的 LaTeX class/style/bibliography/单双栏转换、投稿要求 web search 备忘、全匿名投稿检查、页数约束、图表公式排版、PDF 可视化检查、逐页 desk-reject 风险审计、文本/图片/表格/公式守恒、模板标准文件守恒和最终压页。"
 ---
 
 # LaTeX Template Migration
@@ -12,7 +12,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
 - 写满、空隙、短尾和最终压行要求默认只针对 references 之前的正文部分；参考文献不按正文审美处理，不要求最后一行写满，也不因 references 区域空隙判断论文是否认真。
-- 全程用 diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
+- 全程用投稿要求检索备忘、diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查和逐页风险审计表来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
 
 ## 硬性边界
 
@@ -33,6 +33,78 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 所有“写满页面”“减少大空隙”“最后一行超过半行”“短尾修正”的要求都只看 references 之前的正文；references、appendix 和 supplement 不适用正文压行标准。若目标 venue 将 references 计入总页数，仍需遵守总页数，但不要为了 references 的视觉短尾改全局版式或非合规 bibliography style。
 - 不在用户未授权时 commit 或 push；可以用 git diff 做检查，但不要把阶段性调整提交成历史。
 - 如果目标模板规则不明确，先查看官方 author kit、sample paper、submission checklist 和页数/匿名/补充材料要求，不凭印象猜。
+
+## 阶段零：投稿要求检索备忘
+
+开始改模板前，必须先通过 web search 详细核对目标会议/期刊的最新投稿要求，并写成 Markdown 备忘。不要只看旧论文、旧模板或本地印象；规则可能每年变化。
+
+优先检索和记录官方来源：
+
+- Venue 官网 author instructions、call for papers、submission guidelines、camera-ready/submission checklist。
+- 官方 author kit、LaTeX template、README、sample paper、`.cls`/`.sty` 说明。
+- OpenReview、CMT、Microsoft CMT、HotCRP、PCS 或期刊系统里的正式 submission instructions。
+- 官方 FAQ、ethics/checklist/data availability/code availability/reproducibility policy。
+- 官方关于 supplement、appendix、anonymous code/data、external link、AI disclosure、dual-use、conflict of interest 的说明。
+
+必须确认的要求：
+
+- 模板版本、官方下载链接、compiler 要求、单栏/双栏、字号、页边距、行号、页眉页脚、匿名开关。
+- 主文页数限制，references 是否计入页数，appendix/supplement 是否单独提交，ethics/limitations/checklist 是否计入页数。
+- 是否需要额外 PDF，例如 checklist PDF、ethics checklist、reproducibility checklist、supplement PDF、source zip、author response 文件。
+- 匿名规则：single/double blind、作者信息、acknowledgement、funding、self-citation、external links、code/data links、PDF metadata、source zip 注释和文件名。
+- 文件格式：PDF 版本、字体嵌入、最大文件大小、source 是否必须上传、supplement 文件数量和命名要求。
+- Bibliography/style：`.bst`/BibLaTeX 要求、citation style、references 是否可超页、是否允许压缩 bibliography。
+- Desk-reject 风险：非匿名、模板不合规、页数超限、缺 checklist、缺 ethics statement、缺 line numbers、外链泄漏身份、字体/页边距/行距改动。
+
+将结果写入项目内可追溯的备忘文件，例如 `build/template-migration/notes/submission-requirements.md`。不要放在系统 `/tmp`；如果只是临时存放，任务结束前要清理或移动到项目内。
+
+备忘模板：
+
+```markdown
+# Submission Requirements Memo
+
+## Target Venue
+
+- Venue:
+- Track:
+- Submission stage:
+- Deadline/version date:
+- Access date:
+
+## Official Sources
+
+| Source | URL | What It Confirms | Notes |
+| --- | --- | --- | --- |
+| Author instructions | [URL] | page limit, anonymity, checklist | |
+| Author kit | [URL] | LaTeX class/style/template version | |
+| Submission system | [URL] | required files, PDF/source upload | |
+
+## Requirements Checklist
+
+| Requirement | Confirmed Rule | Source | Action Needed | Status |
+| --- | --- | --- | --- | --- |
+| Template version |  |  |  | TODO |
+| Main text page limit |  |  |  | TODO |
+| References count toward limit |  |  |  | TODO |
+| Appendix/supplement policy |  |  |  | TODO |
+| Checklist PDF required |  |  |  | TODO |
+| Ethics/limitations required |  |  |  | TODO |
+| Anonymous author block |  |  |  | TODO |
+| External links policy |  |  |  | TODO |
+| Code/data link policy |  |  |  | TODO |
+| PDF metadata/source zip anonymity |  |  |  | TODO |
+| Line numbers/header/footer |  |  |  | TODO |
+| File size/source upload |  |  |  | TODO |
+
+## Open Questions
+
+- [ ] Requirement:
+  - Why unclear:
+  - Proposed handling:
+  - Need user confirmation:
+```
+
+如果 web search 找不到官方答案，必须在 memo 的 Open Questions 里记录，不要猜。对会导致 desk reject 的未知项，先问用户或保守处理。
 
 ## 启动前清点
 
@@ -303,10 +375,84 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 页眉、页脚、页码、line number、匿名标记是否符合投稿阶段。
 - references、appendix、supplement 起止位置是否符合要求。
 
+## 阶段六：逐页 Desk-Reject 风险审计
+
+最终交付前，必须逐页查看渲染后的 PDF 图片，并写 `page-risk-audit.md`。这不是泛泛浏览，而是按页填满风险表：每一页是一行，每个风险维度都要写 `OK`、`N/A` 或具体风险描述。
+
+建议先渲染每一页：
+
+```bash
+latexmk -pdf -interaction=nonstopmode -halt-on-error -outdir=build/target paper.tex
+mkdir -p build/template-migration/pages build/template-migration/notes
+pdftoppm -png -r 180 build/target/paper.pdf build/template-migration/pages/page
+pdfinfo build/target/paper.pdf | rg '^Pages:'
+```
+
+逐页审计文件建议写入 `build/template-migration/notes/page-risk-audit.md`。如果项目已有专门的 migration notes 目录，可放入该目录，但路径必须在最终说明里写清楚。
+
+审计模板：
+
+```markdown
+# Page Risk Audit
+
+## Build Info
+
+- PDF:
+- Render command:
+- Page count:
+- Target venue:
+- Submission stage:
+- Requirements memo:
+- Audit date:
+
+## Global Risks
+
+| Risk | Check Method | Result | Action |
+| --- | --- | --- | --- |
+| PDF metadata contains author or private info | `pdfinfo` and source inspection | TODO | TODO |
+| Source zip contains private comments, paths, or filenames | `rg` / archive inspection | TODO | TODO |
+| Global line spacing, body font, margin, or text block changed | diff preamble and template files | TODO | TODO |
+| Official class/style/template files modified | `diff -ru pristine current` | TODO | TODO |
+| Required checklist/supplement/source files missing | compare with requirements memo | TODO | TODO |
+
+## Per-Page Risk Table
+
+| Page | Non-anonymous info | Identity/link leak | Header/footer/line no. | Over-tight compression | Text/figure overlap | Figure/table overflow | Formula overflow | Missing/low-res evidence | Main-body blank/short-tail | Template-sensitive region | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
+| 2 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
+```
+
+风险列填写规则：
+
+- `Non-anonymous info`：作者、单位、邮箱、ORCID、funding、acknowledgement、项目名、个人主页、文件名泄漏。
+- `Identity/link leak`：GitHub、Hugging Face、project page、demo/video、OpenReview 外链、匿名性不足的数据下载地址、自引身份暗示。
+- `Header/footer/line no.`：页眉、页脚、页码、line number、anonymous marker、submission id 是否符合 memo。
+- `Over-tight compression`：局部负 `\vspace` 过度、caption 和正文贴太近、表格字号不可读、图例或轴标签过小。
+- `Text/figure overlap`：正文、标题、caption、图表、脚注、页脚之间是否重叠或遮挡。
+- `Figure/table overflow`：图表是否越过正文边界、裁切、压到边栏、跨栏位置异常。
+- `Formula overflow`：公式是否越界、截断、压住编号或破坏双栏。
+- `Missing/low-res evidence`：源稿中的图表、表格、case、算法、proof 是否缺失，图片是否糊到无法审稿。
+- `Main-body blank/short-tail`：仅针对 references 之前正文；是否有明显大空白、孤立 section 标题、正文段落短尾。
+- `Template-sensitive region`：首页 title/author/abstract 预留区、页边距、行距、正文字体、模板全局版式是否有被压缩的迹象。
+- `Action`：如果无风险写 `None`；如果有风险，写最小修复动作和复查状态。
+
+修复规则：
+
+- 只对标记为风险的页做最小必要调整；一次只修一个页面或一个风险。
+- 优先微调 float 位置、局部图表尺寸、caption/table spacing、局部 `tabcolsep`、局部 `arraystretch`、局部段落压缩。
+- 每次只调一点点，立即编译、重新渲染对应页面、更新 `page-risk-audit.md`。
+- 严禁大版面调整：不改全局行距、正文字体、页边距、正文 text block、模板 class/style、首页 author 预留区。
+- 如果一个调整影响多页，必须回看受影响页面并更新表格；不要只看原风险页。
+- 如果风险来自目标规则不明确，回到 `submission-requirements.md` 的 Open Questions，不要猜。
+- 持续迭代直到 `Per-Page Risk Table` 中没有具体风险描述，只剩 `OK`、`N/A` 或 `None`。
+
 ## 最终交付检查
 
 - `latexmk` 无 fatal error。
 - 关键 warning 已排查，剩余 warning 不影响投稿 PDF。
+- `submission-requirements.md` 已完成，所有关键要求有官方来源或明确 Open Question。
+- `page-risk-audit.md` 已完成，每一页和每个风险维度都填过，所有 desk-reject 风险已消除或明确交给用户确认。
 - 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
 - 第一阶段文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
