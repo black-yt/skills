@@ -49,6 +49,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 必须确认的要求：
 
 - 模板版本、官方下载链接、compiler 要求、单栏/双栏、字号、页边距、行号、页眉页脚、匿名开关。
+- Caption 位置和样式：一般图的 caption 在图下方、表的 caption 在表上方，但必须以目标 venue 的 author kit、sample paper 和模板说明为准。
 - 主文页数限制，references 是否计入页数，appendix/supplement 是否单独提交，ethics/limitations/checklist 是否计入页数。
 - 是否需要额外 PDF，例如 checklist PDF、ethics checklist、reproducibility checklist、supplement PDF、source zip、author response 文件。
 - 匿名规则：single/double blind、作者信息、acknowledgement、funding、self-citation、external links、code/data links、PDF metadata、source zip 注释和文件名。
@@ -84,6 +85,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 | Requirement | Confirmed Rule | Source | Action Needed | Status |
 | --- | --- | --- | --- | --- |
 | Template version |  |  |  | TODO |
+| Figure/table caption placement |  |  |  | TODO |
 | Main text page limit |  |  |  | TODO |
 | References count toward limit |  |  |  | TODO |
 | Appendix/supplement policy |  |  |  | TODO |
@@ -177,14 +179,16 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 5. 对公式做宽度适配：长公式可用 `aligned`、`split`、`multline` 或局部缩放，但不能改变数学含义。
 6. 对表格做宽度适配：优先调整 `tabcolsep`、字号、列宽、`resizebox`/`adjustbox`，不要删列、删数据或改数字。
 7. 对图片做宽度适配：单栏通常用 `0.95\linewidth` 到 `\linewidth`，跨栏通常用 `0.85\textwidth` 到 `\textwidth`，以不越界和清晰为准。
-8. 对照启动前内容清单，确认目标模板下仍包含全部正文 section、图片、表格、公式、算法、case/proof、关键脚注和引用。
-9. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
-10. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无图表缺失、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
+8. 对 caption 位置做模板适配：一般 `figure` 的 `\caption` 放在图下方，`table` 的 `\caption` 放在表上方；如果目标 venue 的 sample/template 要求不同，以目标要求为准，不凭个人习惯调整。
+9. 对照启动前内容清单，确认目标模板下仍包含全部正文 section、图片、表格、公式、算法、case/proof、关键脚注和引用。
+10. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
+11. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无图表缺失、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
 
 阶段1允许做的排版调整：
 
 - 移动图、表、公式或算法块在源码中的相对位置，使其靠近首次正文引用并减少空隙。
 - 调整 `figure`、`table`、公式、算法、caption 和子图的尺寸。
+- 按目标模板调整 caption 位置和 spacing；默认图下表上，但不覆盖 venue sample 的具体要求。
 - 切换单栏/双栏 float 环境。
 - 调整局部 float placement，例如 `[t]`、`[tb]`、`[!t]`。
 - 增加必要的 template-compatible 包装命令，例如 `\centering`、`minipage`、`subfigure`、`resizebox`。
@@ -193,6 +197,7 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 
 - 改写段落、句子、摘要、conclusion 或 related work。
 - 改实验结果、数据、指标、模型名、表格数值或 caption 含义。
+- 把 caption 放到与目标模板不一致的位置，或为了压缩空间随意把 table caption 移到下方、figure caption 移到上方。
 - 删除图片、表格、公式、引用、脚注、算法、case、proof、appendix/supplement 指针或正文 section。
 - 改目标模板官方 `.cls`、`.sty` 或官方 sample 的模板文件。
 
@@ -370,6 +375,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 全文没有改全局行间距、正文字体、页边距、正文 text block、模板字号或 bibliography style 来压缩空间。
 - 双栏正文是否有跨栏图表压住文字。
 - 单栏转双栏后公式是否越界。
+- 图表 caption 位置是否符合投稿要求：一般图下表上；如果 venue 模板另有规定，以阶段0 memo 为准。
 - 宽表是否可读，表格线和数字是否清楚。
 - 图片是否清晰，子图标签是否可见。
 - 源版本中的图片、表格、公式、算法、case/proof 是否都仍在正文或经用户同意后移动到 appendix/supplement。
@@ -418,10 +424,10 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 
 ## Per-Page Risk Table
 
-| Page | Non-anonymous info | Identity/link leak | Header/footer/line no. | Over-tight compression | Text/figure overlap | Figure/table overflow | Formula overflow | Missing/low-res evidence | Main-body blank/short-tail | Template-sensitive region | Action |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
-| 2 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
+| Page | Non-anonymous info | Identity/link leak | Header/footer/line no. | Caption placement | Over-tight compression | Text/figure overlap | Figure/table overflow | Formula overflow | Missing/low-res evidence | Main-body blank/short-tail | Template-sensitive region | Action |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
+| 2 | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO | TODO |
 ```
 
 风险列填写规则：
@@ -429,6 +435,7 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 - `Non-anonymous info`：作者、单位、邮箱、ORCID、funding、acknowledgement、项目名、个人主页、文件名泄漏。
 - `Identity/link leak`：GitHub、Hugging Face、project page、demo/video、OpenReview 外链、匿名性不足的数据下载地址、自引身份暗示。
 - `Header/footer/line no.`：页眉、页脚、页码、line number、anonymous marker、submission id 是否符合 memo。
+- `Caption placement`：图 caption 和表 caption 是否符合阶段0 memo；通常图下表上，但目标 venue 有特殊要求时按目标要求。
 - `Over-tight compression`：局部负 `\vspace` 过度、caption 和正文贴太近、表格字号不可读、图例或轴标签过小。适度局部 `vspace` 本身不是问题；只有肉眼可见过紧或影响阅读时才标为风险。
 - `Text/figure overlap`：正文、标题、caption、图表、脚注、页脚之间是否重叠或遮挡。
 - `Figure/table overflow`：图表是否越过正文边界、裁切、压到边栏、跨栏位置异常。
@@ -458,6 +465,7 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
 - 阶段1文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
 - 实验部分的主结果、消融、设置、对比和分析表仍保留表格形态；相关图表没有被删除、散文化或未经用户同意移动到 appendix/supplement。
+- Figure/table caption 位置符合阶段0 memo；一般图下表上，若目标 venue 另有规定则按 venue 规则执行。
 - 若发生过文字删除、压缩后回填或匿名化后恢复，已确认回填文本来自源论文/源 LaTeX/原始版本/用户原稿，而不是重新生成的近似文本。
 - 首页 title、`\maketitle`、匿名 author block 和 abstract 前区域没有用负 `\vspace` 压缩，保留目标投稿模板的官方首页结构。
 - 最终 PDF 页数满足目标要求，并尽量写满 references 之前的正文最后一页；references 不要求最后一行占满，不用按正文短尾标准修。
