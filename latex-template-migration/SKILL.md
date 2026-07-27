@@ -9,7 +9,7 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 
 - 先把论文工程从源模板迁移到目标投稿模板，并确保能稳定编译、PDF 美观、图表公式不重叠。
 - 投稿版本必须完全匿名：不能出现作者信息、affiliation、acknowledgement、个人主页、项目链接、代码/数据链接或暗示“这是我们之前工作”的表述；即使源版本来自 arXiv、camera-ready 或技术报告，submission 版本也默认按匿名稿处理。
-- 第一阶段只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
+- 阶段1只做模板迁移和排版适配，不改正文语义文本；允许超页数，但不允许文本、图片、表格、公式、算法、case、proof 或关键脚注丢失。
 - 后续阶段按页数缺口分层处理：先排版压缩，再轻微文字压缩，最后才询问是否移动内容到补充材料。
 - 写满、空隙、短尾和最终压行要求默认只针对 references 之前的正文部分；参考文献不按正文审美处理，不要求最后一行写满，也不因 references 区域空隙判断论文是否认真。
 - 全程用投稿要求检索备忘、diff、内容清点、LaTeX 编译日志、PDF 转图片可视化检查和逐页风险审计表来证明迁移没有偷偷改内容、删掉多模态证据或破坏模板。
@@ -27,14 +27,14 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 - 如果某段文字被删除、压缩或匿名化后又需要加回，优先从源论文、源 LaTeX、原始 arXiv/技术报告或用户提供的原稿中恢复第一手文本；不要凭记忆重写，也不要让模型重新生成近似文本，避免删除后再添加导致 claim、术语、数值或语气漂移。
 - 只有在用户明确同意时，才能把正文中的图表、公式、算法、case、proof 或大段内容移动到 appendix/supplement；移动前必须说明会移动什么、为什么、对主文证据链有什么影响。
 - 首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方、abstract 前的模板预留区域不能用负 `\vspace` 压缩。很多匿名投稿模板会给非匿名版本作者列表预留空间；submission 里即使显示 Anonymous，也必须保留官方模板的作者区域版式。压掉这块空白属于破坏模板规范，可能触发 desk reject。
-- 第一阶段不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
-- 第一阶段可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
+- 阶段1不改论文正文、claim、实验数字、表格数据、公式含义、引用意图或 conclusion。
+- 阶段1可调整 float、equation、table 的位置、大小、跨栏形式和 LaTeX 包装方式；这些调整必须服务排版，不改变内容。
 - 不为了压页删除数据、实验、图片、表格、公式、算法、图表证据、重要 citation 或方法定义。
 - 所有“写满页面”“减少大空隙”“最后一行超过半行”“短尾修正”的要求都只看 references 之前的正文；references、appendix 和 supplement 不适用正文压行标准。若目标 venue 将 references 计入总页数，仍需遵守总页数，但不要为了 references 的视觉短尾改全局版式或非合规 bibliography style。
 - 不在用户未授权时 commit 或 push；可以用 git diff 做检查，但不要把阶段性调整提交成历史。
 - 如果目标模板规则不明确，先查看官方 author kit、sample paper、submission checklist 和页数/匿名/补充材料要求，不凭印象猜。
 
-## 阶段零：投稿要求检索备忘
+## 阶段0：投稿要求检索备忘
 
 开始改模板前，必须先通过 web search 详细核对目标会议/期刊的最新投稿要求，并写成 Markdown 备忘。不要只看旧论文、旧模板或本地印象；规则可能每年变化。
 
@@ -163,10 +163,10 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 - 对尚未公开或会暴露身份的 code/data，写成“will be released upon acceptance”这类 venue 允许的中性表达；如果 venue 禁止该表述，按 venue 规则删除。
 - 对注释和源码内部路径也要检查，因为部分投稿系统可能要求上传 source zip。
 
-## 阶段一：只换模板
+## 阶段1：只换模板
 
-阶段一的验收目标是“模板 B 下排版正常”，不是“页数已经合格”。
-阶段一还必须做到内容完整：文本、图片、表格、公式、算法、case、proof、关键脚注和引用都不能少。
+阶段1的验收目标是“模板 B 下排版正常”，不是“页数已经合格”。
+阶段1还必须做到内容完整：文本、图片、表格、公式、算法、case、proof、关键脚注和引用都不能少。
 
 执行顺序：
 
@@ -181,7 +181,7 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 9. 编译到无错误，排查 undefined refs/citations、missing figures、overfull boxes、float too large 和 bibliography 错误。
 10. PDF 转图片逐页检查：无文字重叠、无图表越界、无公式截断、无图表缺失、无异常大空白、无作者信息、无外部链接、无标题/页眉错误。
 
-阶段一允许做的排版调整：
+阶段1允许做的排版调整：
 
 - 移动图、表、公式或算法块在源码中的相对位置，使其靠近首次正文引用并减少空隙。
 - 调整 `figure`、`table`、公式、算法、caption 和子图的尺寸。
@@ -189,14 +189,14 @@ pdfinfo build/target/paper.pdf | sed -n '1,80p'
 - 调整局部 float placement，例如 `[t]`、`[tb]`、`[!t]`。
 - 增加必要的 template-compatible 包装命令，例如 `\centering`、`minipage`、`subfigure`、`resizebox`。
 
-阶段一禁止做的内容调整：
+阶段1禁止做的内容调整：
 
 - 改写段落、句子、摘要、conclusion 或 related work。
 - 改实验结果、数据、指标、模型名、表格数值或 caption 含义。
 - 删除图片、表格、公式、引用、脚注、算法、case、proof、appendix/supplement 指针或正文 section。
 - 改目标模板官方 `.cls`、`.sty` 或官方 sample 的模板文件。
 
-阶段一 diff 检查：
+阶段1 diff 检查：
 
 ```bash
 git diff --check
@@ -226,7 +226,7 @@ diff -u build/template-migration-diff/source-text.txt build/template-migration-d
 
 ## 页数判断
 
-阶段一完成后再判断页数。先确认目标要求：
+阶段1完成后再判断页数。先确认目标要求：
 
 - 主文页数限制：例如 8 页、9 页、12 页。
 - References 是否计入页数。
@@ -249,10 +249,10 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 ```
 
-## 阶段二：不改文字压缩
+## 阶段2：不改文字压缩
 
-如果超页，第二阶段只做排版压缩，不改正文文字。
-第二阶段仍必须保留正文中的图片、表格、公式、算法和关键证据；压缩只能改变排版位置、尺寸和间距，不能删除内容。
+如果超页，阶段2只做排版压缩，不改正文文字。
+阶段2仍必须保留正文中的图片、表格、公式、算法和关键证据；压缩只能改变排版位置、尺寸和间距，不能删除内容。
 实验图表和表格仍按正文证据处理：main result、ablation、setting、comparison、analysis table 应保持 table 环境和可读结构，不能改成正文句子、普通列表或压缩到无法核对数字的形式。
 
 优先顺序：
@@ -260,12 +260,13 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 1. 调整 float 位置，减少单独占页和大块空白。
 2. 合并或压缩图表布局，例如多子图横排、宽图跨栏、表格跨栏或单栏重排。
 3. 微调图表尺寸，但保证坐标轴、legend、数字和文本可读。
-4. 局部使用 `\vspace` 压缩图表上下空白，但幅度要小，不能造成重叠或模板违规。
+4. 局部使用 `\vspace` 压缩图表上下空白；适当的小幅 `vspace` 是允许且有益的，可以减少模板迁移后的松散空白、提高正文信息密度，但不能造成肉眼可见的过度压缩、重叠、可读性下降或模板违规。
 5. 调整 caption spacing、`tabcolsep`、`arraystretch`、列表间距和算法块间距。
 6. 检查 bibliography 样式是否按目标模板要求，不能私自改成更短但不合规的格式。
 
 `vspace` 使用规则：
 
+- 把适度局部 `vspace` 视为正常排版工具，不要把所有负 `\vspace` 都当作风险；风险来自肉眼可见的过紧压缩、内容相撞、读者难读或破坏模板结构。
 - 只在明确的大空隙处局部使用，例如 figure 前后、caption 后、section 前后。
 - 每处改动尽量小，例如 `-0.2em`、`-0.4em`、`-0.6em`；避免连续堆叠大负值。
 - 每次加完都重新编译并可视化检查上下文，不允许文字、caption、图表互相压住。
@@ -273,17 +274,17 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 不修改全文行距、正文字体、页边距、正文 text block 或全局字号；压缩只能做局部 float、caption、table、list、algorithm 间距调整，不能动模板敏感项。
 - 不在首页 title、`\maketitle`、匿名 author block、title 下方、author block 上下方或 abstract 前使用负 `\vspace`。这块空白通常是投稿模板为非匿名作者列表预留的结构空间，不是普通可压缩空白；submission 版本也应保留官方模板版式。
 
-阶段二验收：
+阶段2验收：
 
 - 页数减少或空隙减少。
 - 没有文字重叠、图表越界、caption 撞图、页脚撞内容。
 - `git diff --word-diff -- '*.tex'` 中没有正文文本改写。
 - 内容清单数量和位置合理：图片、表格、公式、算法、case/proof 没有缺失，除非用户明确同意移动到 appendix/supplement。
 
-## 阶段三：轻微文字压缩
+## 阶段3：轻微文字压缩
 
 如果排版压缩后仍超页，才进入文字压缩。
-第三阶段也不能删除正文图表、公式、算法和关键证据；只能压缩对正文信息量影响极小的文字表达。
+阶段3也不能删除正文图表、公式、算法和关键证据；只能压缩对正文信息量影响极小的文字表达。
 
 允许优先压缩：
 
@@ -311,15 +312,15 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 4. 记录压缩来源，例如 caption、table header、method detail。
 5. 如果后续需要补回被删或被压缩的文字，先从源论文、源 LaTeX、原始 arXiv/技术报告或用户提供原稿中复制第一手文本，再做最小必要适配；不要直接新写一段替代文本。
 
-## 阶段四：仍超页时询问
+## 阶段4：仍超页时询问
 
 如果仍然超出太多，不要继续硬压。
 
 需要向用户说明：
 
 - 当前目标页数、当前页数、超出多少。
-- 阶段二已经做过哪些不改文字压缩。
-- 阶段三已经压缩了哪些低风险文字。
+- 阶段2已经做过哪些不改文字压缩。
+- 阶段3已经压缩了哪些低风险文字。
 - 继续压缩会伤害哪些内容或证据。
 
 可询问用户选择：
@@ -329,7 +330,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 把 supplement 中更重要的内容移入正文，同时删除正文低价值内容。
 - 调整论文结构或重新确定投稿目标。
 
-## 阶段五：压行和最终美观
+## 阶段5：压行和最终美观
 
 内容和页数合格后，再做最终压行。
 
@@ -375,7 +376,7 @@ pdftoppm -png -r 180 build/target/paper.pdf build/target/page
 - 页眉、页脚、页码、line number、匿名标记是否符合投稿阶段。
 - references、appendix、supplement 起止位置是否符合要求。
 
-## 阶段六：逐页 Desk-Reject 风险审计
+## 阶段6：逐页 Desk-Reject 风险审计
 
 最终交付前，必须逐页查看渲染后的 PDF 图片，并写 `page-risk-audit.md`。这不是泛泛浏览，而是按页填满风险表：每一页是一行，每个风险维度都要写 `OK`、`N/A` 或具体风险描述。
 
@@ -428,7 +429,7 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 - `Non-anonymous info`：作者、单位、邮箱、ORCID、funding、acknowledgement、项目名、个人主页、文件名泄漏。
 - `Identity/link leak`：GitHub、Hugging Face、project page、demo/video、OpenReview 外链、匿名性不足的数据下载地址、自引身份暗示。
 - `Header/footer/line no.`：页眉、页脚、页码、line number、anonymous marker、submission id 是否符合 memo。
-- `Over-tight compression`：局部负 `\vspace` 过度、caption 和正文贴太近、表格字号不可读、图例或轴标签过小。
+- `Over-tight compression`：局部负 `\vspace` 过度、caption 和正文贴太近、表格字号不可读、图例或轴标签过小。适度局部 `vspace` 本身不是问题；只有肉眼可见过紧或影响阅读时才标为风险。
 - `Text/figure overlap`：正文、标题、caption、图表、脚注、页脚之间是否重叠或遮挡。
 - `Figure/table overflow`：图表是否越过正文边界、裁切、压到边栏、跨栏位置异常。
 - `Formula overflow`：公式是否越界、截断、压住编号或破坏双栏。
@@ -455,7 +456,7 @@ pdfinfo build/target/paper.pdf | rg '^Pages:'
 - `page-risk-audit.md` 已完成，每一页和每个风险维度都填过，所有 desk-reject 风险已消除或明确交给用户确认。
 - 投稿版本已通过匿名检查：无作者、单位、邮箱、acknowledgement、funding、外部链接、项目链接和自引身份暗示。
 - 目标模板官方文件与 pristine copy 对比无非预期改动。
-- 第一阶段文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
+- 阶段1文字 diff 和内容清单已确认没有正文语义改动，也没有丢失图片、表格、公式、算法、case/proof、关键脚注或引用。
 - 实验部分的主结果、消融、设置、对比和分析表仍保留表格形态；相关图表没有被删除、散文化或未经用户同意移动到 appendix/supplement。
 - 若发生过文字删除、压缩后回填或匿名化后恢复，已确认回填文本来自源论文/源 LaTeX/原始版本/用户原稿，而不是重新生成的近似文本。
 - 首页 title、`\maketitle`、匿名 author block 和 abstract 前区域没有用负 `\vspace` 压缩，保留目标投稿模板的官方首页结构。
