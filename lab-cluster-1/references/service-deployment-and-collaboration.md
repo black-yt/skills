@@ -79,6 +79,14 @@ curl --max-time 20 "http://$SERVICE_IP:$PORT/v1/models"
 ```bash
 ssh -N -T \
   -L <local_port>:<service_ip>:<service_port> \
+  agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn
+```
+
+旧的 `ailab-ai4sdata.ws` workspace 保留为历史/备用入口；如果需要旧 workspace 或 `llmagent` 入口不可用，只替换 SSH 远端登录名，转发目标 `<service_ip>:<service_port>` 仍必须来自 job 日志或实际服务信息：
+
+```bash
+ssh -N -T \
+  -L <local_port>:<service_ip>:<service_port> \
   agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
 ```
 
@@ -88,7 +96,7 @@ ssh -N -T \
 ssh -N -T \
   -L <local_port_1>:<service_ip_1>:<service_port_1> \
   -L <local_port_2>:<service_ip_2>:<service_port_2> \
-  agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
+  agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn
 ```
 
 参数含义：
@@ -106,7 +114,7 @@ ssh -N -T \
 ssh -N -T \
   -L 18010:100.96.167.106:8010 \
   -L 18011:100.101.195.51:8011 \
-  agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
+  agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn
 ```
 
 示例含义：

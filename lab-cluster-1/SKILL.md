@@ -10,7 +10,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 | 序号 | 文件内容概览 | 关键词 | 触发时机 | 文件路径 |
 | --- | --- | --- | --- | --- |
 | 1 | 概括开发机、CPU/GPU worker 和 rjob 的安全边界，列出禁止修改共享环境/conda/配置、不要在开发机跑重任务、必须使用原始 rlaunch/rjob、当前实测状态和提交前检查。 | lab cluster、dev host、rlaunch worker、rjob、CPU/GPU、environment safety、conda、shared config、raw commands、tested status、storage limit、no secrets | 触发本 skill 后默认读取；接触开发机/worker/rjob 前；准备跑测试、训练、部署、联网或改环境前；不确定某个操作是否会影响共享环境时读取 | `SKILL.md` |
-| 2 | 说明交互式 SSH 工作流和远端文件编辑边界，覆盖登录方式、域名不可用时的备用 IP 登录、后台持续终端、keepalive/TTY 参数、个人项目路径、代码/数据存放、标准 unified diff + `git apply`、`perl`/`sed` 小替换、`scp` 传输和临时文件清理。 | SSH、interactive shell、keepalive、`ssh -tt`、ServerAliveInterval、domain fallback、10.102.254.2、remote editing、project path、storage path、`git apply --check`、unified diff、`perl -0pi`、`sed -i`、`scp`、tmp cleanup、remote git repo | 登录开发机前；域名 SSH 连接失败或解析异常时；需要长时间交互式 SSH、远端编辑文件或跟踪日志前；本地工具无法直接改远端文件时；准备传输文件、应用 patch、小范围替换、清理临时文件或确认远端路径边界时必须读取 | [references/remote-access-and-editing.md](references/remote-access-and-editing.md) |
+| 2 | 说明交互式 SSH 工作流和远端文件编辑边界，覆盖优先使用 `ailab-llmagent.ws` 开发机入口、保留 `ailab-ai4sdata.ws` 历史/备用入口、域名不可用时的备用 IP 登录、后台持续终端、keepalive/TTY 参数、个人项目路径、代码/数据存放、标准 unified diff + `git apply`、`perl`/`sed` 小替换、`scp` 传输和临时文件清理。 | SSH、interactive shell、ailab-llmagent.ws、ailab-ai4sdata.ws、keepalive、`ssh -tt`、ServerAliveInterval、domain fallback、10.102.254.2、remote editing、project path、storage path、`git apply --check`、unified diff、`perl -0pi`、`sed -i`、`scp`、tmp cleanup、remote git repo | 登录开发机前；域名 SSH 连接失败或解析异常时；需要长时间交互式 SSH、远端编辑文件或跟踪日志前；本地工具无法直接改远端文件时；准备传输文件、应用 patch、小范围替换、清理临时文件或确认远端路径边界时必须读取 | [references/remote-access-and-editing.md](references/remote-access-and-editing.md) |
 | 3 | 记录网络和存储资源规则，覆盖开发机/CPU/GPU 节点联网差异、代理启停、`no_proxy`、公共模型/软件目录、Hugging Face cache 格式转标准模型目录、大文件放置、缓存控制、ai4sdata/scieval 当前资源状态和历史可用性。 | proxy、network、`setup_proxy.sh`、`no_proxy`、CPU internet、GPU no internet、shared storage、model weights、HuggingFace cache、`models--Org--Model`、`refs`、`snapshots`、standard checkpoint、large files、ai4sdata、scieval、partition status | 需要联网下载/访问 API 前；CPU/GPU 节点网络行为不确定时；选择分区前；查模型权重/公共软件路径前；发现模型目录是 Hugging Face hub cache 而不是标准 ckpt 目录时；放置大文件、缓存或排查代理/407/timeout 问题时必须读取 | [references/network-storage-resources.md](references/network-storage-resources.md) |
 | 4 | 给出交互式 `rlaunch` CPU/GPU worker 的原始命令模板，包含资源配比、scieval/ai4sdata 分区差异、mount、启动后检查、联网测试、GPU 检查和 worker 释放边界。 | `rlaunch`、interactive worker、CPU worker、GPU worker、resource ratio、mount、namespace、charged group、`nvidia-smi`、proxy test、worker cleanup、scieval CPU | 需要启动临时 CPU/GPU worker 前；需要交互式测试、短任务、临时服务或资源预测时；排查 worker 资源、挂载、联网、GPU 可见性或分区参数时必须读取 | [references/rlaunch-workers.md](references/rlaunch-workers.md) |
 | 5 | 提供正式 `rjob` CPU/GPU 作业模板和排错规则，覆盖 submit/query/logs/delete、CPU task/GPU job、脚本初始化、CUDA_HOME/CUDA_PATH/CUDACXX、conda 恢复、host-network、代理联网、1/2 GPU 资源模板、rjob/replica 结构化查询、GPU 卡位巡检，以及 rjob 任务层信息与网页监控层信息的边界。 | `rjob submit`、CPU task、GPU job、logs、delete、events、replica、CRD、status.phase、Inqueue、GPU slot、creator、pod mapping、monitoring separation、CUDA_HOME、CUDA_PATH、CUDACXX、worker_init、conda env、host-network、proxy、namespace、resource template | 提交正式训练/部署/评测任务前；写 rjob runner 前；查询/删除/看日志前；巡检 GPU 卡位、排队任务、成员占用或排队原因前；需要把 rjob/replica 与 GPU 利用率/显存/功率等监控数据合并前；配置 CUDA/conda/代理/host-network 前；排查 job Pending/Starting/Inqueue/OOM/联网失败时必须读取 | [references/rjob-tasks.md](references/rjob-tasks.md) |
@@ -30,6 +30,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 ## 核心原则
 
 - 默认打开一个后台持久交互 SSH 终端登录开发机，并在同一个远端 shell 中连续操作。单次 `ssh 'command'` 只用于健康检查、只读查询、dry-run 这类简单一次性任务。
+- 2026-08-03 起，开发机 SSH 入口优先使用 `agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn`；旧的 `agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn` 作为历史/备用入口保留，不要删除旧模板。
 - 复杂任务必须走交互模式，包括远端文件编辑、项目内多步操作、调试、提交/监控 `rjob`、持续查看日志、启动/管理 `rlaunch` worker 或服务。不要为这类任务反复发送独立 `ssh` 命令。
 - 主路径必须使用原始 `rlaunch` 和 `rjob submit` 命令。不要依赖远端 `.bashrc` 中的 `gpu`、`cpu`、`pred`、`proxy_on`、`openai_on` 等函数或 alias。
 - 把开发机只当作登录、编辑、提交、监控和轻量检查入口。不要在开发机上跑训练、评测、部署、压力测试或依赖 GPU/大内存的任务；开发机联网但资源很少，高负载可能导致死机。
@@ -63,6 +64,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 已完整跑通：
 
 - 交互式 SSH 登录开发机，开发机上 `rlaunch` 位于 `/kubebrain/rlaunch`，`rjob` 位于 `/usr/local/bin/rjob`。
+- 2026-08-03 新优先入口 `agent.xuwanghan+root.ailab-llmagent.ws@10.102.254.2` 的 IP 方式 SSH 健康检查已跑通；远端返回 `hostname=agent`、`whoami=root`、`pwd=/root`，并能找到 `/kubebrain/rlaunch` 和 `/usr/local/bin/rjob`。旧 `ailab-ai4sdata.ws` 入口仍作为历史/备用模板保留。
 - 后台持久 SSH 远端编辑流程：在 `/mnt/shared-storage-user/xuwanghan/projects` 创建测试文件、备份、用 `sed -i` 编辑、`diff -u` 校验、内容验证、删除测试文件和备份，清理检查通过。`perl` 与 `sed` 同属小范围机械替换工具，适用边界见下文。
 - 远端 git patch 流程：在项目根目录下创建临时 git repo，生成 `.tmp/change.patch`，执行 `git apply --check` 和 `git apply`，内容验证通过，随后删除 patch、`.tmp` 和整个临时测试目录，清理检查通过。
 - `scp` 传输流程：本地创建小测试文件，`scp` 到远端个人项目根目录，远端 `grep` 验证后删除远端测试文件，本地测试文件也已删除，清理检查通过。

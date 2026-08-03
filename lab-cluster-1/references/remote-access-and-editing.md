@@ -2,13 +2,27 @@
 
 ## 固定信息、登录与路径
 
-交互式登录开发机：
+交互式登录开发机。2026-08-03 起优先使用 `ailab-llmagent.ws` workspace：
+
+```bash
+ssh -CAXY agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn
+```
+
+旧的 `ailab-ai4sdata.ws` workspace 保留为历史/备用入口。只有在用户明确需要旧 workspace、`llmagent` 入口不可用，或排查历史任务/旧环境时再切回：
 
 ```bash
 ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn
 ```
 
-如果 `h.pjlab.org.cn` 域名 SSH 连接失败、DNS 解析异常或网络到域名不稳定，可以保持相同用户名，把目标主机临时换成开发机 IP 试一次：
+如果 `h.pjlab.org.cn` 域名 SSH 连接失败、DNS 解析异常或网络到域名不稳定，可以保持相同 workspace 用户，把目标主机临时换成开发机 IP 试一次。优先入口：
+
+```bash
+ssh -CAXY agent.xuwanghan+root.ailab-llmagent.ws@10.102.254.2
+```
+
+2026-08-03 已实测：该 IP 方式可登录，远端返回 `hostname=agent`、`whoami=root`，并可找到 `/kubebrain/rlaunch` 与 `/usr/local/bin/rjob`。
+
+历史/备用入口：
 
 ```bash
 ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@10.102.254.2
@@ -17,6 +31,14 @@ ssh -CAXY agent.xuwanghan+root.ailab-ai4sdata.ws@10.102.254.2
 这只是 SSH 入口的备用连接方式。后续 `rjob` 日志里的服务 IP、worker 内网 IP、KAPI URL 和 `ssh -L` 转发目标仍按对应章节从日志或实际服务信息获取，不要用这个入口 IP 代替服务 IP。
 
 推荐工作方式：先保持一个后台持久 SSH 终端，再在这个终端内连续执行 `cd`、编辑、提交、日志查看和清理。对于 Codex 或其他自动化 agent，这意味着优先维护一个长期 PTY/session，而不是每一步都新发一次 `ssh 'command'`。只有下面这种单次简单检查才适合一次性 SSH：
+
+```bash
+ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=1 \
+  -CAXY agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn \
+  'hostname; command -v rlaunch; command -v rjob'
+```
+
+历史/备用 workspace 做同样检查时，只替换远端登录名：
 
 ```bash
 ssh -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=5 -o ServerAliveCountMax=1 \
@@ -132,7 +154,9 @@ trap 'rm -rf "$RUN_TMP"' EXIT
 
 ```bash
 # 本地终端
-REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
+REMOTE='agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn'
+# 历史/备用 workspace:
+# REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
 PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
 PATCH_NAME="cluster-change-$(date +%Y%m%d-%H%M%S).patch"
 PATCH_LOCAL="./$PATCH_NAME"
@@ -225,7 +249,9 @@ rm -f "$BACKUP_FILE"
 
 ```bash
 # 本地终端
-REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
+REMOTE='agent.xuwanghan+root.ailab-llmagent.ws@h.pjlab.org.cn'
+# 历史/备用 workspace:
+# REMOTE='agent.xuwanghan+root.ailab-ai4sdata.ws@h.pjlab.org.cn'
 PROJECT='/mnt/shared-storage-user/xuwanghan/projects/<project>'
 LOCAL_FILE='./file.new'
 REMOTE_NAME="file.new.$(date +%Y%m%d-%H%M%S).$$"
