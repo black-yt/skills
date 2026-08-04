@@ -14,7 +14,7 @@
 | --- | --- | --- | --- | --- |
 | 01 | 解释每个 skill 文件夹与仓库展示层的职责边界，说明 `SKILL.md`、`references/`、`assets/`、`scripts/`、`docs/`、`docs/.nojekyll`、favicon 和 `download_skill.py` 分别何时可改、何时不应顺手修改。 | layout、skill folder、`SKILL.md`、`references/`、`assets/`、`scripts/`、`docs/index.html`、`docs/.nojekyll`、favicon、`download_skill.py`、GitHub Pages、资源路径、生成物边界 | 新增/删除/移动 skill 文件夹前；拆分/合并 reference 前；移动 assets/scripts 前；修改 GitHub Pages 资源路径、favicon、下载脚本或展示层目录前必须读取 | `AGENTS.local/01_repository_layout_and_resources.md` |
 | 02 | 记录新增和更新 skill 的完整维护流程，包括 frontmatter、reference 拆分、文件导航表、README 列表、`docs/index.html` 展示数据、安装 prompt、Markdown 公式和跨文件同步要求。 | skill workflow、frontmatter、name/description、file navigation、README.md、`docs/index.html`、tags、preview content、install prompt、GitHub Markdown math、reference split、coverage checklist | 新增 skill 前；大改 `SKILL.md` 前；修改导航表前；更新 README/docs 展示项前；写 GitHub Markdown 公式前；整理用户大段经验或拆分 reference 前必须读取 | `AGENTS.local/02_skill_workflows_and_formats.md` |
-| 03 | 汇总维护过程中的风险和验证方法，覆盖隐私泄漏、路径失效、跨 skill 规则不一致、第三方源码误改、公式渲染失败、内容迁移丢失、canonical copy 同步、`rsync --dry-run`、Git 暂存提交和 push 前检查。 | pitfalls、privacy、validation、source tracing、site-packages、third-party docs、git diff、git status、commit、push、stale path、content loss、cross-skill consistency、formula rendering、canonical copy、rsync dry-run | 排查异常时；复制经验到多个 skill 前；追溯第三方库源码前；移动/删除文件后；同步 ignored 指南到 canonical copy 前；提交或 push 前；检查内容是否丢失、路径是否过期或规则是否冲突时必须读取 | `AGENTS.local/03_risks_validation_and_git.md` |
+| 03 | 汇总维护过程中的风险和验证方法，覆盖隐私泄漏、路径失效、版本化文档链接占位符与完整 fallback URL、跨 skill 规则不一致、第三方源码误改、公式渲染失败、内容迁移丢失、canonical copy 同步、`rsync --dry-run`、Git 暂存提交和 push 前检查。 | pitfalls、privacy、validation、source tracing、site-packages、third-party docs、versioned docs、fallback URL、stable/latest、git diff、git status、commit、push、stale path、content loss、cross-skill consistency、formula rendering、canonical copy、rsync dry-run | 排查异常时；复制经验到多个 skill 前；记录第三方文档链接或版本化 URL 前；追溯第三方库源码前；移动/删除文件后；同步 ignored 指南到 canonical copy 前；提交或 push 前；检查内容是否丢失、路径是否过期或规则是否冲突时必须读取 | `AGENTS.local/03_risks_validation_and_git.md` |
 | 04 | 保留 `docs/` 静态网页的长期 UI 经验，覆盖固定头部和滚动列表、自定义多选标签、复制链接/安装 prompt、按钮字体一致性、渐隐 mask、4 种背景颜色切换和 GitHub Pages 视觉验证。 | web UI、`docs/index.html`、layout、fixed header、scroll list、tag filter、checkbox dropdown、copy prompt、copy link、button style、mask-image、theme switcher、GitHub Pages、responsive | 修改 `docs/` 前端前；调整搜索/筛选/展开交互前；改复制按钮或安装 prompt 前；改渐隐滚动、主题切换、移动端样式、favicon 或页面文案前必须读取 | `AGENTS.local/04_web_pages_and_ui_notes.md` |
 
 如果某个文件不存在，不要假设其内容；按当前任务需要创建或更新，并保持本表同步。
@@ -86,6 +86,7 @@
 - 记录第三方库经验时，优先推荐官方教程、官方文档、recipe、API reference 和当前环境 CLI help；源码阅读应放在官方文档之后。
 - 文档链接必须与当前安装版本匹配；不要把 `stable`、`latest` 或某个历史版本链接写成固定答案。
 - 需要写具体文档链接时，先说明如何获取当前版本，例如 `python -c 'import vllm; print(vllm.__version__)'`。
+- 版本化或易变官网链接可以写占位符模板以便适配不同版本，但必须同时记录一组当前已验证可访问的完整 URL 作为 fallback，避免后续只剩模板找不到入口。
 - 源码追溯用于确认当前安装版本的真实行为、参数名、默认值、兼容分支、错误路径和边界条件。
 - 追源码示例应使用 `module.__file__`、`module.__version__`、`inspect.getsource(...)`、`command --help` 等只读方法。
 

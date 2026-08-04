@@ -45,7 +45,9 @@ SERVE_COMPILATION_CONFIG='{"mode": 0, "cudagraph_mode": "FULL"}'
 官方参考：
 
 - 使用前先按当前 `vllm.__version__` 选择匹配的 vLLM 文档版本。
-- 查 OpenAI-compatible server、Qwen/Qwen3.5 recipe 和 compilation config 时，使用上文的版本匹配链接模板，不要写死 `stable` 或 `latest`。
+- 查 OpenAI-compatible server、Qwen/Qwen3.5 recipe 和 compilation config 时，优先使用主 `SKILL.md` 中的版本匹配链接模板。
+- 不要只依赖 `<matched-vllm-doc-version>` 占位符；如果精确版本路径找不到，使用主 `SKILL.md` 中已经验证可访问的完整 fallback 链接。当前记录的 fallback 包括 vLLM `v0.26.0` OpenAI server、compilation config、release notes，以及 Qwen3.5 recipe 的 `latest`/`stable` 完整链接。
+- recipe 站点和核心 docs 站点的版本路径可能不同。不要强行把一个可访问的核心 docs 版本号拼到 recipe URL；版本化 recipe 不存在时，使用已验证的 `latest` 或 `stable` recipe，并在任务记录中写明这个差异。
 
 ### Qwen3.5 35B-A3B 部署要点
 

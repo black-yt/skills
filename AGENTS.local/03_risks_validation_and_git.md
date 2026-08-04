@@ -16,6 +16,9 @@
 
 - 记录第三方库经验时，优先推荐官方教程、官方文档、recipe、API reference 和当前环境 CLI help；源码阅读应放在官方文档之后。
 - 文档链接必须与当前安装版本匹配。不要把 `stable`、`latest` 或某个历史版本链接写成固定答案；如果只能给模板，使用 `<matched-version>` 这类占位符。
+- 对版本化、易变或文档站结构不稳定的网址，可以保留占位符模板，例如 `https://docs.example.com/en/<matched-version>/...`，但必须同时记录至少一组当前已验证可访问的完整 URL 作为 fallback。
+- fallback URL 要写清核对日期、来源版本和验证方式，例如 `curl -L -I`、浏览器打开或官方 release 页面；如果某类文档只能使用 `latest` / `stable`，要说明它与本地包版本不完全绑定。
+- 更新这类 skill 时，不能只刷新 `<matched-version>` 模板；如果上游 release 或文档站变化，也要重新验证并刷新完整 fallback 链接，避免后续找不到真实入口。
 - 当 skill 绑定某个会更新的核心上游仓库或包时，必须用该 skill 中记录的 package version / `VERSION` / GitHub HEAD 作为漂移检查锚点；发现上游版本变化后，不要只改版本号，必须重新审 README、配置示例、CLI help 和相关源码。
 - 源码追溯用于确认当前安装版本的真实行为、参数名、默认值、兼容分支、错误路径和边界条件，不用于替代官方教程学习推荐用法。
 - 源码必须只读。不要修改 `site-packages`、pip 安装目录、共享 checkout、editable checkout 或共享环境。

@@ -54,6 +54,22 @@ VLLM_RECIPES_BASE="https://docs.vllm.ai/projects/recipes/en/<matched-vllm-doc-ve
 VLLM_QWEN35_RECIPE="${VLLM_RECIPES_BASE}Qwen/Qwen3.5.html"
 ```
 
+不要只记录占位符模板。还要保留一组已经验证可访问的完整链接作为 fallback，避免官方版本路径找不到时完全丢失入口。当前核对时间为 `2026-08-04`，GitHub release 页面显示的最新 vLLM release 为 `v0.26.0`；以下链接已用 `curl -L -I` 验证可访问：
+
+```text
+VLLM_RELEASE_NOTES_FALLBACK="https://github.com/vllm-project/vllm/releases/tag/v0.26.0"
+VLLM_OPENAI_SERVER_DOC_FALLBACK="https://docs.vllm.ai/en/v0.26.0/serving/openai_compatible_server/"
+VLLM_COMPILATION_DOC_FALLBACK="https://docs.vllm.ai/en/v0.26.0/api/vllm/config/compilation/"
+VLLM_QWEN35_RECIPE_FALLBACK="https://docs.vllm.ai/projects/recipes/en/latest/Qwen/Qwen3.5.html"
+VLLM_QWEN35_RECIPE_STABLE_FALLBACK="https://docs.vllm.ai/projects/recipes/en/stable/Qwen/Qwen3.5.html"
+```
+
+使用规则：
+
+- 先按当前 `vllm.__version__` 匹配文档；匹配不到时，再使用上面的完整 fallback 链接追溯。
+- recipe 站点不一定提供与核心文档相同的版本路径；如果版本化 recipe 缺失，可以用已验证的 `latest` 或 `stable` recipe，并在记录中说明 recipe 版本与本地 vLLM 版本不完全绑定。
+- 以后更新本 skill 时，如果上游 vLLM 最新 release 变化，应同步刷新这些完整 fallback 链接，不要只留下 `<matched-vllm-doc-version>` 占位符。
+
 ms-swift 官方阅读入口：
 
 1. 文档根目录：`https://swift.readthedocs.io/zh-cn/latest/`。
