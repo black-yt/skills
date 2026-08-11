@@ -17,7 +17,7 @@
 5. 先用 `rjob submit --dry-run true ...` 做语法和资源字段检查；确认无误后去掉 `--dry-run true` 正式提交。
 6. 用 `rjob submit ... -- bash command.sh` 提交。
 7. 提交后记录 job name、job id、worker id 或服务 IP；只摘录必要日志，不复制 secret。
-8. 2026-08-11 当前 rjob 默认使用 `llmagent` / `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。ai4sdata/scieval 模板是历史备份模板，不要删除；只有用户明确要求回退、资源恢复或排查历史任务时再使用。
+8. 2026-08-11 当前 rjob 默认使用 GPU `llmagent_gpu` / CPU `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。ai4sdata/scieval 模板是历史备份模板，不要删除；只有用户明确要求回退、资源恢复或排查历史任务时再使用。
 
 最小 dry-run，用于生成并检查 YAML。2026-08-11 当前 CPU rjob 默认使用 llmagent：
 
@@ -482,11 +482,11 @@ rjob delete "$JOB"
 
 1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。
 
-2026-08-11 当前 GPU rjob 默认使用 `llmagent` + `--namespace=ailab-llmagent`。ai4sdata/scieval 的 GPU 模板作为历史备份保留，不要删除。
+2026-08-11 当前 GPU rjob 默认使用 `llmagent_gpu` + `--namespace=ailab-llmagent`。ai4sdata/scieval 的 GPU 模板作为历史备份保留，不要删除。
 
 增量备注：有用户反馈 scieval 2 GPU 训练在一些场景下不能加 `--host-network=true`。下面历史模板里的 `--host-network=true` 行先保留，不做全局替换；正式训练前按当前任务做 `--dry-run true` 和最小短任务验证。如果 scieval 2 GPU 训练出现调度、网络或容器启动异常，优先尝试去掉 `--host-network=true`，并记录本次任务实际可用的提交参数。
 
-llmagent 1 GPU dry-run 模板，当前默认：
+llmagent_gpu 1 GPU dry-run 模板，当前默认：
 
 ```bash
 rjob submit --dry-run true \
@@ -495,7 +495,7 @@ rjob submit --dry-run true \
   --gpu=1 \
   --memory=230000 \
   --cpu=22 \
-  --charged-group=llmagent \
+  --charged-group=llmagent_gpu \
   --private-machine=group \
   --namespace=ailab-llmagent \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
@@ -553,7 +553,7 @@ rjob submit --dry-run true \
   -- bash command.sh
 ```
 
-llmagent GPU rjob，当前默认：
+llmagent_gpu GPU rjob，当前默认：
 
 ```bash
 JOB=codex-skill-gpu-llmagent-real-$(date +%s)
@@ -562,7 +562,7 @@ rjob submit --name "$JOB" \
   --gpu=2 \
   --memory=460000 \
   --cpu=44 \
-  --charged-group=llmagent \
+  --charged-group=llmagent_gpu \
   --private-machine=group \
   --namespace=ailab-llmagent \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
@@ -631,7 +631,7 @@ KUBEBRAIN_NAMESPACE=ailab-scieval rjob delete "$JOB"
 
 常规 GPU 模板。正式训练或部署时，把最后一行改为 `-- bash command.sh`，并确保 `command.sh` 已放在共享存储中；需要检查语法时保留 `--dry-run true`。
 
-llmagent GPU 模板，当前默认：
+llmagent_gpu GPU 模板，当前默认：
 
 ```bash
 rjob submit --dry-run true \
@@ -640,7 +640,7 @@ rjob submit --dry-run true \
   --gpu=2 \
   --memory=460000 \
   --cpu=44 \
-  --charged-group=llmagent \
+  --charged-group=llmagent_gpu \
   --private-machine=group \
   --namespace=ailab-llmagent \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \

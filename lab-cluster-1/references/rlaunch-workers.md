@@ -8,8 +8,8 @@
 # 2026-08-11 当前默认 CPU/GPU worker 检查。
 rlaunch --cpu=4 --memory=16000 --charged-group=llmagent_cpu_task --namespace=ailab-llmagent --predict-only
 rlaunch --cpu=8 --memory=32000 --charged-group=llmagent_cpu_task --namespace=ailab-llmagent --predict-only
-rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=llmagent --private-machine=group --namespace=ailab-llmagent --predict-only
-rlaunch --gpu=2 --cpu=44 --memory=460000 --charged-group=llmagent --private-machine=group --namespace=ailab-llmagent --predict-only
+rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=llmagent_gpu --private-machine=group --namespace=ailab-llmagent --predict-only
+rlaunch --gpu=2 --cpu=44 --memory=460000 --charged-group=llmagent_gpu --private-machine=group --namespace=ailab-llmagent --predict-only
 
 # 2026-06-05 备份 CPU worker 检查；2026-08-11 起不作为默认分区。
 rlaunch --cpu=4 --memory=16000 --charged-group=scieval_cpu_task --namespace=ailab-scieval --predict-only
@@ -195,16 +195,16 @@ wget --spider https://www.google.com
 
 以下命令用于申请 GPU worker。真实交互使用时把末尾命令写成 `-- bash`，进入 worker 后先运行 `hostname`、`nvidia-smi -L` 和挂载检查；如果调度器提示资源不足或 pending unschedulable，不要反复提交。
 
-2026-08-11 当前默认 GPU worker 使用 `llmagent` + `--namespace=ailab-llmagent`。旧 `ai4sdata_gpu` 和 `scieval_gpu` 模板只作为历史备份保留，不要删除。
+2026-08-11 当前默认 GPU worker 使用 `llmagent_gpu` + `--namespace=ailab-llmagent`。旧 `ai4sdata_gpu` 和 `scieval_gpu` 模板只作为历史备份保留，不要删除。
 
-llmagent 1 GPU，当前默认模板：
+llmagent_gpu 1 GPU，当前默认模板：
 
 ```bash
 rlaunch \
   --gpu=1 \
   --cpu=22 \
   --memory=230000 \
-  --charged-group=llmagent \
+  --charged-group=llmagent_gpu \
   --private-machine=group \
   --namespace=ailab-llmagent \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
@@ -215,14 +215,14 @@ rlaunch \
   -- bash -lc 'echo worker_host=$(hostname); nvidia-smi -L; test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok'
 ```
 
-llmagent 2 GPU，当前默认模板：
+llmagent_gpu 2 GPU，当前默认模板：
 
 ```bash
 rlaunch \
   --gpu=2 \
   --cpu=44 \
   --memory=460000 \
-  --charged-group=llmagent \
+  --charged-group=llmagent_gpu \
   --private-machine=group \
   --namespace=ailab-llmagent \
   --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \

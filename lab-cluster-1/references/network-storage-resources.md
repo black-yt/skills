@@ -271,7 +271,7 @@ memory  = 4000 * C
 
 | 场景 | 分区 | charged group | namespace | private machine |
 | --- | --- | --- | --- | --- |
-| rlaunch GPU / rjob GPU | llmagent | `llmagent` | `ailab-llmagent` | `group` |
+| rlaunch GPU / rjob GPU | llmagent | `llmagent_gpu` | `ailab-llmagent` | `group` |
 | rlaunch CPU worker | llmagent | `llmagent_cpu_task` | `ailab-llmagent` | 不加 |
 | rjob CPU | llmagent | `llmagent_cpu_task` | `ailab-llmagent` | 不加 |
 | rlaunch GPU / rjob GPU | ai4sdata，历史备份 | `ai4sdata_gpu` | 不加 | `group` |
@@ -287,11 +287,11 @@ memory  = 4000 * C
 | --- | --- | --- | --- | --- |
 | 2026-05 | 尚未作为默认分区记录 | CPU rjob、GPU rjob 和相关模板已验证 | GPU rjob 已验证；CPU worker 历史上可用 | 按任务选择 ai4sdata 或 scieval |
 | 2026-06-05 | 尚未作为默认分区记录 | 当时没有 CPU/GPU 可用资源；模板保留为历史已验证配置 | `rlaunch` CPU worker、CPU rjob、CPU 外网代理已验证 | 当时 CPU 默认用 scieval；GPU 先按实际资源验证 |
-| 2026-08-11 | 当前默认分区；GPU 使用 `llmagent`，CPU 使用 `llmagent_cpu_task`，namespace 使用 `ailab-llmagent` | 历史备份；不作为默认提交目标 | 历史备份；不作为默认提交目标 | 默认使用 llmagent；旧分区仅在用户确认回退、资源恢复或排查历史任务时使用 |
+| 2026-08-11 | 当前默认分区；GPU charged group 使用 `llmagent_gpu`，CPU 使用 `llmagent_cpu_task`，namespace 使用 `ailab-llmagent` | 历史备份；不作为默认提交目标 | 历史备份；不作为默认提交目标 | 默认使用 llmagent 体系；旧分区仅在用户确认回退、资源恢复或排查历史任务时使用 |
 
 当前使用边界：
 
-- 2026-08-11 当前 `rlaunch` 和 `rjob` 默认使用 llmagent 体系：GPU 用 `llmagent`，CPU 用 `llmagent_cpu_task`，统一带 `--namespace=ailab-llmagent`。
+- 2026-08-11 当前 `rlaunch` 和 `rjob` 默认使用 llmagent 体系：GPU charged group 用 `llmagent_gpu`，CPU charged group 用 `llmagent_cpu_task`，统一带 `--namespace=ailab-llmagent`。
 - llmagent rjob 查询、日志和删除时带 `KUBEBRAIN_NAMESPACE=ailab-llmagent`；不要拿 ai4sdata 或 scieval 的查询前缀直接查当前任务。
 - ai4sdata 分区和 scieval 分区当前不作为默认提交目标；下面保留的 ai4sdata/scieval 命令只作为历史备份、回退参考和历史任务排查入口。
 - scieval 在 2026-06-05 曾验证过 CPU task、CPU rjob 和 CPU 外网代理；这些结论是历史备份，不表示当前默认仍是 scieval。
