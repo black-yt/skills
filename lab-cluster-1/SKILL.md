@@ -11,9 +11,9 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 | --- | --- | --- | --- | --- |
 | 1 | 概括开发机、CPU/GPU worker 和 rjob 的安全边界，列出禁止修改共享环境/conda/配置、不要在开发机跑重任务、必须使用原始 rlaunch/rjob、当前实测状态和提交前检查。 | lab cluster、dev host、rlaunch worker、rjob、CPU/GPU、environment safety、conda、shared config、raw commands、tested status、storage limit、no secrets | 触发本 skill 后默认读取；接触开发机/worker/rjob 前；准备跑测试、训练、部署、联网或改环境前；不确定某个操作是否会影响共享环境时读取 | `SKILL.md` |
 | 2 | 说明交互式 SSH 工作流和远端文件编辑边界，覆盖优先使用 `ailab-llmagent.ws` 开发机入口、保留 `ailab-ai4sdata.ws` 历史/备用入口、域名不可用时的备用 IP 登录、后台持续终端、keepalive/TTY 参数、个人项目路径、代码/数据存放、标准 unified diff + `git apply`、`perl`/`sed` 小替换、`scp` 传输和临时文件清理。 | SSH、interactive shell、ailab-llmagent.ws、ailab-ai4sdata.ws、keepalive、`ssh -tt`、ServerAliveInterval、domain fallback、10.102.254.2、remote editing、project path、storage path、`git apply --check`、unified diff、`perl -0pi`、`sed -i`、`scp`、tmp cleanup、remote git repo | 登录开发机前；域名 SSH 连接失败或解析异常时；需要长时间交互式 SSH、远端编辑文件或跟踪日志前；本地工具无法直接改远端文件时；准备传输文件、应用 patch、小范围替换、清理临时文件或确认远端路径边界时必须读取 | [references/remote-access-and-editing.md](references/remote-access-and-editing.md) |
-| 3 | 记录网络和存储资源规则，覆盖开发机/CPU/GPU 节点联网差异、代理启停、`no_proxy`、公共模型/软件目录、Hugging Face cache 格式转标准模型目录、大文件放置、缓存控制、ai4sdata/scieval 当前资源状态和历史可用性。 | proxy、network、`setup_proxy.sh`、`no_proxy`、CPU internet、GPU no internet、shared storage、model weights、HuggingFace cache、`models--Org--Model`、`refs`、`snapshots`、standard checkpoint、large files、ai4sdata、scieval、partition status | 需要联网下载/访问 API 前；CPU/GPU 节点网络行为不确定时；选择分区前；查模型权重/公共软件路径前；发现模型目录是 Hugging Face hub cache 而不是标准 ckpt 目录时；放置大文件、缓存或排查代理/407/timeout 问题时必须读取 | [references/network-storage-resources.md](references/network-storage-resources.md) |
-| 4 | 给出交互式 `rlaunch` CPU/GPU worker 的原始命令模板，包含资源配比、scieval/ai4sdata 分区差异、mount、启动后检查、联网测试、GPU 检查和 worker 释放边界。 | `rlaunch`、interactive worker、CPU worker、GPU worker、resource ratio、mount、namespace、charged group、`nvidia-smi`、proxy test、worker cleanup、scieval CPU | 需要启动临时 CPU/GPU worker 前；需要交互式测试、短任务、临时服务或资源预测时；排查 worker 资源、挂载、联网、GPU 可见性或分区参数时必须读取 | [references/rlaunch-workers.md](references/rlaunch-workers.md) |
-| 5 | 提供正式 `rjob` CPU/GPU 作业模板和排错规则，覆盖 submit/query/logs/delete、CPU task/GPU job、脚本初始化、CUDA_HOME/CUDA_PATH/CUDACXX、conda 恢复、host-network、代理联网、1/2 GPU 资源模板、rjob/replica 结构化查询、GPU 卡位巡检，以及 rjob 任务层信息与网页监控层信息的边界。 | `rjob submit`、CPU task、GPU job、logs、delete、events、replica、CRD、status.phase、Inqueue、GPU slot、creator、pod mapping、monitoring separation、CUDA_HOME、CUDA_PATH、CUDACXX、worker_init、conda env、host-network、proxy、namespace、resource template | 提交正式训练/部署/评测任务前；写 rjob runner 前；查询/删除/看日志前；巡检 GPU 卡位、排队任务、成员占用或排队原因前；需要把 rjob/replica 与 GPU 利用率/显存/功率等监控数据合并前；配置 CUDA/conda/代理/host-network 前；排查 job Pending/Starting/Inqueue/OOM/联网失败时必须读取 | [references/rjob-tasks.md](references/rjob-tasks.md) |
+| 3 | 记录网络和存储资源规则，覆盖开发机/CPU/GPU 节点联网差异、代理启停、`no_proxy`、公共模型/软件目录、Hugging Face cache 格式转标准模型目录、大文件放置、缓存控制、当前 `llmagent` 分区与历史 ai4sdata/scieval 备份模板。 | proxy、network、`setup_proxy.sh`、`no_proxy`、CPU internet、GPU no internet、shared storage、model weights、HuggingFace cache、`models--Org--Model`、`refs`、`snapshots`、standard checkpoint、large files、llmagent、llmagent_cpu_task、ai4sdata、scieval、partition status、legacy backup | 需要联网下载/访问 API 前；CPU/GPU 节点网络行为不确定时；选择分区前；查模型权重/公共软件路径前；发现模型目录是 Hugging Face hub cache 而不是标准 ckpt 目录时；放置大文件、缓存或排查代理/407/timeout 问题时必须读取 | [references/network-storage-resources.md](references/network-storage-resources.md) |
+| 4 | 给出交互式 `rlaunch` CPU/GPU worker 的原始命令模板，包含当前 `llmagent`/`llmagent_cpu_task` 资源配比、历史 scieval/ai4sdata 备份模板、mount、启动后检查、联网测试、GPU 检查和 worker 释放边界。 | `rlaunch`、interactive worker、CPU worker、GPU worker、resource ratio、mount、namespace、charged group、`nvidia-smi`、proxy test、worker cleanup、llmagent、llmagent_cpu_task、ai4sdata、scieval、legacy backup | 需要启动临时 CPU/GPU worker 前；需要交互式测试、短任务、临时服务或资源预测时；排查 worker 资源、挂载、联网、GPU 可见性或分区参数时必须读取 | [references/rlaunch-workers.md](references/rlaunch-workers.md) |
+| 5 | 提供正式 `rjob` CPU/GPU 作业模板和排错规则，覆盖当前 `llmagent`/`llmagent_cpu_task` submit/query/logs/delete、历史 ai4sdata/scieval 备份模板、脚本初始化、CUDA_HOME/CUDA_PATH/CUDACXX、conda 恢复、host-network、代理联网、1/2 GPU 资源模板、rjob/replica 结构化查询、GPU 卡位巡检，以及 rjob 任务层信息与网页监控层信息的边界。 | `rjob submit`、CPU task、GPU job、logs、delete、events、replica、CRD、status.phase、Inqueue、GPU slot、creator、pod mapping、monitoring separation、CUDA_HOME、CUDA_PATH、CUDACXX、worker_init、conda env、host-network、proxy、namespace、resource template、llmagent、llmagent_cpu_task、ai4sdata、scieval、legacy backup | 提交正式训练/部署/评测任务前；写 rjob runner 前；查询/删除/看日志前；巡检 GPU 卡位、排队任务、成员占用或排队原因前；需要把 rjob/replica 与 GPU 利用率/显存/功率等监控数据合并前；配置 CUDA/conda/代理/host-network 前；排查 job Pending/Starting/Inqueue/OOM/联网失败时必须读取 | [references/rjob-tasks.md](references/rjob-tasks.md) |
 | 6 | 说明集群内网服务部署和本地访问链路，覆盖从 job 日志读取服务 IP/端口、设置 `no_proxy`、CPU/GPU 协作、KAPI 访问、任意内网服务的 SSH local port forwarding 和本地 OpenAI SDK/curl 验证。 | service deployment、internal IP、job logs、`SERVICE_IP`、`no_proxy`、CPU/GPU collaboration、KAPI、SSH local port forwarding、`ssh -L`、OpenAI SDK、curl `/v1/models`、private service | 部署模型/API/HTTP 服务后；需要从开发机/CPU worker/本地访问内网服务时；rjob 重启导致 IP 变化时；做多节点协作、端口转发、OpenAI SDK 验证或排查本地直连超时时必须读取 | [references/service-deployment-and-collaboration.md](references/service-deployment-and-collaboration.md) |
 | 7 | 提供 Hugging Face hub cache 到标准模型目录的离线转换脚本，读取 `refs/<revision>` 与 `snapshots/<commit>`，把 snapshot 中的 symlink 解引用为硬链接或普通文件，输出可作为 `MODEL_PATH` 的目录。 | `hf_cache_to_model_dir.py`、Hugging Face hub cache、`models--Org--Model`、`refs/main`、`snapshots/<commit>`、symlink、hardlink、copy、`MODEL_PATH`、vLLM、Transformers、dry-run、overwrite | 公共模型路径只有 `blobs/refs/snapshots` 而没有根目录 `config.json` 时；vLLM/Transformers 不能直接读取 cache 顶层目录时；需要把公共 cache 转到大模型目录并避免重复下载时；执行大文件转换前做 dry-run 或检查 hardlink/copy 行为时必须读取 | [scripts/hf_cache_to_model_dir.py](scripts/hf_cache_to_model_dir.py) |
 
@@ -24,7 +24,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 - 远端文件编辑：本地编辑工具边界、后台持久 SSH、标准 unified diff + `git apply`、远端编辑器、`sed`/`perl` 小替换、`scp` 传输替换和清理。
 - 网络代理：开发机、CPU worker、CPU rjob、GPU 节点、私网服务和 OpenAI 相关代理边界。
 - 模型权重：公共 HuggingFace 目录、大模型保存目录、cache 格式转标准模型目录、查找和迁移前检查。
-- 资源任务：CPU/GPU 资源公式、ai4sdata/scieval 当前可用性、scieval CPU task、GPU/CPU `rlaunch`、`rjob`、日志和清理。
+- 资源任务：CPU/GPU 资源公式、当前 `llmagent`/`llmagent_cpu_task` 默认模板、ai4sdata/scieval 历史备份模板、GPU/CPU `rlaunch`、`rjob`、日志和清理。
 - 服务协作：host-network、KAPI、GPU 服务 + CPU 评测、多 worker 协作和排错。
 
 ## 核心原则
@@ -59,7 +59,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 
 ## 实测状态
 
-以下结果包含 2026-05-20 实测、2026-05-22 更新和 2026-06-05 scieval CPU task 更新。不要把“已提交但未调度运行”的 GPU 功能描述成已完整跑通。
+以下结果包含 2026-05-20 实测、2026-05-22 更新、2026-06-05 scieval CPU task 更新和 2026-08-11 llmagent 分区切换记录。2026-08-11 的 llmagent 切换是当前使用约束记录，不等同于本轮重新实测所有模板；不要把“已提交但未调度运行”的 GPU 功能描述成已完整跑通。
 
 已完整跑通：
 
@@ -69,7 +69,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 - 远端 git patch 流程：在项目根目录下创建临时 git repo，生成 `.tmp/change.patch`，执行 `git apply --check` 和 `git apply`，内容验证通过，随后删除 patch、`.tmp` 和整个临时测试目录，清理检查通过。
 - `scp` 传输流程：本地创建小测试文件，`scp` 到远端个人项目根目录，远端 `grep` 验证后删除远端测试文件，本地测试文件也已删除，清理检查通过。
 - `rlaunch --help`、`rjob submit --help`。`rjob` 在非交互 shell 中需要先执行 `source /etc/profile.d/ssh-init.sh 2>/dev/null || true`。
-- `rlaunch` CPU worker：2026-06-05 使用 `scieval_cpu_task` + `--namespace=ailab-scieval` 申请 4 CPU 成功，调度到 `lg-cmc-h-cpu-0084.host.h.pjlab.org.cn`，worker 内 `nproc=4`，四个共享挂载检查通过，worker 自动退出并删除 podGroup。历史上 ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU 也曾跑通；2026-06-05 当前不要把 ai4sdata 当默认可用分区。
+- `rlaunch` CPU worker：2026-06-05 使用 `scieval_cpu_task` + `--namespace=ailab-scieval` 申请 4 CPU 成功，调度到 `lg-cmc-h-cpu-0084.host.h.pjlab.org.cn`，worker 内 `nproc=4`，四个共享挂载检查通过，worker 自动退出并删除 podGroup。历史上 ai4sdata 4 CPU、ai4sdata 8 CPU、scieval 8 CPU 也曾跑通；2026-06-05 当时不要把 ai4sdata 当默认可用分区。
 - `rlaunch` CPU worker 外网代理：2026-06-05 在 scieval 4 CPU worker 内执行 `source /jobutils/scripts/worker_init.sh`、`source <(curl ...setup_proxy.sh)`，`curl -I -L https://www.google.com` 返回 `HTTP/1.0 200 OK` 和 `HTTP/2 200`，`wget --spider` 返回 `200 OK`。
 - `rjob` CPU 短任务：2026-06-05 使用 `scieval_cpu_task` + `--namespace=ailab-scieval` 提交 1 CPU 最小任务成功，调度到 `lg-cmc-h-cpu-0065.host.h.pjlab.org.cn`，任务状态 `Succeeded`，日志包含 `nproc=1`、`mount_xuwanghan_ok` 和 `scieval_cpu_rjob_done`，测试 job 已删除。2026-05 ai4sdata CPU rjob 也曾跑通；2026-06-05 当前 ai4sdata 没有 CPU/GPU 可用资源，因此 ai4sdata CPU rjob 模板只作为历史已验证模板保留。
 - `rjob` CPU 外网代理：2026-06-05 scieval CPU rjob 使用 `--host-network=false`，job 启动后 `sleep 5`，再执行 `setup_proxy.sh`，`curl -I -L https://www.google.com` 返回 `HTTP/1.0 200 OK` 和 `HTTP/2 200`，`wget --spider` 返回 `200 OK`，测试 job 已删除。2026-05 ai4sdata CPU rjob 外网代理也曾跑通，测试 job `codex-skill-cpu-net-nohost-1779424506` 保留给运维排查；2026-06-05 当前 ai4sdata 无 CPU 资源时只作为历史验证结果。
@@ -81,17 +81,17 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 
 当前不可用或未完整跑通：
 
+- 2026-08-11 起，`rjob` 和 `rlaunch` 的默认提交目标切到 `llmagent` / `llmagent_cpu_task`。`ai4sdata` 和 `scieval` 不再作为当前默认分区；旧命令模板必须保留为历史备份，只有用户明确要求回退、资源恢复或需要排查历史任务时再使用。
 - `rlaunch` GPU worker：ai4sdata 1 GPU、ai4sdata 2 GPU、scieval 1 GPU 都可执行调度命令，但当前资源不足或 pending unschedulable，未进入 GPU worker。
-- 2026-06-05 当前 ai4sdata 分区没有 CPU/GPU 可用资源；不要把 ai4sdata 作为默认提交目标。需要 CPU worker 时优先使用已实测的 scieval CPU task；GPU 资源仍需按实际分区状态先 predict-only 或短任务验证。
+- 2026-06-05 历史记录：当时 ai4sdata 分区没有 CPU/GPU 可用资源，CPU worker 临时优先使用已实测的 scieval CPU task。2026-08-11 后 ai4sdata/scieval 都不再作为当前默认分区；GPU 资源仍需按实际分区状态先 predict-only 或短任务验证。
 
 关键边界：
 
 - CPU rjob 外网任务使用 `--host-network=false`。`--host-network=true` 下代理访问外网返回 `407 Proxy Authentication Required`，不要用于 CPU rjob 外网任务。
-- 2026-06-05 当前 `rlaunch` CPU worker 优先使用 `scieval_cpu_task` + `--namespace=ailab-scieval`。
-- 2026-06-05 当前 CPU rjob 优先使用 `scieval_cpu_task` + `--namespace=ailab-scieval`；查询、日志和删除时使用 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
-- CPU rjob 的 ai4sdata 模板是历史已验证模板；2026-06-05 当前 ai4sdata 无 CPU/GPU 资源时不要直接提交。
-- GPU rjob 历史上 ai4sdata/scieval 都跑通过；2026-06-05 当前 ai4sdata 无 GPU 资源时不要直接提交 ai4sdata GPU job，先按实际分区状态验证。
-- ai4sdata 的 CPU/GPU 命令模板不要删除；它们是 2026-05 已验证模板。后续如果 ai4sdata 资源恢复，先做 predict-only、最小短任务和日志检查，再恢复为默认提交目标。
+- 2026-08-11 当前 `rlaunch` CPU worker 优先使用 `llmagent_cpu_task` + `--namespace=ailab-llmagent`。
+- 2026-08-11 当前 CPU rjob 优先使用 `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除时使用 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。
+- 2026-08-11 当前 GPU `rlaunch`/`rjob` 优先使用 `llmagent` + `--namespace=ailab-llmagent`；正式使用前先做 predict-only、dry-run 或最小短任务验证。
+- CPU/GPU 的 ai4sdata 和 scieval 模板都是历史备份模板；不要删除。后续如果这些分区恢复或用户要求回退，先做 predict-only、dry-run、最小短任务和日志检查，再恢复为默认提交目标。
 
 ## 提交前检查
 
@@ -99,7 +99,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 - 任务是否真的需要 GPU；能用 CPU 解决的联网任务不要占 GPU。
 - 是短测试还是正式任务；短测试用 `rlaunch`，正式任务用 `rjob submit`。
 - GPU 数是否和 CPU/memory 匹配。
-- 分区是否正确：2026-06-05 当前 rlaunch CPU worker 和 CPU rjob 都可使用 scieval `scieval_cpu_task` + `--namespace=ailab-scieval`；查询、日志和删除 scieval rjob 时加 `KUBEBRAIN_NAMESPACE=ailab-scieval`；ai4sdata CPU/GPU 当前不作为默认提交目标；GPU rjob 可用 ai4sdata 或 scieval，scieval 加 `--namespace=ailab-scieval`。
+- 分区是否正确：2026-08-11 当前 rlaunch/rjob 默认使用 `llmagent` / `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除 llmagent rjob 时加 `KUBEBRAIN_NAMESPACE=ailab-llmagent`；ai4sdata/scieval 只作为历史备份模板，不作为默认提交目标。
 - GPU 任务是否完全不依赖外网。
 - `command.sh` 是否位于共享存储，且没有硬编码 secret。
 - 代码、脚本和普通项目数据是否位于 `/mnt/shared-storage-user/xuwanghan/projects/<project>`。
@@ -118,7 +118,7 @@ description: "当需要在 lab cluster 1 / PJLAB 上使用开发机、rlaunch wo
 - `gpu: command not found` 或 `cpu: command not found`：不要修 `.bashrc`，直接使用本 skill 中的原始 `rlaunch` 命令。
 - 非交互 SSH 没加载 alias/function：这是正常现象。`.bashrc` 常见写法会在非交互 shell 中提前 return。
 - `rlaunch` 申请失败：先跑对应资源的 `rlaunch --predict-only`，再降低 CPU/memory/GPU 或换分区。
-- `unknown charged-group` 或 namespace 相关错误：核对分区矩阵；scieval 的 `rlaunch` CPU worker 和 CPU rjob 使用 `scieval_cpu_task` 且必须带 `--namespace=ailab-scieval`；scieval rjob 查询、日志和删除需要临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`；ai4sdata 通常不带 namespace，但 2026-06-05 当前无 CPU/GPU 可用资源。
+- `unknown charged-group` 或 namespace 相关错误：核对当前分区矩阵；2026-08-11 默认使用 `llmagent_cpu_task` 或 `llmagent` 且必须带 `--namespace=ailab-llmagent`；llmagent rjob 查询、日志和删除需要临时前缀 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。ai4sdata/scieval 是历史备份模板，只有用户确认回退或资源恢复后再按对应 namespace 使用。
 - GPU 节点下载失败：预期行为。改用 CPU worker 下载到共享存储，或提前准备镜像/环境。
 - GPU rjob 里 `flashinfer`、`ninja`、CUDA extension build、`nvcc not found`、`CUDA_HOME not set` 报错：不要只看开发机或 submit host 的 CUDA 路径。进入 rjob 日志或 worker 内检查 `echo "$CUDA_HOME"`、`echo "$CUDA_PATH"`、`echo "$CUDACXX"`、`test -x "$CUDACXX"`、`which nvcc`、`nvcc --version`。如果脚本 source 了 `/jobutils/scripts/worker_init.sh`，确认之后又恢复了 `CUDA_HOME`、`CUDA_PATH`、`CUDACXX`、`PATH` 和 conda env。
 - 外部 API 调用失败：确认任务是否在 CPU 节点；GPU 节点不可联网。

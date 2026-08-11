@@ -61,10 +61,26 @@ git fetch
 git push
 ```
 
-scieval 4 CPU worker 内代理和外网访问检查。2026-06-05 已实测通过，命令会自动退出，不留下空闲 worker：
+llmagent 4 CPU worker 内代理和外网访问检查。2026-08-11 当前默认使用 llmagent；命令会自动退出，不留下空闲 worker：
 
 ```bash
-# 2026-06-05: ai4sdata 当前无 CPU/GPU 可用资源；仅在资源恢复并短测后使用。
+rlaunch \
+  --cpu=4 \
+  --memory=16000 \
+  --charged-group=llmagent_cpu_task \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --max-wait-duration=5m \
+  -- bash -lc 'set -eo pipefail; echo worker_host=$(hostname); echo nproc=$(nproc); source /jobutils/scripts/worker_init.sh 2>/dev/null || true; source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh); export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147; export NO_PROXY=$no_proxy; env | grep -i "^http_proxy\|^https_proxy\|^no_proxy"; curl -I -L --max-time 30 https://www.google.com | sed -n "1,12p"; wget --spider --timeout=30 --tries=1 https://www.google.com; echo llmagent_cpu_network_ok'
+```
+
+scieval 4 CPU worker 内代理和外网访问检查，历史备份；2026-08-11 起不作为默认分区：
+
+```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 rlaunch \
   --cpu=4 \
   --memory=16000 \
@@ -255,24 +271,29 @@ memory  = 4000 * C
 
 | 场景 | 分区 | charged group | namespace | private machine |
 | --- | --- | --- | --- | --- |
-| rlaunch GPU / rjob GPU | ai4sdata | `ai4sdata_gpu` | 不加 | `group` |
-| rlaunch GPU / rjob GPU | scieval | `scieval_gpu` | `ailab-scieval` | `group` |
-| rlaunch CPU worker | ai4sdata | `ai4sdata_cpu_task` | 不加 | 不加 |
-| rlaunch CPU worker | scieval | `scieval_cpu_task` | `ailab-scieval` | 不加 |
-| rjob CPU | ai4sdata | `ai4sdata_cpu_task` | 不加 | 不加 |
-| rjob CPU | scieval | `scieval_cpu_task` | `ailab-scieval` | 不加 |
+| rlaunch GPU / rjob GPU | llmagent | `llmagent` | `ailab-llmagent` | `group` |
+| rlaunch CPU worker | llmagent | `llmagent_cpu_task` | `ailab-llmagent` | 不加 |
+| rjob CPU | llmagent | `llmagent_cpu_task` | `ailab-llmagent` | 不加 |
+| rlaunch GPU / rjob GPU | ai4sdata，历史备份 | `ai4sdata_gpu` | 不加 | `group` |
+| rlaunch GPU / rjob GPU | scieval，历史备份 | `scieval_gpu` | `ailab-scieval` | `group` |
+| rlaunch CPU worker | ai4sdata，历史备份 | `ai4sdata_cpu_task` | 不加 | 不加 |
+| rlaunch CPU worker | scieval，历史备份 | `scieval_cpu_task` | `ailab-scieval` | 不加 |
+| rjob CPU | ai4sdata，历史备份 | `ai4sdata_cpu_task` | 不加 | 不加 |
+| rjob CPU | scieval，历史备份 | `scieval_cpu_task` | `ailab-scieval` | 不加 |
 
 分区状态记录：
 
-| 日期 | ai4sdata | scieval | 默认选择 |
-| --- | --- | --- | --- |
-| 2026-05 | CPU rjob、GPU rjob 和相关模板已验证 | GPU rjob 已验证；CPU worker 历史上可用 | 按任务选择 ai4sdata 或 scieval |
-| 2026-06-05 | 当前没有 CPU/GPU 可用资源；模板保留为历史已验证配置 | `rlaunch` CPU worker、CPU rjob、CPU 外网代理已验证 | CPU 默认用 scieval；GPU 先按实际资源验证 |
+| 日期 | llmagent | ai4sdata | scieval | 默认选择 |
+| --- | --- | --- | --- | --- |
+| 2026-05 | 尚未作为默认分区记录 | CPU rjob、GPU rjob 和相关模板已验证 | GPU rjob 已验证；CPU worker 历史上可用 | 按任务选择 ai4sdata 或 scieval |
+| 2026-06-05 | 尚未作为默认分区记录 | 当时没有 CPU/GPU 可用资源；模板保留为历史已验证配置 | `rlaunch` CPU worker、CPU rjob、CPU 外网代理已验证 | 当时 CPU 默认用 scieval；GPU 先按实际资源验证 |
+| 2026-08-11 | 当前默认分区；GPU 使用 `llmagent`，CPU 使用 `llmagent_cpu_task`，namespace 使用 `ailab-llmagent` | 历史备份；不作为默认提交目标 | 历史备份；不作为默认提交目标 | 默认使用 llmagent；旧分区仅在用户确认回退、资源恢复或排查历史任务时使用 |
 
 当前使用边界：
 
-- ai4sdata 分区当前没有 CPU/GPU 可用资源，不作为默认提交目标；下面保留的 ai4sdata 命令只在资源恢复且用户确认后使用。
-- scieval 分区已增加 CPU task；`rlaunch` CPU worker 使用 `scieval_cpu_task` + `--namespace=ailab-scieval`，4 CPU 启动、挂载和外网代理均已实测通过。
-- scieval CPU rjob 使用 `scieval_cpu_task` + `--namespace=ailab-scieval`，1 CPU 最小任务已实测 `Succeeded`；查询、日志和删除时带 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
-- GPU rjob 历史上 ai4sdata/scieval 都跑通过；当前是否可调度仍要以 predict-only、短任务和调度器状态为准。
-- 保留 ai4sdata 模板是为了资源恢复时复用；恢复后仍必须先短测，不要直接按历史结果提交正式任务。
+- 2026-08-11 当前 `rlaunch` 和 `rjob` 默认使用 llmagent 体系：GPU 用 `llmagent`，CPU 用 `llmagent_cpu_task`，统一带 `--namespace=ailab-llmagent`。
+- llmagent rjob 查询、日志和删除时带 `KUBEBRAIN_NAMESPACE=ailab-llmagent`；不要拿 ai4sdata 或 scieval 的查询前缀直接查当前任务。
+- ai4sdata 分区和 scieval 分区当前不作为默认提交目标；下面保留的 ai4sdata/scieval 命令只作为历史备份、回退参考和历史任务排查入口。
+- scieval 在 2026-06-05 曾验证过 CPU task、CPU rjob 和 CPU 外网代理；这些结论是历史备份，不表示当前默认仍是 scieval。
+- GPU rjob 历史上 ai4sdata/scieval 都跑通过；当前默认改用 llmagent 后，正式训练或部署前仍要以 predict-only、dry-run、最小短任务和调度器状态为准。
+- 保留 ai4sdata/scieval 模板是为了资源恢复或用户要求回退时复用；恢复后仍必须先短测，不要直接按历史结果提交正式任务。

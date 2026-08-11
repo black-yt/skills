@@ -2,11 +2,32 @@
 
 ## 服务部署模式
 
-host-network 服务访问模式：job 内启动 HTTP 服务，开发机访问日志中的内网 IP 和端口。下面是 2026-05 ai4sdata CPU rjob 已跑通的历史模板；2026-06-05 当前 ai4sdata 无 CPU 资源时不要直接提交。scieval CPU rjob 基础任务和外网代理已实测，但 host-network 服务模式尚未在 scieval 上重测，需要另行短任务验证。
+host-network 服务访问模式：job 内启动 HTTP 服务，开发机访问日志中的内网 IP 和端口。2026-08-11 当前默认使用 llmagent CPU rjob；旧 ai4sdata/scieval 服务模板只作为历史备份或回退参考，使用前必须重新短测。
+
+```bash
+JOB=codex-skill-http-service-llmagent-$(date +%s)
+rjob submit --name "$JOB" \
+  -P 1 \
+  --cpu=1 \
+  --memory=4000 \
+  --charged-group=llmagent_cpu_task \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -- bash -lc 'IP=$(hostname -I | awk "{print \$1}"); echo SERVICE_IP=$IP; SERVE_DIR="/mnt/shared-storage-user/xuwanghan/projects/.tmp/$JOB-http"; mkdir -p "$SERVE_DIR"; echo codex_service_ok > "$SERVE_DIR/index.html"; cd "$SERVE_DIR"; python3 -m http.server 18081 --bind 0.0.0.0 & pid=$!; echo SERVICE_READY; sleep 180; kill $pid 2>/dev/null || true; cd /; rm -rf "$SERVE_DIR"'
+sleep 20
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob get "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob logs job "$JOB" --tail-lines 40
+curl --max-time 10 http://<SERVICE_IP_FROM_LOGS>:18081/
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob delete "$JOB"
+```
+
+ai4sdata host-network 服务模板，历史备份；2026-08-11 起不作为默认模板：
 
 ```bash
 # 2026-06-05: ai4sdata 当前无 CPU 可用资源；这是 2026-05 已跑通的历史模板。
-JOB=codex-skill-http-service-real-$(date +%s)
+JOB=codex-skill-http-service-ai4sdata-$(date +%s)
 rjob submit --name "$JOB" \
   -P 1 \
   --cpu=1 \
@@ -172,7 +193,7 @@ from openai import OpenAI
 
 api_key = "EMPTY"
 worker_id = "<worker-id>"
-partition = "ai4sdata"  # or "scieval"
+partition = "llmagent"  # 2026-08-11 current default; legacy backups: "ai4sdata" or "scieval"
 port = 8000
 url = f"https://h.pjlab.org.cn/kapi/workspace.kubebrain.io/ailab-{partition}/{worker_id}.xuwanghan/{port}/v1"
 

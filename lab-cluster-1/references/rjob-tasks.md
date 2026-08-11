@@ -17,12 +17,28 @@
 5. 先用 `rjob submit --dry-run true ...` 做语法和资源字段检查；确认无误后去掉 `--dry-run true` 正式提交。
 6. 用 `rjob submit ... -- bash command.sh` 提交。
 7. 提交后记录 job name、job id、worker id 或服务 IP；只摘录必要日志，不复制 secret。
-8. 2026-06-05 当前 CPU rjob 优先使用 scieval `scieval_cpu_task` + `--namespace=ailab-scieval`；查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`。ai4sdata CPU rjob 模板是历史已验证模板，当前 ai4sdata 无 CPU/GPU 资源时不要直接提交。GPU rjob 可使用 ai4sdata 或 scieval；scieval GPU job 的查询、日志和删除同样使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-scieval`。
+8. 2026-08-11 当前 rjob 默认使用 `llmagent` / `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除使用临时前缀 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。ai4sdata/scieval 模板是历史备份模板，不要删除；只有用户明确要求回退、资源恢复或排查历史任务时再使用。
 
-最小 dry-run，用于生成并检查 YAML。2026-06-05 当前 CPU rjob 默认使用 scieval：
+最小 dry-run，用于生成并检查 YAML。2026-08-11 当前 CPU rjob 默认使用 llmagent：
 
 ```bash
-# 2026-06-05: ai4sdata 当前无 CPU/GPU 可用资源；仅在资源恢复并短测后使用。
+rjob submit --dry-run true \
+  --name codex-skill-dryrun \
+  -P 1 \
+  --cpu=1 \
+  --memory=4000 \
+  --charged-group=llmagent_cpu_task \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=false \
+  -- bash -lc "echo dryrun"
+```
+
+scieval CPU 最小 dry-run，历史备份；2026-08-11 起不作为默认模板：
+
+```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 rjob submit --dry-run true \
   --name codex-skill-dryrun \
   -P 1 \
@@ -76,7 +92,7 @@ KUBEBRAIN_NAMESPACE=<namespace> rjob events <job-name>
 KUBEBRAIN_NAMESPACE=<namespace> rjob logs job <job-name> --tail-lines 100
 ```
 
-scieval 的 namespace 通常是 `ailab-scieval`。ai4sdata 通常不需要 namespace 前缀；如果某个命令查不到任务，先核对任务实际提交的 namespace 和 charged group。
+llmagent 的 namespace 通常是 `ailab-llmagent`，scieval 历史备份 namespace 通常是 `ailab-scieval`。ai4sdata 历史备份通常不需要 namespace 前缀；如果某个命令查不到任务，先核对任务实际提交的 namespace 和 charged group。
 
 数据源要分层，不要把 `rjob` 信息和网页监控信息混成一个来源：
 
@@ -315,11 +331,33 @@ GPU 总卡数
 
 ## rjob CPU 任务
 
-2026-06-05 当前 CPU rjob 默认使用 scieval。scieval CPU rjob 已实测提交、运行、日志读取和删除链路；查询、日志和删除必须带 `KUBEBRAIN_NAMESPACE=ailab-scieval`。ai4sdata CPU rjob 模板保留为 2026-05 历史已验证模板，当前 ai4sdata 没有 CPU/GPU 可用资源时不要直接提交。
+2026-08-11 当前 CPU rjob 默认使用 llmagent。提交使用 `llmagent_cpu_task` + `--namespace=ailab-llmagent`；查询、日志和删除必须带 `KUBEBRAIN_NAMESPACE=ailab-llmagent`。scieval CPU rjob 是 2026-06-05 已实测的历史备份模板；ai4sdata CPU rjob 是 2026-05 历史已验证模板；旧模板都不要删除，但当前不作为默认提交目标。
 
-scieval CPU rjob 最小任务，当前默认模板：
+llmagent CPU rjob 最小任务，当前默认模板：
 
 ```bash
+JOB=codex-skill-cpu-llmagent-real-$(date +%s)
+rjob submit --name "$JOB" \
+  -P 1 \
+  --cpu=1 \
+  --memory=4000 \
+  --charged-group=llmagent_cpu_task \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=false \
+  -- bash -lc 'set -eo pipefail; echo llmagent_cpu_rjob_start; hostname; echo nproc=$(nproc); test -d /mnt/shared-storage-user/xuwanghan && echo mount_xuwanghan_ok; sleep 10; echo llmagent_cpu_rjob_done'
+
+sleep 90
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob get "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob logs job "$JOB" --tail-lines 100
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob delete "$JOB"
+```
+
+scieval CPU rjob 最小任务，历史备份；2026-08-11 起不作为默认模板：
+
+```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 JOB=codex-skill-cpu-scieval-real-$(date +%s)
 rjob submit --name "$JOB" \
   -P 1 \
@@ -377,9 +415,30 @@ rjob submit --dry-run true \
   -- bash command.sh
 ```
 
-CPU rjob 外网代理必须使用 `--host-network=false`，并先用短任务验证。下面是 2026-06-05 scieval CPU rjob 已跑通的模板；跑到 `HTTP/2 200`、`HTTP/1.1 200` 或 `scieval_cpu_network_rjob_done` 明确出现后，才能继续正式联网任务。
+CPU rjob 外网代理必须使用 `--host-network=false`，并先用短任务验证。下面是当前 llmagent CPU rjob 模板；跑到 `HTTP/2 200`、`HTTP/1.1 200` 或 `llmagent_cpu_network_rjob_done` 明确出现后，才能继续正式联网任务。
 
 ```bash
+JOB=codex-skill-cpu-llmagent-net-$(date +%s)
+rjob submit --name "$JOB" \
+  -P 1 \
+  --cpu=1 \
+  --memory=4000 \
+  --charged-group=llmagent_cpu_task \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=false \
+  -- bash -lc 'set -eo pipefail; echo llmagent_cpu_network_rjob_start; sleep 5; source /jobutils/scripts/worker_init.sh 2>/dev/null || true; unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY ftp_proxy all_proxy ALL_PROXY; source <(curl -sSL http://deploy.i.h.pjlab.org.cn/infra/scripts/setup_proxy.sh); export no_proxy=10.140.158.153,100.100.125.235,10.0.0.0/8,100.96.0.0/12,0.0.0.0,127.0.0.1,localhost,10.140.213.96,10.140.213.145,.pjlab.org.cn,10.140.14.204,10.140.2.204,10.140.31.254,10.140.14.254,p-ceph-norm-outside.pjlab.org.cn,p-ceph-norm-inside.pjlab.org.cn,10.140.97.32,10.140.96.147; export NO_PROXY=$no_proxy; env | grep -i "^http_proxy\|^https_proxy\|^no_proxy"; curl -I -L --max-time 30 https://www.google.com | sed -n "1,12p"; wget --spider --timeout=30 --tries=1 https://www.google.com; echo llmagent_cpu_network_rjob_done'
+sleep 110
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob get "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob logs job "$JOB" --tail-lines 140
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob delete "$JOB"
+```
+
+scieval CPU rjob 外网代理，历史备份；2026-08-11 起不作为默认模板：
+
+```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 JOB=codex-skill-cpu-scieval-net-$(date +%s)
 rjob submit --name "$JOB" \
   -P 1 \
@@ -423,7 +482,31 @@ rjob delete "$JOB"
 
 1 张 GPU 可以用。资源公式是 `--gpu=1 --cpu=22 --memory=230000`。
 
+2026-08-11 当前 GPU rjob 默认使用 `llmagent` + `--namespace=ailab-llmagent`。ai4sdata/scieval 的 GPU 模板作为历史备份保留，不要删除。
+
 增量备注：有用户反馈 scieval 2 GPU 训练在一些场景下不能加 `--host-network=true`。下面历史模板里的 `--host-network=true` 行先保留，不做全局替换；正式训练前按当前任务做 `--dry-run true` 和最小短任务验证。如果 scieval 2 GPU 训练出现调度、网络或容器启动异常，优先尝试去掉 `--host-network=true`，并记录本次任务实际可用的提交参数。
+
+llmagent 1 GPU dry-run 模板，当前默认：
+
+```bash
+rjob submit --dry-run true \
+  --name=xxxxx \
+  -P 1 \
+  --gpu=1 \
+  --memory=230000 \
+  --cpu=22 \
+  --charged-group=llmagent \
+  --private-machine=group \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -e DISTRIBUTED_JOB=true \
+  -- bash command.sh
+```
 
 ai4sdata 1 GPU dry-run 模板，历史模板；2026-06-05 当前 ai4sdata 无 CPU/GPU 资源时不要作为默认模板：
 
@@ -447,9 +530,10 @@ rjob submit --dry-run true \
   -- bash command.sh
 ```
 
-scieval 1 GPU dry-run 模板：
+scieval 1 GPU dry-run 模板，历史备份；2026-08-11 起不作为默认模板：
 
 ```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 rjob submit --dry-run true \
   --name=xxxxx \
   -P 1 \
@@ -467,6 +551,31 @@ rjob submit --dry-run true \
   --host-network=true \
   -e DISTRIBUTED_JOB=true \
   -- bash command.sh
+```
+
+llmagent GPU rjob，当前默认：
+
+```bash
+JOB=codex-skill-gpu-llmagent-real-$(date +%s)
+rjob submit --name "$JOB" \
+  -P 1 \
+  --gpu=2 \
+  --memory=460000 \
+  --cpu=44 \
+  --charged-group=llmagent \
+  --private-machine=group \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -e DISTRIBUTED_JOB=true \
+  -- bash -lc 'echo gpu_rjob_start; hostname; nvidia-smi -L; echo gpu_rjob_done'
+sleep 20
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob get "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob delete "$JOB"
 ```
 
 ai4sdata GPU rjob，历史模板；2026-06-05 当前 ai4sdata 无 CPU/GPU 资源时不要直接提交：
@@ -494,9 +603,10 @@ rjob get "$JOB"
 rjob delete "$JOB"
 ```
 
-scieval GPU rjob：
+scieval GPU rjob，历史备份；2026-08-11 起不作为默认模板：
 
 ```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 JOB=codex-skill-gpu-scieval-real-$(date +%s)
 rjob submit --name "$JOB" \
   -P 1 \
@@ -521,6 +631,28 @@ KUBEBRAIN_NAMESPACE=ailab-scieval rjob delete "$JOB"
 
 常规 GPU 模板。正式训练或部署时，把最后一行改为 `-- bash command.sh`，并确保 `command.sh` 已放在共享存储中；需要检查语法时保留 `--dry-run true`。
 
+llmagent GPU 模板，当前默认：
+
+```bash
+rjob submit --dry-run true \
+  --name=xxxxx \
+  -P 1 \
+  --gpu=2 \
+  --memory=460000 \
+  --cpu=44 \
+  --charged-group=llmagent \
+  --private-machine=group \
+  --namespace=ailab-llmagent \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --mount=gpfs://gpfs1/sciprismax:/mnt/shared-storage-user/sciprismax \
+  --mount=gpfs://gpfs2/gpfs2-shared-public:/mnt/shared-storage-gpfs2/gpfs2-shared-public \
+  --mount=gpfs://gpfs2/sciprismax2:/mnt/shared-storage-gpfs2/sciprismax2 \
+  --image=registry.h.pjlab.org.cn/ailab/ml-base:22.04-pjlab \
+  --host-network=true \
+  -e DISTRIBUTED_JOB=true \
+  -- bash command.sh
+```
+
 ai4sdata GPU 模板，历史模板；2026-06-05 当前 ai4sdata 无 CPU/GPU 资源时不要作为默认模板：
 
 ```bash
@@ -543,9 +675,10 @@ rjob submit --dry-run true \
   -- bash command.sh
 ```
 
-scieval GPU 模板：
+scieval GPU 模板，历史备份；2026-08-11 起不作为默认模板：
 
 ```bash
+# 2026-08-11: scieval 不再作为当前默认分区；仅在用户确认回退或资源恢复并短测后使用。
 rjob submit --dry-run true \
   --name=xxxxx \
   -P 1 \
