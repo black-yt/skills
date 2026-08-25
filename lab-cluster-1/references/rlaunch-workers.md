@@ -5,6 +5,9 @@
 先在开发机交互 shell 中检查。只做资源预测时不会启动 worker：
 
 ```bash
+# 只查看当前 CPU task 分区的 CPU 和存储剩余，不申请具体 worker。
+rlaunch --charged-group=llmagent_cpu_task --predict-only
+
 # 2026-08-11 当前默认 CPU/GPU worker 检查。
 rlaunch --cpu=4 --memory=16000 --charged-group=llmagent_cpu_task --namespace=ailab-llmagent --predict-only
 rlaunch --cpu=8 --memory=32000 --charged-group=llmagent_cpu_task --namespace=ailab-llmagent --predict-only
@@ -23,7 +26,7 @@ rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=ai4sdata_gpu --private-
 rlaunch --gpu=1 --cpu=22 --memory=230000 --charged-group=scieval_gpu --private-machine=group --namespace=ailab-scieval --predict-only
 ```
 
-先用预测命令看调度结果；如果 GPU 返回资源不足或不可调度，不要循环提交或长期占用开发机轮询。
+`rlaunch --charged-group=llmagent_cpu_task --predict-only` 用于快速查看 CPU task 分区整体剩余 CPU 和存储资源；带 `--cpu` / `--memory` / `--gpu` 的 predict-only 用于判断某个具体资源申请能否调度。先用预测命令看调度结果；如果 GPU 返回资源不足或不可调度，不要循环提交或长期占用开发机轮询。
 
 ## rlaunch CPU Worker
 
