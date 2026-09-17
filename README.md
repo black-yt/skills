@@ -35,6 +35,7 @@ skill-name/
 | `markdown-to-docx` | [`markdown-to-docx/SKILL.md`](markdown-to-docx/SKILL.md) | 使用 [`scripts/build_docx.py`](markdown-to-docx/scripts/build_docx.py) 将 Markdown 文档转为 Word `.docx`，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
 | `overleaf-project-sync` | [`overleaf-project-sync/SKILL.md`](overleaf-project-sync/SKILL.md) | 从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。 |
+| `paper-figure-style-1` | [`paper-figure-style-1/SKILL.md`](paper-figure-style-1/SKILL.md) | 绘制浅桃紫渐变风格的论文流程图与统计图，覆盖柱状图、区间曲线、Pareto 散点、横条矩阵、训练仪表盘和双环图；包含可复用 Python 组件、17 个独立示例、10 款模型 logo 及文字可复制的 PDF 输出。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
 | `rebuttal-writing` | [`rebuttal-writing/SKILL.md`](rebuttal-writing/SKILL.md) | 撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名性、开头感谢、问题弱化改写、Markdown Q&A、强证据回答、小表格、引用和礼貌结尾。 |

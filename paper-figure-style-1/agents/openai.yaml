@@ -1,0 +1,4 @@
+interface:
+  display_name: "论文绘图风格 1"
+  short_description: "绘制浅桃紫渐变风格的论文流程图、统计图与多面板结果图，保留 PDF 可复制文字"
+  default_prompt: "使用 $paper-figure-style-1 将我的方法或实验数据绘制成浅桃紫渐变风格的矢量 PDF，保留可复制文字。"
