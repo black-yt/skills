@@ -2,7 +2,7 @@
 
 ## 先看什么
 
-先运行示例，再打开 `outputs/examples.pdf` 查看 17 页成品。每页对应一个完整的新用户需求，无需阅读参考论文，也不需要原图作输入。统计示例在页脚明确标注虚构演示数据，区间不是计算得到的置信区间。
+先查看 [skill 入口的 8 张效果预览](../SKILL.md#效果预览)，无需安装依赖即可了解输出质量。运行示例后可打开 `outputs/examples.pdf` 查看全部 17 页成品。每页对应一个完整的新用户需求，无需阅读参考论文，也不需要原图作输入。统计示例在页脚明确标注虚构演示数据，区间不是计算得到的置信区间。
 
 | 场景 | 模拟用户需求 | 代码 | 输出 |
 | --- | --- | --- | --- |
@@ -63,7 +63,38 @@
 - **保留可编辑性**：`--book` 用 PDF 页合并生成合集，不是将页面截图后拼接。
 - **分组**：`diagrams` 含七个方法/系统示例，`statistics` 含十个统计示例，`extension` 含十二个扩展示例，`all` 含全部十七例。`--examples` 和 `--group` 二选一；不指定时生成全部。
 - **合集命名**：`--book-name` 只接受 `.pdf` 文件名，不能包含目录或与本批单页文件重名；输出位置使用 `--output-dir` 控制。
-- **生成物目录**：示例 PDF、预览与验证报告都在 `outputs/` 下，由 `.gitignore` 排除；分发时保留代码、`assets/` 内的 logo、依赖和参考文档。
+- **生成物目录**：示例 PDF、逐页检查图与验证报告都在 `outputs/` 下，由 `.gitignore` 排除；分发时保留代码、`assets/` 内的 logo 和两张精选预览、依赖及参考文档。
+
+## 重新生成预览图集
+
+[build_previews.py](../scripts/build_previews.py) 将八个示例的单页 PDF 转成两张 2×2 PNG。图集只展示这些代码的成品，没有原论文图片或对照图。
+
+| 图集 | 第一行（左 → 右） | 第二行（左 → 右） | 文件 |
+| --- | --- | --- | --- |
+| 方法结构与任务总览 | `pipeline`、`architecture` | `runtime`、`coverage` | [01_methods_and_coverage.png](../assets/previews/01_methods_and_coverage.png) |
+| 模型评估与训练统计 | `model-logos`、`budget` | `efficiency`、`training` | [02_evaluation_and_training.png](../assets/previews/02_evaluation_and_training.png) |
+
+在 skill 根目录运行：
+
+```bash
+# 从可复用示例代码生成八个源 PDF
+.venv/bin/python scripts/render_examples.py --examples \
+  pipeline architecture runtime coverage model-logos budget efficiency training
+
+# 从现有 PDF 重建两张随 skill 分发的预览
+.venv/bin/python scripts/build_previews.py
+
+# 可选：把临时图集写入本地输出目录
+.venv/bin/python scripts/build_previews.py \
+  --output-dir outputs/contact-sheets --tile-width 1440 --renderer pymupdf
+```
+
+- **渲染方式**：默认优先调用系统 `pdftoppm`，未安装时使用已有 PyMuPDF 依赖；无需为预览单独安装系统工具。`--renderer` 可显式选择。
+- **画幅与清晰度**：每个示例默认渲染为 1440 像素宽，等比居中排列，完整保留标题、坐标、图例和页脚。图集编号为 01–08，对应上表阅读顺序。
+- **位置**：`--pdf-dir` 指定源 PDF 目录，默认为本 skill 的 `outputs/`；`--output-dir` 默认为本 skill 的 `assets/previews/`，可以从其他工作目录运行。
+- **重建行为**：默认只更新两张固定命名的 PNG；源 PDF 缺失或不是单页时明确报错，不改动原 PDF。
+- **分发边界**：两张 `assets/previews/` PNG 是可公开浏览的固定展示资产，保存在 Git 中；逐页检查图和 PDF 继续留在 ignored 的 `outputs/`。
+- **验收**：重新生成后打开两张图集，检查八个面板完整、文字可辨、比例正常。预览是栅格图，不能替代可复制文字的 PDF 交付文件。
 
 ## 替换为自己的数据
 
