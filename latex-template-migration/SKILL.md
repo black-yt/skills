@@ -5,6 +5,11 @@ description: "将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程�
 
 # LaTeX Template Migration
 
+## 项目启动说明
+
+- **启动模板**：[assets/init_instruction.md](assets/init_instruction.md) 可复制到论文项目根目录作为启动说明，涵盖 `arxiv` 源稿保护、`submissions/` 多会议目录、当届投稿规则 `rules.md`、中文维护文档初始化，以及编译和 PDF 预览所需的 skill 链接。
+- **使用时机**：使用该模板启动或接续论文迁移项目时，先在目标论文项目中阅读启动说明，初始化或接续 `AGENTS.md` 和相关维护文档，再按下述流程迁移。
+
 ## 核心目标
 
 - 先把论文工程从源模板迁移到目标投稿模板，并确保能稳定编译、PDF 美观、图表公式不重叠。
