@@ -1,0 +1,4 @@
+matplotlib>=3.8
+numpy>=1.24
+PyMuPDF>=1.24
+Pillow>=9.0

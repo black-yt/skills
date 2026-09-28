@@ -1,0 +1,3 @@
+interface:
+  display_name: "论文绘图风格 2"
+  short_description: "绘制浅彩分区架构图与白底蓝青统计图，生成文字可复制的 PDF 及成品预览"
