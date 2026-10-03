@@ -904,6 +904,13 @@
         content: '### 浏览器渲染可视化\n- 用真实 Chromium 渲染网页，而不是只检查 HTML 源码。\n- 覆盖本地 HTTP server、Playwright CLI 截图、桌面/移动端 viewport 和 console/pageerror 捕获。\n- 对 Canvas、Three.js、WebGL 页面额外检查截图是否非空白，避免页面打开但核心画面没渲染。'
       },
       {
+        name: 'codex-app-troubleshooting',
+        path: 'codex-app-troubleshooting/SKILL.md',
+        tags: ['Codex', 'Windows', 'WSL', '代理', '维护'],
+        desc: '排查 Codex App 登录换令牌失败、Clash 端口变化、Windows/WSL 代理继承和后端错配，保护现有 provider、活动对话与历史记录。',
+        content: '### Codex App 故障修复\n- 区分浏览器授权、本地回调与后端 token exchange，定位实际发起请求的进程和网络环境。\n- 覆盖 Clash 重装端口变化、Windows/WSL 地址差异、环境继承、备份回滚与正常桌面双击启动验收。\n- 提供只读、脱敏的代理环境检查脚本；保留现有 API provider，不清空认证、会话或数据库，不中断受保护的活动任务。'
+      },
+      {
         name: 'codex-history-sync',
         path: 'codex-history-sync/SKILL.md',
         tags: ['Codex', '同步', 'Python', '迁移'],
@@ -1056,6 +1063,13 @@
         tags: ['LLM', 'Agent', '工具调用', 'API'],
         desc: '使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。',
         content: '### ResearchHarness\n- 用于运行、嵌入或部署轻量 tool-using LLM agent harness。\n- 覆盖 rh-agent、rh-frontend、rh-server、create_agent、run_agent、工具全集、workspace、trace、compaction 和 API 协议。\n- 推荐通过源码阅读确认复杂行为，但源码只读，不要修改 site-packages、editable checkout 或共享环境。'
+      },
+      {
+        name: 'ssh-remote-troubleshooting',
+        path: 'ssh-remote-troubleshooting/SKILL.md',
+        tags: ['远程', 'Windows', 'WSL', '维护'],
+        desc: '排查终端能 SSH 但 VS Code 失败、Windows 临时目录权限、Profile 与服务安装、系统盘缓存及挂载遮蔽，支持保留任务的迁移与连接验收。',
+        content: '### SSH 与 VS Code Remote SSH 排障\n- 按本地脚本、SSH、非交互 shell、下载解压和远端连接分层诊断，先定位首个错误。\n- 覆盖用户 TEMP/TMP、实际 Profile、数据盘临时安装和迁回默认目录，连接验证成功后再清理旧安装。\n- 区分下载缓存、运行资产与会话历史；用私有只读挂载视图和 SHA-256 比较调查隐藏模型副本，保留共享模型及活动进程。'
       },
       {
         name: 'structai',
