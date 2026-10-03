@@ -1,0 +1,2 @@
+# These helpers are executed by Linux/WSL, including the temporary curl shim.
+scripts/** text eol=lf

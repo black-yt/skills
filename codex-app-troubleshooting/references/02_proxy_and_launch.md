@@ -28,6 +28,58 @@ Linux/WSL 检查候选地址后，使用 reference 1 的显式代理探针，再
 - 检查残留 `ALL_PROXY`、已有 `NO_PROXY` 和绕过规则；不要删除整个 bypass 列表，避免让内网 API 或当前 agent 中转链路失效。
 - 从 WSL 发起 Windows 程序时，Windows 子进程可能继承调用者的旧值。诊断启动器要显式使用本次已验证的变量，而不是假定当前工具进程环境正确。
 
+## 端口变化案例与分层取证
+
+完整保留一次已解决案例的三个阶段，主机地址以占位符表示：
+
+| 阶段 | 系统代理/环境变量 | 观察结果 |
+| --- | --- | --- |
+| Clash 重装后 | Windows 系统代理已到 `127.0.0.1:7897`，用户 HTTP/HTTPS 环境变量仍到 `[WINDOWS_HOST]:7890` | 旧端口不可达，浏览器正常而 App 失败 |
+| 首次修正 | 将环境变量改到 `127.0.0.1:7897` | Windows 探针正常；实际 WSL 登录后端连接自己的 loopback，仍失败 |
+| 最终修正 | 环境变量改为两侧都实测可达的 `[WINDOWS_HOST]:7897`，系统代理仍是 loopback | 新 WSL 后端继承正确 URI，正常桌面启动与真实 OAuth 均通过 |
+
+- 因此系统代理和环境变量不必显示相同字符串，关键是各自的消费者可达；保留有效的 7897，不要求退回 7890。
+- 当时 Clash 对应配置为 `mixed-port: 7897`、`allow-lan: true`，监听和 Windows 防火墙允许所需 WSL 来源；此配置只作为案例，不能把代理端口向所有网络开放。
+- `.bashrc` 在很多发行版开头有以下逻辑，写在后面的代理配置不会被非交互 shell 读取；直接执行后端更可能完全跳过 shell 配置：
+
+```bash
+case $- in
+    *i*) ;;
+      *) return ;;
+esac
+```
+
+Windows 只查询必要的系统代理字段与环境变量，代理值显示时去除用户信息和 URL 附带内容：
+
+```powershell
+Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings' |
+    Select-Object ProxyEnable, ProxyServer
+foreach ($scope in 'Process', 'User', 'Machine') {
+    foreach ($name in 'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY') {
+        $value = [Environment]::GetEnvironmentVariable($name, $scope)
+        $summary = '[unset]'
+        if ($value) {
+            try {
+                $u = [uri]$value
+                if (-not $u.IsAbsoluteUri -or -not $u.Host) { throw 'Invalid URI' }
+                $summary = '{0}://{1}:{2}' -f $u.Scheme, $u.DnsSafeHost, $u.Port
+            } catch { $summary = '[set; unrecognized URI]' }
+        }
+        [pscustomobject]@{ Scope = $scope; Name = $name; Proxy = $summary }
+    }
+    [pscustomobject]@{
+        Scope = $scope; Name = 'NO_PROXY'
+        Configured = [bool][Environment]::GetEnvironmentVariable('NO_PROXY', $scope)
+    }
+}
+```
+
+- PAC/`AutoConfigURL` 也可能影响系统代理；需要时只读检查并隐藏其中私有地址或 query，不能原样发布。
+- App 历史日志位置 `%LOCALAPPDATA%\Codex\Logs\YYYY\MM\DD`，证据包括 `spawnCommand=wsl.exe` 和 `.codex\bin\wsl\...\codex`。路径随版本变化，先验证当前实际位置。
+- 在 Linux 只定位目标 app-server 的 PID、启动时间和可执行路径，再用脱敏脚本读取环境。`/proc/[PID]/environ` 反映可见的进程环境区，不保证捕获程序运行中所有内部改写；读取被拒绝不能当作“变量不存在”。
+- 原探针从 Windows 与 WSL 分别测试旧端口、新 loopback 和新宿主机地址；完整比较这五种观察结果，才能解释“一边能用另一边不能用”。
+- 收到 `200 Connection established` 及目标 `405 Method Not Allowed` 说明本次 CONNECT/HTTPS 请求到达了响应阶段；协议可能是 HTTP/1.1 或 HTTP/2。这是无凭据 GET，不代表账号/授权成功；403 或证书错误仍须继续调查。
+
 ## 备份与最小持久化
 
 先以单次启动/进程范围验证目标 URI。只有明确需要让未来桌面启动继承时，才修改用户变量；用户变量会影响其他新启动程序，不是 App 专属设置。
@@ -88,5 +140,25 @@ $result = [UIntPtr]::Zero
 6. Windows 主机网关可能随 WSL 重建改变。若持久化了 NAT 地址，应记录重新发现和验证方法；不要承诺一个地址永久有效，也不要为此擅自切换 WSL 网络模式。
 
 回滚只恢复本次备份中的变量；原来缺失的用户变量应移除覆盖。重新通知并检查新进程，不能用回滚覆盖用户后续修改。
+
+以下回滚模板先验证两个字段都存在，再执行修改，避免只恢复一半才发现备份错误：
+
+```powershell
+$backupPath = '[THIS_OPERATION_BACKUP_JSON]'
+$previous = Get-Content -LiteralPath $backupPath -Raw | ConvertFrom-Json
+foreach ($name in 'HTTP_PROXY', 'HTTPS_PROXY') {
+    if ($previous.PSObject.Properties.Name -notcontains $name) {
+        throw "Missing backup field: $name; no settings restored"
+    }
+    if ($null -ne $previous.$name -and $previous.$name -isnot [string]) {
+        throw "Invalid backup value: $name; no settings restored"
+    }
+}
+foreach ($name in 'HTTP_PROXY', 'HTTPS_PROXY') {
+    [Environment]::SetEnvironmentVariable($name, $previous.$name, 'User')
+}
+```
+
+当前已正常时不执行回滚。最终分别验收配置写入、新进程继承、后端网络、真实 OAuth 四层；修复后也核对原先使用中转 API 的 CLI 仍正常，不能通过 killall、重启整机或 WSL 来替代。
 
 官方网络依据：[WSL networking](https://learn.microsoft.com/en-us/windows/wsl/networking)，2026-10-03 实际 GET 核对。它说明 NAT、mirrored 与主机访问方式，具体代理软件仍需以当前监听配置为准。

@@ -1,0 +1,10 @@
+# Shell configuration: review before sourcing; no credentials belong here.
+# direct: current shell -> target HTTP proxy; chain: local relay -> upstream CONNECT -> target.
+CC_PROXY_MODE=direct
+CC_TARGET_HOST='[EGRESS_PROXY_HOST]'
+CC_TARGET_PORT=26751
+CC_UPSTREAM_HOST='[UPSTREAM_CONNECT_HOST]'
+CC_UPSTREAM_PORT=10805
+CC_LISTEN_PORT=26751
+# Uncomment only to deliberately override existing bypass settings.
+# CC_NO_PROXY='localhost,127.0.0.1,::1,[INTERNAL_DOMAIN]'

@@ -1,4 +1,4 @@
 interface:
   display_name: "Codex App 故障修复"
-  short_description: "排查桌面登录、Clash 代理与 Windows/WSL 后端故障，保护活动对话"
-  default_prompt: "使用 $codex-app-troubleshooting 定位并修复 Codex App 故障，保留现有 provider、活动对话和历史记录。"
+  short_description: "排查 Codex 登录、项目、MCP 与 WSL 故障，兼顾 Claude/Gemini 环境"
+  default_prompt: "使用 $codex-app-troubleshooting 按实际客户端定位 Codex 或相关 agent 故障，保留 provider、活动任务、认证和完整历史。"
