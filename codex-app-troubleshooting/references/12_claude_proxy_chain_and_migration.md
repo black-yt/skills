@@ -9,7 +9,7 @@
 | `install.sh` | 安装代理文件、保留已有配置、按需迁移认证与身份 | [scripts/claude_proxy/install.py](../scripts/claude_proxy/install.py)，默认只安装工具，凭据迁移须显式参数 |
 | `proxy/cc_proxy.conf` | direct/chain、上游、目标、本地端口、bypass | [scripts/claude_proxy/cc_proxy.conf.example](../scripts/claude_proxy/cc_proxy.conf.example)，只有占位值 |
 | `proxy/cc_env.sh` | `cc_on`、`cc_off`、`cc_status` 与环境快照恢复 | [scripts/claude_proxy/cc_env.sh](../scripts/claude_proxy/cc_env.sh) |
-| `proxy/cc_proxy.sh` | start/stop/status、PID 文件、日志与端口诊断 | [scripts/claude_proxy/cc_proxy.py](../scripts/claude_proxy/cc_proxy.py)，精确 PID/starttime/argv 校验 |
+| `proxy/cc_proxy.sh` | start/stop/status、PID 文件、日志与端口诊断 | [scripts/claude_proxy/cc_proxy.sh](../scripts/claude_proxy/cc_proxy.sh) 加载配置；[cc_proxy.py](../scripts/claude_proxy/cc_proxy.py) 精确校验 PID/starttime/argv |
 | `proxy/cc_proxy_chain.py` | 本地 socket 经上游 CONNECT 透明中继 | [scripts/claude_proxy/cc_proxy_chain.py](../scripts/claude_proxy/cc_proxy_chain.py) |
 | `claude/credentials.json` | 私有 OAuth access/refresh token | 不随 skill 分发，用户可在私有通道提供 |
 | `claude/claude.json.seed` | 私有账号身份与 onboarding 字段 | 不分发值，下面保留字段 schema 与合并策略 |
@@ -64,7 +64,17 @@ claude
 cc_off
 ```
 
-- 原 `cc_proxy.sh start|stop|status` 对应 `python3 "$HOME/.cc/cc_proxy.py" start|stop|status`；无需创建额外 shell wrapper。
+- 手动管理使用下面的 shell 入口。它会在 start 时加载已审查的 `cc_proxy.conf`；不要直接运行没有配置环境的 `python3 cc_proxy.py start`，底层 Python 管理器不解析 shell 配置文件。stop/status 只读取进程记录，配置损坏或被移除时仍可用于恢复。
+
+```bash
+bash "$HOME/.cc/cc_proxy.sh" status
+# 只有 chain 模式且已确认可启用此通路时执行。
+bash "$HOME/.cc/cc_proxy.sh" start
+# 只有确认没有其他终端依赖此共享 relay 时执行。
+bash "$HOME/.cc/cc_proxy.sh" stop
+```
+
+- 使用 `CC_DIR='[ALTERNATE_PROXY_DIRECTORY]' bash '[ALTERNATE_PROXY_DIRECTORY]/cc_proxy.sh' status` 可管理自选安装目录。入口不带参数时只查状态，不默认启动服务；direct 模式使用 `cc_on`，不需要 relay。
 - 工具脚本更新前保留已有副本；已有 `cc_proxy.conf` 原样保留，新模板保存为 `.new`。本机旧配置必须先审查，不能盲 source 不可信文件。
 - 如需每个新终端都有函数，可在用户授权后加入 `[ -f "$HOME/.cc/cc_env.sh" ] && . "$HOME/.cc/cc_env.sh"`；它只定义函数，不自动开代理。
 - 安装器与 start/stop 共用文件锁，检测到该工具自己的存活 daemon 时拒绝覆盖运行脚本；先确认无人依赖并正常停服务，再升级。启动失败或 PID 元数据写入失败时回收本次子进程，避免留下无记录的 daemon。

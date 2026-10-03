@@ -84,11 +84,13 @@ start_local_switch() {
 }
 ```
 
+- `start_local_switch`/原 `sw` 依赖另一个项目里的 `switch_proxy.py`，**该文件不在原备份中，也不随本 skill 提供**。只有已有该项目且其依赖完整时才定义此函数；否则用已验证的 provider 地址，不能把这段入口当作独立可运行的本地代理实现。
 - provider 选择与用于评测/其他工作流的 provider 可以隔离，不为个人 CLI 更改全部项目。
 - `proxy_r` 类函数设置 SSH 反向代理；`openai_on` 类函数切到专用 HTTP 代理；`proxy_no` 设置内网 bypass；`proxy_test` 用 curl/wget 验证；它们修改当前 shell 及子进程，不自动修改 App 已运行后端。
 - 原 `.bashrc` 会 `source <(curl ...setup_proxy.sh)` 自动加载集群代理。该行为会执行远端代码，不应复制私有地址到公开 skill，也不默认在每个 shell 启动时联网执行；需要时先审查可信脚本。
 - `.wgetrc` 的 `http_proxy`、`https_proxy`、`no_proxy`、`use_proxy=on` 是 wget 自己的配置层。curl 正常但 wget 异常时应单独核对；不要把旧私人 bypass 清单写成通用值。
 - 原 `proxy_off` 是一组 unset，还遗漏了某些大小写变体。更可靠的恢复是快照后逐项恢复，防止中断已配置的中转 API。
+- 原旧代理代码还包含 `ftp_proxy`，专用 `openai_on` 设置过 `PROXY_STATUS` 作为提示文本；它们不是 Codex 的认证开关。WSL 配置中的 `WS_PROXY`/`WSS_PROXY` 只作为注释尝试出现，不能据此认定当前 Codex 支持这两个变量。保留这些线索，实际修复仍以目标进程和请求结果为准。
 - Linux 发行版 `.bashrc` 常有非交互提前 return；App 和 SSH 的非交互启动未必读取后面的 nvm、conda 或代理配置。重复 source nvm 与 conda 改 PATH 也可能改变实际 `node/npm/codex` 来源。
 - 记录代理、provider 和配置来源时只输出必要键，不 `env | grep` 打印所有可能包含凭据的值。
 

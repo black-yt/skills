@@ -60,7 +60,7 @@ def main():
         if path.is_symlink():
             raise ValueError('Refusing symlink installation directory')
     source = Path(__file__).resolve().parent
-    scripts = ('cc_env.sh', 'cc_proxy.py', 'cc_proxy_chain.py')
+    scripts = ('cc_env.sh', 'cc_proxy.sh', 'cc_proxy.py', 'cc_proxy_chain.py')
     payloads = {name: (source / name).read_bytes() for name in scripts}
     template = (source / 'cc_proxy.conf.example').read_bytes()
     spec = importlib.util.spec_from_file_location('cc_proxy_manager', source / 'cc_proxy.py')

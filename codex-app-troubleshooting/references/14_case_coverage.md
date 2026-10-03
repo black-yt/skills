@@ -64,16 +64,71 @@
 | K01 | `.bashrc`/`.bashrc.wsl`：proxy_on/off/no/test/echo、远程加载代理 | [10](10_provider_config_and_cc_switch.md)：作用、恢复快照与远端执行风险 |
 | K02 | proxy_r、openai_on、mycodex、ag/cr/sw、nvm/conda PATH | [08](08_auth_network_and_remote_proxy.md)、[10](10_provider_config_and_cc_switch.md)：通用函数与参数保留 |
 | K03 | Claude 模型映射与插件数组、独立 token、.wgetrc 代理层 | [10](10_provider_config_and_cc_switch.md)、[11](11_claude_gemini_and_extension_env.md)：不混淆客户端 |
+| K04 | shell 只引用但未提供 `switch_proxy.py`、远端 `setup_proxy.sh` | [10](10_provider_config_and_cc_switch.md)、下方依赖表：明确外部来源缺失，不能声称本 skill 内置这些服务 |
+| K05 | 历史 `ftp_proxy`、提示用 `PROXY_STATUS`、注释中的 `WS_PROXY`/`WSS_PROXY` | [10](10_provider_config_and_cc_switch.md)：保留变量职责与未确认支持的边界 |
 | L01 | `README.md` 的 cmp/diff/cp 与 `settings.json` node CPU 排除 | [10](10_provider_config_and_cc_switch.md)、[13](13_shared_storage_watchers.md)：保留配置比较及 exclude 差异 |
 | M01 | `cc-migrate/README.md`：组件清单、作用范围、private token | [12](12_claude_proxy_chain_and_migration.md)：完整组件表与输入边界 |
 | M02 | 多跳 CONNECT、direct/chain/直连模式、401/000 信号 | [12](12_claude_proxy_chain_and_migration.md)：网络图、模式表、响应局限 |
 | M03 | `install.sh`：HOME 路径、保留 conf/.new、备份 credentials、跳过 settings | [12](12_claude_proxy_chain_and_migration.md)、install.py：保留职责，凭据显式选择 |
 | M04 | seed 顶层/账号 schema、cur.update、损坏 JSON、文件权限 | [12](12_claude_proxy_chain_and_migration.md)、install.py：字段完整，损坏时停止而不静默丢数据 |
 | M05 | `cc_env.sh`：首次快照、unset/空值、on/off/status、daemon 跨终端 | [12](12_claude_proxy_chain_and_migration.md)、cc_env.sh：增补 export 状态、ALL_PROXY 与 keep-daemon |
-| M06 | `cc_proxy.sh`：pidfile、no pkill、start/stop/status、TERM/KILL、游离端口 | [12](12_claude_proxy_chain_and_migration.md)、cc_proxy.py：保留功能，加强 starttime/身份验证 |
+| M06 | `cc_proxy.sh`：配置加载、pidfile、no pkill、start/stop/status、TERM/KILL、游离端口 | [12](12_claude_proxy_chain_and_migration.md)、cc_proxy.sh/cc_proxy.py：手动入口加载配置，加强 starttime/身份验证 |
 | M07 | `cc_proxy_chain.py`：CONNECT/header/rest、30 秒、64 KiB、线程与关闭 | [12](12_claude_proxy_chain_and_migration.md)、cc_proxy_chain.py：保留中继逻辑，加强边界并关闭请求日志 |
 | M08 | `.conf`：target/upstream/listen/bypass；seed 与 settings 文件 | [12](12_claude_proxy_chain_and_migration.md)、配置模板：去除私有值、保留所有参数职责 |
 | M09 | OAuth 有效期、两机刷新互踢、传输/清理包、重新登录 | [12](12_claude_proxy_chain_and_migration.md)：保留机制，不发布旧账号期限 |
+
+## 文件级完整清单
+
+本次对照的备份目录共 **33 个文件**：25 个文件的相关技术内容已归入下表；另有 6 份 Codex 认证快照、1 份 Claude credentials 和 1 份 rclone 私有配置，不公开其内容。这里的完整性按技术内容和运行依赖判断，不要求保持原来的文件名或重复段落。
+
+| 来源文件 | 发布位置与处理 |
+| --- | --- |
+| `codex_app.md` | [04](04_managed_cli_and_installation.md)，Store、CLI 定位、路径覆盖与恢复 |
+| `codex_app_bug_1.md` | [05](05_wsl_reconnect_auth_and_sandbox.md)，WSL 重连、认证、sandbox、撤回尝试 |
+| `codex_app_bug_2.md` | [06](06_project_migration_and_windows_setup.md)，创建项目失败与迁移缓存 |
+| `codex_app_bug_3.md` | [06](06_project_migration_and_windows_setup.md)、[07](07_mcp_invalid_transport.md)，Windows setup、MCP 与 wrapper 附带处理 |
+| `codex_app_bug_4.md` | [01](01_oauth_diagnosis.md)、[02](02_proxy_and_launch.md)，OAuth/Clash 完整诊断与命令 |
+| `codex_mcp_bug.md` | [07](07_mcp_invalid_transport.md)，合法 transport、生成来源、CLI path |
+| `codex_setting.md` | [04](04_managed_cli_and_installation.md)、[08](08_auth_network_and_remote_proxy.md)，安装、403、10013、认证与三环境代理 |
+| `codex_with_github.md` | [09](09_github_rate_limit_and_installer.md)、[github_api_curl.py](../scripts/github_api_curl.py)，WSL/PowerShell 与临时 wrapper |
+| `cc_switch.md` | [10](10_provider_config_and_cc_switch.md)，Windows/WSL/远端配置归属 |
+| `AI.md` | [04](04_managed_cli_and_installation.md)、[10](10_provider_config_and_cc_switch.md)、[11](11_claude_gemini_and_extension_env.md)，三种 agent、安装与环境 |
+| `README.md` | [10](10_provider_config_and_cc_switch.md)、[13](13_shared_storage_watchers.md)，比较恢复与共享盘扫描 |
+| `config.toml` | [10](10_provider_config_and_cc_switch.md)，provider、sandbox、trust、features、UI 和插件键 |
+| `settings.json` | [13](13_shared_storage_watchers.md)，完整 JSON 模板及 watcher 区别 |
+| `.bashrc` | [08](08_auth_network_and_remote_proxy.md)、[10](10_provider_config_and_cc_switch.md)、[11](11_claude_gemini_and_extension_env.md)，相关代理和 agent 函数；排除私人与非 agent 内容 |
+| `.bashrc.wsl` | [02](02_proxy_and_launch.md)、[10](10_provider_config_and_cc_switch.md)、[11](11_claude_gemini_and_extension_env.md)，WSL 端口、provider 快捷函数和客户端环境 |
+| `.ssh_config` | [08](08_auth_network_and_remote_proxy.md)，代理有关的 RemoteForward 与执行位置；不公开主机拓扑 |
+| `.wgetrc` | [10](10_provider_config_and_cc_switch.md)，wget 独立代理配置层 |
+| `cc-migrate/README.md` | [12](12_claude_proxy_chain_and_migration.md)，组件、安装、网络、凭据与影响范围 |
+| `cc-migrate/install.sh` | [install.py](../scripts/claude_proxy/install.py)，功能迁移为 Python；文档明确新的调用方式 |
+| `cc-migrate/proxy/cc_env.sh` | [cc_env.sh](../scripts/claude_proxy/cc_env.sh)，启用、关闭、状态与快照恢复 |
+| `cc-migrate/proxy/cc_proxy.sh` | [cc_proxy.sh](../scripts/claude_proxy/cc_proxy.sh)、[cc_proxy.py](../scripts/claude_proxy/cc_proxy.py)，配置加载入口及进程管理 |
+| `cc-migrate/proxy/cc_proxy_chain.py` | [cc_proxy_chain.py](../scripts/claude_proxy/cc_proxy_chain.py)，CONNECT 中继完整实现 |
+| `cc-migrate/proxy/cc_proxy.conf` | [cc_proxy.conf.example](../scripts/claude_proxy/cc_proxy.conf.example)，全部参数职责、无私有服务地址 |
+| `cc-migrate/claude/settings.json` | [12](12_claude_proxy_chain_and_migration.md) 中保留完整两字段 JSON；属于可选输入，不是默认安装所需文件 |
+| `cc-migrate/claude/claude.json.seed` | [12](12_claude_proxy_chain_and_migration.md) 保留顶层与 oauthAccount schema；真实账号值仅作为私有迁移输入 |
+
+## 运行依赖、未提供源码与包验证
+
+| 对象 | 是否随 skill 提供 | 使用边界 |
+| --- | --- | --- |
+| Claude 代理运行文件 | 是 | 安装器所读的 `cc_env.sh`、`cc_proxy.sh`、`cc_proxy.py`、`cc_proxy_chain.py`、`cc_proxy.conf.example` 全部在同目录；需要 Linux/WSL、Bash、Python 3.9+ 标准库 |
+| 代理状态探针 | 命令在代码内 | 需要本机 curl；真实目标连通性只在显式 `cc_status` 时探测 |
+| GitHub API wrapper | 是 | 实际使用还需 curl 和已登录的 gh；安装器本身从当前官方入口取得并审查 |
+| `switch_proxy.py` | 否，原备份未提供源码 | 原 `sw` 函数只跳转另一个本地项目；不把该函数当作已打包服务 |
+| 集群 `setup_proxy.sh` | 否，原备份只有远程加载命令 | 私有集群配置需要从其可信维护方取得，不能复制旧地址或虚构实现 |
+| 临时 Codex `.cmd`、managed CLI wrapper | 原备份仅记录其曾存在且已移除 | 最终修复不依赖这些撤回产物，不为凑齐文件重新创建 |
+| 认证文件与身份值 | 否，有意排除 | 默认安装无需它们；只有私有迁移时显式传入，不能从公共包获得有效登录态 |
+| 离线回归测试 | [test_helpers.py](../scripts/tests/test_helpers.py) | 临时 home、虚构凭据、回环模拟服务；不登录、不访问真实模型、不停止用户服务 |
+
+从下载后的完整 skill 文件夹验证代码包，不要求原备份或作者目录存在：
+
+```bash
+python3 -B scripts/tests/test_helpers.py
+```
+
+测试覆盖安装依赖是否齐全、配置保留、可选迁移、环境精确恢复、手动入口配置加载、CONNECT 数据与半关闭、活动 relay 升级保护、无关 PID 保护和 GitHub token 不进 argv。Windows 原生 PowerShell 示例没有在此 Linux 离线测试中执行；真实账号登录和网络需要在实际环境按各篇验收。
 
 ## 明确不迁入的私人或无关内容
 

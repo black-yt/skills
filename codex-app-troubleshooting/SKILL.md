@@ -52,6 +52,8 @@ description: "排查 Codex App 登录、WSL 后端、CLI 定位、项目迁移�
 - 该脚本不修改变量、不发网络请求、不读取对话或认证文件；输出仍可能包含内部代理主机，公开分享前继续匿名化。
 - [scripts/github_api_curl.py](scripts/github_api_curl.py)：仅供 reference 9 的临时安装器 wrapper，限定 GitHub API 请求并避免 token 出现在 argv；不是全局 curl 替代品。
 - [scripts/claude_proxy/install.py](scripts/claude_proxy/install.py) 与同目录资源：按 reference 12 安装 Linux/WSL 代理助手，默认不导入凭据、不改 shell rc；只有显式命令才会安装、联网或停止共享 relay。
+- [scripts/claude_proxy/cc_proxy.sh](scripts/claude_proxy/cc_proxy.sh)：供已安装助手手动管理 relay，启动前加载配置；原始文件与运行依赖的完整对应表见 reference 14。
+- [scripts/tests/test_helpers.py](scripts/tests/test_helpers.py)：在临时目录和回环模拟服务上验证下载后的完整代码包，不依赖作者的认证或本地项目。
 
 ## 官方依据与版本边界
 
