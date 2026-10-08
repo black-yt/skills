@@ -1,0 +1,3 @@
+interface:
+  display_name: "论文审稿提示词注入检查"
+  short_description: "分别检查论文 PDF 与 Markdown，识别特定词符号、暗示表达和规避披露的审稿注入"
