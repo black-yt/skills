@@ -883,6 +883,13 @@
   <script>
     var SKILLS = [
       {
+        name: 'agent-orchestration',
+        path: 'agent-orchestration/SKILL.md',
+        tags: ['Agent', 'Codex', 'Claude Code', 'LLM', '维护'],
+        desc: '组织主 Codex、中层原生子 agent 或 Claude Code/Atria 陪跑者与底层确定性管线，控制临时凭据、长期会话、异常接管、资源并发和证据验收。',
+        content: '### Agent 调度与持续陪跑\n- 顶层统筹和核实，中层长期监督与精准修复，底层按固定流程执行。\n- Claude Code 可临时接入 Atria-Dawn 处理纯文本任务，不改全局认证；会话按 ID 续接。\n- 有界快照触发模型调用，按 CPU、内存和服务延迟控制并发；候选报告须经顶层与原生门禁验收。'
+      },
+      {
         name: 'agents-md-maintenance',
         path: 'agents-md-maintenance/SKILL.md',
         tags: ['Agent', '文档', '维护'],
