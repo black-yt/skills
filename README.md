@@ -19,6 +19,7 @@ skill-name/
 | `agent-orchestration` | [`agent-orchestration/SKILL.md`](agent-orchestration/SKILL.md) | 组织主 Codex、中层原生子 agent 或 Claude Code/Atria 陪跑者与底层确定性管线，覆盖临时凭据注入、长期会话、异常接管、资源并发和证据验收。 |
 | `agents-md-maintenance` | [`agents-md-maintenance/SKILL.md`](agents-md-maintenance/SKILL.md) | 创建、整理、拆分和维护仓库级 `AGENTS.md` 与 `AGENTS.local/`，覆盖常驻上下文边界、公开/私有跟踪策略、同步校验和安全编辑。 |
 | `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
+| `bilibili-video-download` | [`bilibili-video-download/SKILL.md`](bilibili-video-download/SKILL.md) | 下载哔哩哔哩普通 BV 投稿视频为 MP4，选择画质和分 P，或导出 MP3；附完整 Python 标准库脚本、ffmpeg 安装、私有 Cookie 文件调用与结果验证。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
 | `codex-app-troubleshooting` | [`codex-app-troubleshooting/SKILL.md`](codex-app-troubleshooting/SKILL.md) | 排查 Codex App 登录、代理、CLI/WSL 后端、项目迁移与 MCP 故障，收录 CC Switch、Claude/Gemini 和 IDE 相关经验，保护认证、活动对话与历史。 |
 | `codex-history-sync` | [`codex-history-sync/SKILL.md`](codex-history-sync/SKILL.md) | 使用保守的一向同步脚本，把一个 `.codex` 的 Codex 会话记录、`history.jsonl`、`sessions/` 和 thread title 元数据同步到另一个用户或目录，默认排除敏感配置并要求先 dry-run。 |
