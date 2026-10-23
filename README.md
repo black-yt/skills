@@ -21,6 +21,7 @@ skill-name/
 | `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
 | `bilibili-video-download` | [`bilibili-video-download/SKILL.md`](bilibili-video-download/SKILL.md) | 下载哔哩哔哩普通 BV 投稿视频为 MP4，选择画质和分 P，或导出 MP3；附完整 Python 标准库脚本、ffmpeg 安装、私有 Cookie 文件调用与结果验证。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
+| `cloudflare-flux-image-generation` | [`cloudflare-flux-image-generation/SKILL.md`](cloudflare-flux-image-generation/SKILL.md) | 注册并调用 Cloudflare Workers AI 的 FLUX.1 schnell 文生图；附完整 Python 标准库脚本、临时凭据配置、免费额度核算和排错。 |
 | `codex-app-troubleshooting` | [`codex-app-troubleshooting/SKILL.md`](codex-app-troubleshooting/SKILL.md) | 排查 Codex App 登录、代理、CLI/WSL 后端、项目迁移与 MCP 故障，收录 CC Switch、Claude/Gemini 和 IDE 相关经验，保护认证、活动对话与历史。 |
 | `codex-history-sync` | [`codex-history-sync/SKILL.md`](codex-history-sync/SKILL.md) | 使用保守的一向同步脚本，把一个 `.codex` 的 Codex 会话记录、`history.jsonl`、`sessions/` 和 thread title 元数据同步到另一个用户或目录，默认排除敏感配置并要求先 dry-run。 |
 | `context-overlay` | [`context-overlay/SKILL.md`](context-overlay/SKILL.md) | 配置和验证 OpenAI-compatible context overlay proxy，覆盖 rule matching、prompt/context 注入、prompt patch、routing、reject、skill_dir 检索和转发安全。 |
