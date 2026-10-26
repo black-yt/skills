@@ -1,0 +1,3 @@
+interface:
+  display_name: "论文绘图风格 3"
+  short_description: "复用矢量图元与布局代码，绘制可编辑的论文方法图和统计图"

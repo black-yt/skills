@@ -41,6 +41,7 @@ skill-name/
 | `overleaf-project-sync` | [`overleaf-project-sync/SKILL.md`](overleaf-project-sync/SKILL.md) | 从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。 |
 | `paper-figure-style-1` | [`paper-figure-style-1/SKILL.md`](paper-figure-style-1/SKILL.md) | 绘制浅桃紫渐变风格的论文流程图与统计图，覆盖柱状图、区间曲线、Pareto 散点、横条矩阵、训练仪表盘和双环图；包含可复用 Python 组件、17 个独立示例、10 款模型 logo 及文字可复制的 PDF 输出，可直接浏览 [8 张效果预览](paper-figure-style-1/SKILL.md#效果预览)。 |
 | `paper-figure-style-2` | [`paper-figure-style-2/SKILL.md`](paper-figure-style-2/SKILL.md) | 绘制浅彩分区架构图、生命周期泳道及白底蓝青统计图，覆盖能力径向图、响应曲线、54 面板柱状图、热力图、饼图、界面与任务证据表；包含可复用组件、9 个独立示例及文字可复制的矢量 PDF，可直接浏览 [成品预览](paper-figure-style-2/SKILL.md#效果预览)。 |
+| `paper-figure-style-3` | [`paper-figure-style-3/SKILL.md`](paper-figure-style-3/SKILL.md) | 复用 Python 手绘矢量笔触、图元与布局函数绘制可编辑论文图；含 LatentEvolve 图 1/2 的重绘、图 3/4 统计图、原图误差定位和[效果预览](paper-figure-style-3/SKILL.md#效果预览)。 |
 | `paper-review-injection-audit` | [`paper-review-injection-audit/SKILL.md`](paper-review-injection-audit/SKILL.md) | 分别检查现有论文 PDF 与解析 Markdown，两者都有就都检查；识别指定或暗示词语、词组、符号、评分和可识别输出的注入，拒绝“不告知人类”等隐瞒要求，提供本地证据采集脚本和页码/行号报告模板。 |
 | `paper-review-writing` | [`paper-review-writing/SKILL.md`](paper-review-writing/SKILL.md) | 仔细阅读论文，在对应目录写简洁匿名的双语审稿 MD；完整中文在前、完整英文在后，一个优点、两个具体深入的缺点与逐项对应的问题，用原文、章节标题和表格描述定位，避免数字引用及模板化表达。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
