@@ -1,0 +1,87 @@
+[
+  {
+    "id": "tabler:brain",
+    "discovery_page": "https://yesicon.app/tabler/brain",
+    "metadata_url": "https://yesicon.app/api/icon/tabler:brain?locale=en",
+    "download_url": "https://api.iconify.design/tabler/brain.svg",
+    "author": "Paweł Kuna",
+    "license": {
+      "title": "MIT",
+      "spdx": "MIT",
+      "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+    },
+    "collection_version": "3.49.0",
+    "svg_sha256": "067611d20d0e8cb297d291959b485af236c190fb01c98fc4fb78a2d84b92ac39",
+    "native_shape": "tabler-brain.shape.xml",
+    "tested": "2026-10-27",
+    "verified_license_url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE"
+  },
+  {
+    "id": "tabler:snowflake",
+    "discovery_page": "https://yesicon.app/tabler/snowflake",
+    "metadata_url": "https://yesicon.app/api/icon/tabler:snowflake?locale=en",
+    "download_url": "https://api.iconify.design/tabler/snowflake.svg",
+    "author": "Paweł Kuna",
+    "license": {
+      "title": "MIT",
+      "spdx": "MIT",
+      "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+    },
+    "collection_version": "3.49.0",
+    "svg_sha256": "5e93bcdd202317a3b7d1795582b9950df6144ba63b745d57699ec4e671a73167",
+    "native_shape": "tabler-snowflake.shape.xml",
+    "tested": "2026-10-27",
+    "verified_license_url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE"
+  },
+  {
+    "id": "tabler:file-code",
+    "discovery_page": "https://yesicon.app/tabler/file-code",
+    "metadata_url": "https://yesicon.app/api/icon/tabler:file-code?locale=en",
+    "download_url": "https://api.iconify.design/tabler/file-code.svg",
+    "author": "Paweł Kuna",
+    "license": {
+      "title": "MIT",
+      "spdx": "MIT",
+      "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+    },
+    "collection_version": "3.49.0",
+    "svg_sha256": "7eb6fd722fb453c449b43b222657ee953414ee67d81f46fc6c8c9917e4295163",
+    "native_shape": "tabler-file-code.shape.xml",
+    "tested": "2026-10-27",
+    "verified_license_url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE"
+  },
+  {
+    "id": "tabler:chart-bar",
+    "discovery_page": "https://yesicon.app/tabler/chart-bar",
+    "metadata_url": "https://yesicon.app/api/icon/tabler:chart-bar?locale=en",
+    "download_url": "https://api.iconify.design/tabler/chart-bar.svg",
+    "author": "Paweł Kuna",
+    "license": {
+      "title": "MIT",
+      "spdx": "MIT",
+      "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+    },
+    "collection_version": "3.49.0",
+    "svg_sha256": "04b914ca5bda3e9c6311e152838e167b1e31c7e2ecab2a98395d634eb40c44cc",
+    "native_shape": "tabler-chart-bar.shape.xml",
+    "tested": "2026-10-27",
+    "verified_license_url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE"
+  },
+  {
+    "id": "tabler:yarn",
+    "discovery_page": "https://yesicon.app/tabler/yarn",
+    "metadata_url": "https://yesicon.app/api/icon/tabler:yarn?locale=en",
+    "download_url": "https://api.iconify.design/tabler/yarn.svg",
+    "author": "Paweł Kuna",
+    "license": {
+      "title": "MIT",
+      "spdx": "MIT",
+      "url": "https://github.com/tabler/tabler-icons/blob/master/LICENSE"
+    },
+    "collection_version": "3.49.0",
+    "svg_sha256": "52dc0b406b1567ea173f0e74b7b1ffe067a00bb488bfeeb0fb0c49ee729d6718",
+    "native_shape": "tabler-yarn.shape.xml",
+    "tested": "2026-10-27",
+    "verified_license_url": "https://github.com/tabler/tabler-icons/blob/main/LICENSE"
+  }
+]

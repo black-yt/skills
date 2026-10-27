@@ -1,3 +1,3 @@
 interface:
-  display_name: "论文绘图风格 3"
-  short_description: "复用矢量图元与布局代码，绘制可编辑的论文方法图和统计图"
+  display_name: "论文绘图风格 3 · draw.io"
+  short_description: "用原生 draw.io 绘制可编辑论文图，复用组件、图标获取、渲染与验收代码"
