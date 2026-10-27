@@ -967,6 +967,13 @@
         content: '### 前端 Markdown 渲染\n- 只把最终 assistant result 当 Markdown 渲染，工具调用、trace、错误日志仍按纯文本或 JSON 展示。\n- 使用 marked、DOMPurify、KaTeX 和 Mermaid 组合，不自己手写完整 Markdown parser。\n- 覆盖公式保护、workspace 图片安全路由、图片/表格/SVG 宽度约束和常见渲染错误。'
       },
       {
+        name: 'h3-video-api',
+        path: 'h3-video-api/SKILL.md',
+        tags: ['视频生成', 'MiniMax-H3', 'SSH 隧道', 'curl'],
+        desc: '调用内网部署的 MiniMax-H3 视频 Generation API（SSH 隧道 + curl，无 SDK）：隧道保活、素材上传、文本/首帧/参考模式提交、轮询下载的完整流程与提示词结构，含分层连通性诊断。',
+        content: '### H3 视频生成 API\n- 用于通过内网部署的 MiniMax-H3 服务生成视频（文生视频 + 同步声音），支持文本、首帧、尾帧、首尾帧和参考模式。\n- 覆盖 SSH 隧道保活（含宿主侧绕行）、素材上传、任务提交的 JSON 参数与提示词三段/六段结构、轮询下载与常见 422/429 错误。\n- 强调连通性分层诊断：先区分本机网络与目标服务问题，别急着判定服务下线。'
+      },
+      {
         name: 'github-readme-writing',
         path: 'github-readme-writing/SKILL.md',
         tags: ['GitHub', 'README', '写作'],
