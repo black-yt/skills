@@ -1,5 +1,7 @@
 # Latex Appendix Cases
 
+整套 [`../assets/latex-paper-template/`](../assets/latex-paper-template/) 已提供同一套颜色与可换页 case box：`seed/theme.tex` 中的 `ReportCaseBox` 封装下述 `tcolorbox` 样式，`sections/appendix.tex` 和 `figures/cases/example.tex` 展示完整字段占位。长案例继续拆 box，不截断内容。
+
 ### LaTeX 段首 insight
 
 ```latex
@@ -49,11 +51,11 @@ Appendix 可以比主文长，目标是可复现和可审计。不要把 appendi
 
 ```latex
 \newcommand{\CaseSection}[1]{%
-  \par\smallskip\noindent{\color{DeepPurple}\rule{\linewidth}{0.35pt}}\par\smallskip
-  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\smallskip
+  \par\smallskip\noindent{\color{DeepPurple}\rule{\linewidth}{0.35pt}}\par\nobreak\smallskip
+  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\nobreak\smallskip
 }
 \newcommand{\CaseFirstSection}[1]{%
-  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\smallskip
+  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\nobreak\smallskip
 }
 ```
 

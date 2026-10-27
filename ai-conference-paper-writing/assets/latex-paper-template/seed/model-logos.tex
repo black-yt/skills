@@ -1,0 +1,13 @@
+% Provider logos appear only beside model names, never in score cells.
+\newcommand{\ModelLogo}[1]{\raisebox{-1.5pt}{\includegraphics[height=1.05em]{figures/logos/models/#1.png}}\hspace{0.28em}}
+\newcommand{\OpenAIModel}[1]{\ModelLogo{openai}#1}
+\newcommand{\AnthropicModel}[1]{\ModelLogo{anthropic}#1}
+\newcommand{\GeminiModel}[1]{\ModelLogo{gemini}#1}
+\newcommand{\GrokModel}[1]{\ModelLogo{grok}#1}
+\newcommand{\QwenModel}[1]{\ModelLogo{qwen}#1}
+\newcommand{\GLMModel}[1]{\ModelLogo{glm}#1}
+\newcommand{\KimiModel}[1]{\ModelLogo{kimi}#1}
+\newcommand{\MiMoModel}[1]{\ModelLogo{mimo}#1}
+\newcommand{\MiniMaxModel}[1]{\ModelLogo{minimax}#1}
+\newcommand{\DeepSeekModel}[1]{\ModelLogo{deepseek}#1}
+\newcommand{\ModelRef}[1]{\textsuperscript{\citealp{#1}}}

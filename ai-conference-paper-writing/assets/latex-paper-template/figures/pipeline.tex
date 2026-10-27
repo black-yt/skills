@@ -1,0 +1,15 @@
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[font=\small\sffamily,>=Stealth]
+\tikzset{stage/.style={draw=ReportTheme,fill=ReportPanel,rounded corners=4pt,text width=3cm,minimum height=.9cm,align=center}}
+\node[stage] (source) at (0,0) {Source records\\and task inputs};
+\node[stage] (gen) at (4,0) {Instance generation\\and difficulty control};
+\node[stage] (valid) at (8,0) {Validation, filtering,\\and leakage checks};
+\node[stage] (model) at (8,-2) {Model inference\\or training};
+\node[stage] (eval) at (4,-2) {Programmatic evaluation\\or task reward};
+\node[stage] (feedback) at (0,-2) {Error analysis\\and repair feedback};
+\node[stage,fill=white] (out) at (4,-3.8) {Verified output\\and evidence record};
+\foreach \a/\b in {source/gen,gen/valid,valid/model,model/eval,eval/feedback,eval/out}
+  \draw[->,thick,color=ReportTheme] (\a) -- (\b);
+\draw[->,dashed,thick,color=ReportTheme] (feedback.west) -- ++(-.7,0) |- (gen.north);
+\end{tikzpicture}%
+}

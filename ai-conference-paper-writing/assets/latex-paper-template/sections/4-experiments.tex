@@ -1,0 +1,105 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Experimental Setup}
+Specify [datasets and splits], [exact model variants], [prompt/output formats], [decoding], [token budgets], [number of runs], [statistical aggregation], [invalid handling], and [retry/cache policies]. Keep baseline settings comparable and identify every intentional difference. Training experiments additionally require the hyperparameters in \cref{tab:hyperparameters}.
+
+\subsection{Main Results}
+\Cref{tab:main-results} demonstrates a compact result table with provider logos, source citations, directional text arrows, restrained row grouping, color cells, and best/second formatting. Every value is deliberately marked \texttt{TBD}; the shade intensities and rank marks only preview typography and must be recomputed from real measurements.
+
+\begin{widetable}[htbp]
+\centering
+\caption{\textbf{Main-result layout scaffold.} Task scores use higher-is-better arrows; invalid rate uses lower-is-better. All values, color intensities, and ranking marks are placeholders. Historical model names are citation examples, with no reported comparison.}
+\label{tab:main-results}
+\begingroup
+\small
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.12}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Model / system & Overall \MetricUp & Task A \MetricUp & Task B \MetricUp & Invalid \MetricDown\\
+\midrule
+\rowcolor{CustomRowShade}
+\multicolumn{5}{l}{\textbf{Hosted model examples}}\\
+\OpenAIModel{GPT-4}\ModelRef{openai2023gpt4} & \ScoreCell{25}{TBD} & \SecondScore{40}{TBD} & \ScoreCell{25}{TBD} & TBD\\
+\GeminiModel{Gemini 1.5}\ModelRef{gemini2024gemini15} & \SecondScore{40}{TBD} & \ScoreCell{25}{TBD} & \SecondScore{40}{TBD} & TBD\\
+\rowcolor{CustomRowShade}
+\multicolumn{5}{l}{\textbf{Open-weight and proposed system examples}}\\
+\QwenModel{Qwen2.5}\ModelRef{qwen2024qwen25} & \ScoreCell{25}{TBD} & \ScoreCell{25}{TBD} & \ScoreCell{25}{TBD} & TBD\\
+\textbf{Proposed system [replace]} & \BestScore{55}{TBD} & \BestScore{55}{TBD} & \BestScore{55}{TBD} & TBD\\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\endgroup
+\end{widetable}
+
+The results paragraph should report [measured range], [comparison], [uncertainty], and [invalid-output frequency] from \cref{tab:main-results}. State the observation before interpreting it; use one color scale for comparable columns and avoid implying that two unrelated metrics have a common scale.
+
+\paragraph{Insight 1: [Evidence-backed capability finding].}
+Explain why the measured observation supports \CoreTerm{} within [scope]. Distinguish the relevant capability from simpler alternative explanations using a controlled comparison, and identify any remaining limitation.
+
+\subsection{Ablation Studies}
+\Cref{tab:ablations} illustrates two complementary ablations. Removing a component must test its corresponding design claim; changing validation or feedback must isolate correctness or robustness. Keep other settings fixed, describe the expected diagnostic relationship, and interpret only measured changes.
+
+\begin{widetable}[htbp]
+\centering
+\caption{\textbf{Ablation scaffolds.} Replace placeholders with controlled results and map each removed mechanism to a challenge.}
+\label{tab:ablations}
+\begin{subtable}[t]{.48\textwidth}
+\centering\small
+\caption{Component contribution.}
+\label{tab:component-ablation}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Variant & Overall \MetricUp & [Capability] \MetricUp\\
+\midrule
+Without component A & \DimCell{15}{TBD} & TBD\\
+Without component B & \DimCell{15}{TBD} & TBD\\
+Full approach & \BestScore{35}{TBD} & TBD\\
+\bottomrule
+\end{tabular}
+\end{subtable}\hfill
+\begin{subtable}[t]{.48\textwidth}
+\centering\small
+\caption{Validation and feedback.}
+\label{tab:validation-ablation}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Variant & Valid \MetricUp & Robust \MetricUp\\
+\midrule
+Without validation & TBD & TBD\\
+Without feedback & TBD & TBD\\
+Full approach & TBD & TBD\\
+\bottomrule
+\end{tabular}
+\end{subtable}
+\end{widetable}
+
+Describe the changes in \cref{tab:component-ablation,tab:validation-ablation}, then explain which mechanism the comparison supports and which confounders remain. Avoid treating an ablation label alone as causal evidence.
+
+\subsection{Diagnostic Analysis}
+\Cref{fig:analysis} supplies three editable analysis layouts: error taxonomy, difficulty with uncertainty, and a budget/scaling trend. Their geometry is schematic, with no numeric observations. Replace them with measured arrays and preserve the corresponding labels, units, uncertainty definition, and data provenance.
+
+\begin{widefigure}[htbp]
+\centering
+\input{figures/analysis.tex}
+\caption{\textbf{Three analysis scaffolds.} Bars, intervals, and the dashed series are layout placeholders; no empirical trend is asserted. Replace each panel with verified data and a specific diagnostic question.}
+\label{fig:analysis}
+\end{widefigure}
+
+\paragraph{Insight 2: [Named error mechanism].}
+Describe the phenomenon, its likely cause, a supporting example, and its consequence for the central claim. Candidate error names include parameter drift, order inversion, missing steps, dependency breaks, and invalid format; use only categories actually observed.
+
+\paragraph{Insight 3: [Difficulty or resource boundary].}
+Explain how the measured trend changes with [difficulty, scale, or budget], state how uncertainty was estimated, and connect the boundary to the relevant design constraint. Supplementary measurements belong in \cref{app:supplement}.
+
+\subsection{Case Study}
+\Cref{fig:cases} pairs two compressed cases, with the sample ID, task context, gold, output excerpt, score, and diagnosis. The main text should explain how these cases support the measured failure mode. Complete inputs, outputs, rubrics, and score records appear in \cref{app:case-a,app:case-b}.
+
+\begin{widefigure}[htbp]
+\centering
+\input{figures/cases/comparison.tex}
+\caption{\textbf{Compressed case-study scaffold.} Use one verified success and one verified failure to expose the capability distinction. All fields are placeholders; the complete records belong in the appendix.}
+\label{fig:cases}
+\end{widefigure}

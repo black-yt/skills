@@ -1,0 +1,237 @@
+\section{Training and Experimental Settings}
+\label{app:settings}
+
+This appendix records the reproducibility details referenced in \cref{sec:method,sec:experiments}. Fill the settings in \cref{tab:settings,tab:hyperparameters} from the executed experiment configuration. Preserve exact model versions, data revisions, prompts, and parsing behavior rather than inferring defaults.
+
+\begin{longtable}{@{}p{.28\textwidth}p{.66\textwidth}@{}}
+\caption{\textbf{Evaluation settings scaffold.} Each field must describe the actual run.}\label{tab:settings}\\
+\toprule
+Field & Recorded value or rule\\
+\midrule
+\endfirsthead
+\toprule
+Field & Recorded value or rule (continued)\\
+\midrule
+\endhead
+Test set and revision & [dataset name, revision, test count, split definition]\\
+Models and versions & [exact model IDs, weights or endpoint version, access date]\\
+Prompt template & [system/user text and task-specific fields]\\
+Output schema & [required fields, answer boundary, permitted code blocks]\\
+Decoding & [temperature, top-p, seed, stopping rule]\\
+Token limits & [input budget, output budget, truncation handling]\\
+Parsing & [final-answer extraction, schema checks, numeric normalization]\\
+Invalid handling & [definition, count, scoring rule, retry eligibility]\\
+Runs and aggregation & [run count, averaging, uncertainty, paired tests if used]\\
+Retries and caches & [retry budget, cache keys, replay policy, leakage controls]\\
+Baseline fairness & [shared budgets and prompts; every intentional difference]\\
+Hardware and software & [accelerator, software versions, precision and batch size]\\
+Data quality & [deduplication, leakage, annotation consistency, human audit]\\
+Source provenance & [source IDs, filtering evidence, repair/discard criteria]\\
+Release revision & [dataset/code revision and reproducibility entry points]\\
+\bottomrule
+\end{longtable}
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Training hyperparameter scaffold.} Retain this table only for experiments involving training or adaptation.}
+\label{tab:hyperparameters}
+\small
+\begin{tabularx}{.88\textwidth}{@{}lY@{}}
+\toprule
+Hyperparameter & Value\\
+\midrule
+Base model and initialization & [exact model and revision]\\
+Learning rate / schedule & [value and schedule]\\
+Batch size / accumulation & [values]\\
+Steps / epochs & [value and stopping rule]\\
+Optimizer / regularization & [settings]\\
+Sequence length / precision & [settings]\\
+Training data and split & [revision and leakage safeguards]\\
+Inference temperature / decoding & [settings]\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\Needspace{24\baselineskip}
+\subsection{Prompt, Parsing, and Invalid Outputs}
+\label{app:protocol}
+
+The prompt and parser below are placeholders for a documented protocol. Replace them with the exact text and executed rules, including how invalid outputs are counted, whether retries are allowed, and how cached responses are reused.
+
+\begin{lstlisting}[caption={Prompt-format scaffold.},label={lst:prompt}]
+SYSTEM: [Task scope and permitted tools.]
+USER:
+  Context: [input context]
+  Question: [task]
+  Output contract:
+    {"answer": "[final answer]", "evidence": "[support]"}
+\end{lstlisting}
+
+\begin{lstlisting}[caption={Evaluation-rule scaffold; describe the actual parser.},label={lst:parser}]
+1. Extract only the protocol-defined final answer.
+2. Parse the required schema and check task constraints.
+3. If invalid, record the error category and apply [rule].
+4. If valid, compute the documented task score.
+5. Record retry/cache provenance and aggregate all runs.
+\end{lstlisting}
+
+\Cref{lst:prompt,lst:parser} should match the submitted evaluation code. Document any accepted formatting variation so that superficial differences do not change a score, and isolate semantic errors from invalid-format errors.
+
+\section{Supplementary Results}
+\label{app:supplement}
+
+Use this section for additional ablations, category or difficulty slices, uncertainty estimates, invalid-output distributions, and agreement analyses. \Cref{tab:supplement} is a supplementary table scaffold; name the question it answers and connect it to one of the main-text insights.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Supplementary diagnostic scaffold.} Replace all placeholder values with measured statistics and explain the uncertainty definition.}
+\label{tab:supplement}
+\small
+\begin{tabularx}{.92\textwidth}{@{}Yccc@{}}
+\toprule
+Slice / category & Count & Metric \MetricUp & Invalid \MetricDown\\
+\midrule
+{[Difficulty group A]} & [N] & [value and interval] & [rate]\\
+{[Difficulty group B]} & [N] & [value and interval] & [rate]\\
+{[Held-out composition]} & [N] & [value and interval] & [rate]\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\FloatBarrier
+\section{Full Case A: Success Record}
+\label{app:case-a}
+
+The compact case in \cref{fig:cases} must link to its full record. The following breakable box demonstrates the fields from the skill. Bracketed content is intentionally empty of scientific claims; replace every field with the complete evidence for a real case.
+
+\begin{ReportCaseBox}{Case A: [sample identifier]}
+\CaseFirstSection{Meta Info}
+\begin{itemize}
+\item \textbf{System / model:} [system and exact model]
+\item \textbf{Run / seed:} [run identifier and seed]
+\item \textbf{Total score:} [score and range]
+\item \textbf{Duration / cost:} [seconds] / \$[cost]
+\end{itemize}
+
+\CaseSection{Task}
+\textbf{Input:} [Full task input and context.]\par
+\textbf{Gold / scientific goal:} [Verified target, acceptable alternatives, and task objective.]\par
+\textbf{Expected output:} [Complete required answer or schema.]\par
+
+\CaseSection{Data}
+\begin{itemize}
+\item \texttt{[file\_name]}: [data type, provenance, and full relevant content]. Relative path: \texttt{[relative/path/to/file]}.
+\end{itemize}
+
+\CaseSection{Rubrics}
+\begin{enumerate}
+\item \textbf{Text | Weight([w]):} [criterion]. \emph{Expected evidence:} [required content and validation rule].
+\item \textbf{Image | Weight([w]):} [criterion]. \emph{Expected evidence:} [visual requirement and validation rule].
+\end{enumerate}
+
+\CaseSection{Generated Report}
+\textbf{[Report title]}\par
+[Paste the full output or report here. Preserve the complete input, reasoning or review evidence required by the protocol, and final answer. If long, continue in another named box or page; do not silently shorten the record.]
+
+\CaseSection{Figures}
+\begin{center}
+\includegraphics[width=.88\linewidth]{\detokenize{figures/cases/example.pdf}}
+\par\footnotesize Case evidence placeholder
+\end{center}
+\textbf{Evidence figure.} [Explain the actual image and how it supports the case; replace this generic vector placeholder.]
+
+\CaseSection{Score Items}
+\begin{enumerate}
+\item \textbf{Text | Weight([w]) | Score([score]):} [criterion]. \emph{Reasoning:} [complete evidence-grounded assessment].
+\item \textbf{Image | Weight([w]) | Score([score]):} [criterion]. \emph{Reasoning:} [complete evidence-grounded visual assessment].
+\end{enumerate}
+
+\CaseSection{Diagnosis}
+[Explain the preserved constraint or capability and its relationship to a main-text metric or insight. Include the complete review and scoring record.]
+\end{ReportCaseBox}
+
+\FloatBarrier
+\Needspace{20\baselineskip}
+\section{Full Case B: Failure Record}
+\label{app:case-b}
+
+This second record contrasts with Case A using the same fields, allowing the reader to check the claimed failure mechanism. The box structure can span pages; continue the report or score items when the real record requires more space.
+
+\begin{ReportCaseBox}{Case B: [sample identifier]}
+\CaseFirstSection{Meta Info}
+\begin{itemize}
+\item \textbf{System / model:} [system and exact model]
+\item \textbf{Run / seed:} [run identifier and seed]
+\item \textbf{Total score:} [score and range]
+\item \textbf{Duration / cost:} [seconds] / \$[cost]
+\end{itemize}
+
+\CaseSection{Task}
+\textbf{Input:} [Full input and context.]\par
+\textbf{Gold / scientific goal:} [Complete verified target and objective.]\par
+\textbf{Expected output:} [Complete answer contract.]\par
+
+\CaseSection{Data}
+\begin{itemize}
+\item \texttt{[file\_name]}: [type, provenance, and complete case data]. Relative path: \texttt{[relative/path/to/file]}.
+\end{itemize}
+
+\CaseSection{Rubrics}
+\begin{enumerate}
+\item \textbf{Criterion | Weight([w]):} [criterion and expected evidence].
+\end{enumerate}
+
+\CaseSection{Generated Report}
+[Paste the entire model output and final answer. Preserve the exact portion containing the error together with its full context; do not substitute a representative excerpt for the full record.]
+
+\CaseSection{Figures}
+[Insert the complete relevant visual evidence, using at most two or three images per box. Use additional named boxes for further evidence.]
+
+\CaseSection{Score Items}
+\begin{enumerate}
+\item \textbf{Criterion | Weight([w]) | Score([score]):} [criterion]. \emph{Reasoning:} [full assessment and cited case evidence].
+\end{enumerate}
+
+\CaseSection{Diagnosis}
+[Name the observed mechanism, locate the incorrect output, explain the broken constraint, and connect it to the main-text analysis. Retain the full review and scoring record.]
+\end{ReportCaseBox}
+
+\ifshowgallery
+\clearpage
+\section{Template Formatting Gallery}
+\label{app:gallery}
+
+This template-only appendix verifies the bundled provider wrappers and typography. Remove the gallery from a real paper; it is a rendering aid and conveys no model evaluation. The ten logos in \cref{tab:logo-gallery} use the same baseline and height defined in \texttt{seed/model-logos.tex}.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Provider-logo macro gallery.} Provider marks identify names; they do not replace source citations in a research comparison.}
+\label{tab:logo-gallery}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Provider wrapper & Provider wrapper\\
+\midrule
+\OpenAIModel{OpenAI} & \AnthropicModel{Anthropic}\\[2pt]
+\GeminiModel{Gemini} & \GrokModel{Grok}\\[2pt]
+\QwenModel{Qwen} & \GLMModel{GLM}\\[2pt]
+\KimiModel{Kimi} & \MiMoModel{MiMo}\\[2pt]
+\MiniMaxModel{MiniMax} & \DeepSeekModel{DeepSeek}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Table-style macro gallery.} The visual strengths below demonstrate syntax only.}
+\label{tab:style-gallery}
+\begin{tabular}{@{}llll@{}}
+\toprule
+Normal cell & Best mark & Second mark & Dim cell\\
+\midrule
+\ScoreCell{15}{[value]} & \BestScore{35}{[value]} & \SecondScore{25}{[value]} & \DimCell{10}{[value]}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\Cref{tab:style-gallery} exercises all score-cell wrappers. Attribute symbols use \cmark{} for full support, \pmark{} for partial support with a stated restriction, and \xmark{} for no support. Directional text macros render as \MetricUp{} and \MetricDown{} and remain outside math mode in scaled table headings.
+\fi

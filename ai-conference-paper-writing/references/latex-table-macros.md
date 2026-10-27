@@ -1,5 +1,7 @@
 # Latex Table Macros
 
+可编译示例位于 [`../assets/latex-paper-template/`](../assets/latex-paper-template/)：`seed/theme.tex` 定义下述同名宏，`sections/4-experiments.tex` 展示染色结果表和模型 logo。示例表的色阶、排名标记和 `TBD` 都只是排版占位，必须用真实数据重算。
+
 ### 常用 packages 与颜色
 
 ```latex
@@ -118,11 +120,11 @@ Prior B & \cmark & \pmark & \xmark & \cmark \\
 System & Overall & Dimension 1 & Dimension 2 & Dimension 3 \\
 \midrule
 \multicolumn{5}{l}{\textbf{Autonomous agents}} \\
-\ClaudeIcon System A & \BestScore{82}{82.1} & \ScoreCell{70}{70.4} & \SecondScore{76}{75.8} & \ScoreCell{68}{67.9} \\
-\OpenAIIcon System B & \SecondScore{79}{78.6} & \BestScore{83}{83.2} & \ScoreCell{60}{60.1} & \BestScore{80}{80.0} \\
+\AnthropicModel{System A} & \BestScore{82}{82.1} & \ScoreCell{70}{70.4} & \SecondScore{76}{75.8} & \ScoreCell{68}{67.9} \\
+\OpenAIModel{System B} & \SecondScore{79}{78.6} & \BestScore{83}{83.2} & \ScoreCell{60}{60.1} & \BestScore{80}{80.0} \\
 \midrule
 \multicolumn{5}{l}{\textbf{LLMs}} \\
-\QwenIcon Model C & \ScoreCell{72}{72.3} & \SecondScore{79}{79.1} & \BestScore{84}{84.0} & \SecondScore{77}{77.2} \\
+\QwenModel{Model C} & \ScoreCell{72}{72.3} & \SecondScore{79}{79.1} & \BestScore{84}{84.0} & \SecondScore{77}{77.2} \\
 \bottomrule
 \end{tabular}%
 }
@@ -136,4 +138,4 @@ System & Overall & Dimension 1 & Dimension 2 & Dimension 3 \\
 - 不要把每个 cell 都染得过重。表格太花时，只给关键指标列上色，或者降低强度。
 - `\rowcolor{CustomRowShade}` 只少量用于分组行或隔行，不要和 score heatmap 冲突。
 - Caption 中说明 higher/lower is better，以及分数范围含义。
-- 如果使用 icon，确保路径有效，PDF build 能找到 `imgs/logos/*.png`。
+- 如果使用 model logo，确保已加载 `seed/model-logos.tex` 或定义同名宏，并让 PDF build 找到 `figures/logos/models/*.png`；logo 只放第一列模型名处。

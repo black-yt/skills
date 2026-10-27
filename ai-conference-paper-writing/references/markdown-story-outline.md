@@ -2,7 +2,7 @@
 
 # Markdown 写作模板
 
-这个文件只放 AI conference paper 写作中可直接复制和改写的 Markdown 模板。规则性判断放在 `../SKILL.md`；LaTeX 成稿技巧放在 `latex-paper-templates.md`。
+这个文件只放 AI conference paper 写作中可直接复制和改写的 Markdown 模板。规则性判断放在 `../SKILL.md`；LaTeX 成稿技巧见 `latex-citation-report-style.md`，可编译工程及覆盖表见 [`../assets/latex-paper-template/README.md`](../assets/latex-paper-template/README.md)。
 
 说明性文字默认用中文，便于快速沟通论文结构；只有图内英文文本、英文 caption、Markdown 模板等会直接进入英文论文或图表的内容保留英文。
 

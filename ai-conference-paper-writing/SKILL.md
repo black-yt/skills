@@ -1,6 +1,6 @@
 ---
 name: ai-conference-paper-writing
-description: "当需要撰写、重构或打磨 AI conference paper 时使用；覆盖 research story、章节结构、图表实验布局、引用、case study、术语体系和可复现评测，重点把工作包装成清晰的问题、能力缺口和论证闭环。"
+description: "当需要撰写、重构或打磨 AI conference paper，或从通用 LaTeX 技术报告模板开始写论文时使用；覆盖 research story、章节结构、图表实验布局、引用、case study 和可复现评测。"
 ---
 
 # AI Conference Paper Writing
@@ -14,11 +14,12 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 | 3 | 说明中文版 Markdown 草稿里如何规划图表和 case，覆盖用 blockquote 描述 Figure/Table/caption、数据集对比表、数据分布表、训练超参数表、case 图文本和术语表。 | Markdown draft、figure description、table caption、blockquote、case text、dataset comparison、data distribution、hyperparameter table、terminology table、Chinese outline、visual planning | 在中文稿中安排 teaser、pipeline、组件图、主表、消融表、分析图或 case 图前；需要给画图人员明确英文图内文本和 caption 前；规划 benchmark/data 表格时必须读取 | [references/markdown-figures-tables-cases.md](references/markdown-figures-tables-cases.md) |
 | 4 | 记录 GitHub Markdown 公式的稳定写法，覆盖 fenced `math` block、`$$` 风险、`x_{<t}` 替代、高风险宏、表格内公式、OCR 清理、变量解释和渲染检查命令。 | GitHub math、KaTeX、Markdown formula、`math` fence、`$$`、inline math、`\operatorname`、`\mathrm`、`x_{<t}`、`\mid`、OCR formula、table formula、grep check | 在 Markdown、README、论文笔记或中文草稿中写公式前；从 PDF/OCR 复制公式后；公式放在表格附近或 details 中时；出现 GitHub 渲染失败或 KaTeX 报错时必须读取 | [references/github-markdown-math.md](references/github-markdown-math.md) |
 | 5 | 提供各章节可复制段落骨架，覆盖 Abstract、Introduction、Related Work 分类布局、Method 形式化输入输出、Benchmark/Data、Evaluation、Experiments 两段式结果和 Conclusion。 | section snippets、Abstract、Introduction、Related Work、Method、formal definition、Benchmark、Data construction、Evaluation metrics、Experiments、two-paragraph result、Conclusion | 起草或重写具体章节前；需要形式化定义输入输出前；Related Work 需要分类而非罗列时；实验结果需要写现象和 insight 两段式时必须读取 | [references/markdown-section-snippets.md](references/markdown-section-snippets.md) |
-| 6 | 汇总 LaTeX 中引用和技术报告风格排版，覆盖 BibTeX、引用紧跟 claim、摘要无引用、摘要前资源图标、title 上下横线、abstract 框、页眉、章节标题颜色和主题色。 | BibTeX、citation placement、no citation in abstract、technical report style、resource icons、title rules、abstract box、header/footer、section color、theme color、LaTeX preamble | 写 `.bib` 和 `\cite` 前；整理 40-50 篇参考文献前；制作技术报告风格首页前；添加摘要资源链接、页眉、主题色、标题横线或 abstract 框时必须读取 | [references/latex-citation-report-style.md](references/latex-citation-report-style.md) |
+| 6 | 汇总 LaTeX 中引用和技术报告风格排版，覆盖 BibTeX、引用紧跟 claim、摘要无引用、Abstract 区域资源图标、title 上下横线、abstract 框、页眉、章节标题颜色和主题色。 | BibTeX、citation placement、no citation in abstract、technical report style、resource icons、title rules、abstract box、header/footer、section color、theme color、LaTeX preamble | 写 `.bib` 和 `\cite` 前；整理 40-50 篇参考文献前；制作技术报告风格首页前；添加摘要资源链接、页眉、主题色、标题横线或 abstract 框时必须读取 | [references/latex-citation-report-style.md](references/latex-citation-report-style.md) |
 | 7 | 记录 LaTeX 版面和贡献压缩技巧，覆盖段末短行、图表越界、浮动位置调整、只移动图表不改正文、`paralist compactitem` 贡献列表和紧凑排版边界。 | LaTeX layout、paragraph last line、short final line、float placement、figure overflow、table overflow、compactitem、paralist、contribution list、page break、typesetting | 编译后出现段末孤词、图表超出正文或表格溢出时；贡献列表太占空间或浮动位置不美观时；需要在不改文字和图大小的前提下调整排版时必须读取 | [references/latex-layout-and-contribution.md](references/latex-layout-and-contribution.md) |
 | 8 | 保存 LaTeX 表格宏和视觉规范，覆盖表格主题色、分数热力格、最佳/次佳标记、metric 文本箭头、dataset/method 对比表的勾叉三角、模型图标前缀和缩放表头 warning。 | LaTeX table、table color、score cell、heatmap、best score、second score、metric up/down、text arrow、`\cmark`、`\xmark`、`\pmark`、dataset comparison、model icon、resizebox warning | 写主结果表、leaderboard、dataset 对比表、消融表或分析表前；需要按数值上色、标最佳/次佳或加上下箭头时；需要用勾叉三角表示能力覆盖或排查缩放表头 warning 时必须读取 | [references/latex-table-macros.md](references/latex-table-macros.md) |
-| 9 | 说明 LaTeX 中资源和模型 logo 的使用，覆盖摘要前 Page/GitHub/Hugging Face 图标、常用模型 logo PDF 资产、表格模型名前图标宏、图标尺寸固定和资产路径。 | logo assets、Page logo、GitHub logo、Hugging Face logo、model logo、PDF logo、`\includegraphics`、resource link、model table、icon macro、asset path | 需要在摘要资源链接放 Page/GitHub/Hugging Face 图标时；模型结果表要在模型名前加 logo 时；查询 logo 资产路径、固定图标大小或新增模型图标宏时必须读取 | [references/latex-model-logos.md](references/latex-model-logos.md) |
+| 9 | 说明 LaTeX 中资源和模型 logo 的使用，覆盖 Abstract 框内 Page/GitHub/Hugging Face PDF 图标、10 款模型 provider PNG、表格第一列模型名宏、图标尺寸及 `figures/logos/models/` 路径。 | logo assets、Page logo、GitHub logo、Hugging Face logo、model provider、PNG、PDF、`\includegraphics`、resource link、model table、icon macro、asset path | 需要在摘要资源链接放 Page/GitHub/Hugging Face 图标时；模型结果表要在模型名前加 logo 时；查询 logo 资产路径、固定图标大小或新增模型图标宏时必须读取 | [references/latex-model-logos.md](references/latex-model-logos.md) |
 | 10 | 说明 appendix 和 case 展示规范，覆盖 appendix 顺序、训练/实验 setting 表、补充实验、完整 case study、实验 insight 的 `\paragraph` 段首写法和 `tcolorbox` 展示 meta/task/data/rubrics/report/score。 | appendix、case study、full case、`\paragraph` insight、tcolorbox、setting table、supplementary result、rubrics、generated report、score items、complete logs as cases | 写 appendix 前；准备完整 case study 前；主文 case 压缩但附录要完整展开时；实验分析要用 `\paragraph` 给出 insight 时；需要 tcolorbox 美化 case 时必须读取 | [references/latex-appendix-cases.md](references/latex-appendix-cases.md) |
+| 11 | 提供覆盖本 skill 成稿技巧的可编译通用 LaTeX 工程与逐项覆盖表：六段式引言、图表公式、染色与 logo、真实引用示例、消融分析、双案例和完整附录；保留 `sections/`、`figures/`、`seed/` 结构，并提供单双栏配置。 | LaTeX template、paper.tex、generic_report.cls、sections、figures、seed、theme.tex、model-logos.tex、main.bib、ScoreCell、BestScore、compactitem、case box、coverage、latexmk | 从零建立可编译论文工程前必须读取；核对教学与模板覆盖关系前必须读取；复制或替换章节、图表、引用和案例前必须读取；使用单双栏、字体或目录选项前必须读取；决定是否适用于目标会议投稿前必须读取 | [assets/latex-paper-template/README.md](assets/latex-paper-template/README.md) |
 
 ## 使用原则
 
@@ -29,6 +30,14 @@ description: "当需要撰写、重构或打磨 AI conference paper 时使用；
 - 若用户要求最新相关工作、精确引用或 SOTA 对比，必须查原论文、官方页面或可信来源后再写。
 - 避免 overclaim，但用正向限定包装：在总结性术语或 claim 中加入 1-2 个定语约束适用范围，不要反着说“我们不是 X”。
 - 默认帮助用户提高 AI 会议论文的可读性、可信度和可复述性，而不是单纯让句子更华丽。
+
+## 可编译的 LaTeX 模板
+
+- 需要独立的技术报告或论文初稿工程时，复制整个 [`assets/latex-paper-template/`](assets/latex-paper-template/) 目录；先读其 `README.md`，再替换 `paper.tex`、`sections/`、`figures/` 中的通用占位内容。
+- 保留模板内 `paper.tex`、`generic_report.cls`、`main.bib`、`sections/`、`figures/`、`seed/` 的相对结构；从模板目录运行 `latexmk`，不要单独复制主文件导致 `\input` 路径失效。
+- 模板使用 TeX 自带字体；`seed/theme.tex` 的染色、箭头和对比符号宏与 `references/latex-table-macros.md` 一致，`seed/model-logos.tex` 的 provider 宏与 `references/latex-model-logos.md` 一致。Abstract 框显示 Page/GitHub/Hugging Face logo 和资源链接，示例结果表显示模型 logo 与染色用法。
+- 模板 README 的技巧覆盖表逐项定位到章节、图表、公式、BibTeX、消融、分析和完整 case；先按论文类型选用，再将所有占位、示意色阶和案例字段替换为真实证据。Markdown 大纲与 GitHub 公式写法仍在规划阶段使用。
+- 该模板是可编辑的自定义报告样式；正式投稿时先核对目标 venue 的官方 class、页数、匿名和版式要求，再使用官方模板。现有论文迁移可按 `latex-template-migration` 的流程处理。
 
 ## 工作顺序
 

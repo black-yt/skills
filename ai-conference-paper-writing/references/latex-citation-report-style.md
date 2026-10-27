@@ -2,7 +2,7 @@
 
 # LaTeX 论文模板
 
-这个文件只放 AI conference paper 写作中可直接复制和改写的 LaTeX 模板。规则性判断放在 `../SKILL.md`；中文 Markdown 大纲、GitHub Markdown 公式和图表说明模板放在 `markdown-writing-templates.md`。
+这个文件放 AI conference paper 写作中可直接复制和改写的 LaTeX 片段。可编译的整套工程位于 [`../assets/latex-paper-template/`](../assets/latex-paper-template/)；中文 Markdown 大纲、GitHub Markdown 公式和图表说明分别见对应 reference。
 
 说明性文字默认用中文；LaTeX 命令、英文 caption、表格/图表内英文文本保留英文，便于直接复制到论文工程中。
 
@@ -78,14 +78,14 @@ BibTeX 条目示例：
 - `assets/logos/github-logo.pdf`
 - `assets/logos/hf-logo.pdf`
 
-在论文项目中使用时，把这些 PDF 放到论文的图片目录，例如 `imgs/page-logo.pdf`、`imgs/github-logo.pdf` 和 `imgs/hf-logo.pdf`，或把下面命令里的路径改成实际路径。
+通用模板已将这些 PDF 放在 `figures/logos/` 并在 Abstract 框的资源链接处引用。自建论文工程时，复制文件并把下面宏中的路径改成实际路径。
 
 Preamble / command definitions:
 
 ```latex
-\newcommand{\homepage}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/page-logo.pdf}}}
-\newcommand{\github}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/github-logo.pdf}}}
-\newcommand{\huggingface}{\raisebox{-1.5pt}{\includegraphics[height=1em]{imgs/hf-logo.pdf}}}
+\newcommand{\homepage}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/page-logo.pdf}}}
+\newcommand{\github}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/github-logo.pdf}}}
+\newcommand{\huggingface}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/hf-logo.pdf}}}
 ```
 
 Abstract 末尾资源链接块：
@@ -95,7 +95,7 @@ Abstract 末尾资源链接块：
 
 \homepage\ \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
 
-\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+\github\ \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
 
 \huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
 ```
@@ -105,9 +105,9 @@ Abstract 末尾资源链接块：
 ```latex
 \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}
 
-\github\  \textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
+\textbf{Code} \texttt{\url{https://github.com/[ORG]/[REPO]}}
 
-\huggingface\ \textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
+\textbf{Data} \texttt{\url{https://huggingface.co/datasets/[ORG]/[DATASET]}}
 ```
 
 使用规则：
@@ -119,13 +119,13 @@ Abstract 末尾资源链接块：
 
 ### 技术报告风格首页
 
-适用于 arXiv technical report、project manuscript、internal report 或不受严格会议 class 限制的论文。核心思路是统一一个主题色，把标题横线、页眉 logo、章节标题、链接颜色、teaser/abstract box、case box 都放在同一套视觉语言里。不要在 NeurIPS/ICLR/ICML/ACL/CVPR 官方提交模板中强行覆盖 `\maketitle`、页眉或章节标题，除非已经确认 camera-ready 允许自定义。
+适用于 arXiv technical report、project manuscript、internal report 或不受严格会议 class 限制的论文。核心思路是统一一个主题色，把标题横线、章节标题、链接颜色、teaser/abstract box、case box 都放在同一套视觉语言里。通用模板默认无机构页眉 logo，平台资源 logo 位于 Abstract 框。不要在 NeurIPS/ICLR/ICML/ACL/CVPR 官方提交模板中强行覆盖 `\maketitle`、页眉或章节标题，除非已经确认 camera-ready 允许自定义。
 
-这一类样式可以参考 LabHorizon 的组织方式：
+可直接复制并编译的通用版本见 [`../assets/latex-paper-template/`](../assets/latex-paper-template/)；该工程保留 `paper.tex`、`sections/`、`figures/`、`seed/` 的相对目录结构。使用整套模板时，class、主题宏和模型 logo 宏已配齐，不要再把以下定义重复粘贴进主文件；这些片段用于自建工程时理解或调整样式。技术报告首页可按这些元素组织：
 
-- 首页左上角放机构/项目 logo，去掉页眉横线。
+- 首页使用无机构 logo 的留白页眉，去掉页眉横线。
 - Title 上方和下方各放一条主题色细横线，形成技术报告感。
-- Teaser 和 resource links 放在一个 `tcolorbox` 中，摘要单独放在另一个 `tcolorbox` 中。
+- Teaser 单独放在首页 `tcolorbox`；abstract 与 resource links 放在下一页同一个 `tcolorbox` 中，摘要正文仍是一段。
 - Abstract 标题用主题色 sans-serif bold，正文保持一段式。
 - Section、subsection、subsubsection 全部使用主题色 sans-serif bold。
 - Caption 的 label 用 sans-serif bold，正文保持正常小字号。
@@ -147,7 +147,7 @@ Preamble / class-level skeleton:
 \usepackage{hyphenat}
 \usepackage[colorlinks]{hyperref}
 
-\definecolor{ReportTheme}{HTML}{8C1515}
+\definecolor{ReportTheme}{HTML}{786391}
 \definecolor{ReportLightGray}{HTML}{F4F4F4}
 \newcommand{\reporttheme}[1]{{\bfseries\color{ReportTheme}#1}}
 
@@ -158,13 +158,13 @@ Preamble / class-level skeleton:
 }
 ```
 
-首页页眉 logo 和隐藏页眉/页脚横线：
+无 logo 页眉和隐藏页眉/页脚横线：
 
 ```latex
 \setlength{\headheight}{27pt}
 \fancypagestyle{firststyle}{
   \fancyhead[R]{}
-  \fancyhead[L]{\includegraphics[height=8mm,keepaspectratio]{figures/[LOGO].png}}
+  \fancyhead[L]{\rule{0pt}{8mm}}
 }
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -187,7 +187,7 @@ Preamble / class-level skeleton:
 \captionsetup[sub]{singlelinecheck=true,format=custom,labelsep=custom,font=small}
 ```
 
-Title 上下横线、teaser/resource box、abstract box：
+Title 上下横线、teaser box、abstract/resource box：
 
 ```latex
 \makeatletter
@@ -245,12 +245,11 @@ Title 上下横线、teaser/resource box、abstract box：
     \setlength{\parskip}{0cm}
     \ifdefempty{\teaserlist}{}{
       \begin{center}
-        \includegraphics[width=0.97\textwidth,height=0.48\textheight,keepaspectratio]{\teaserlist}
+        \teaserlist
       \end{center}
       \vskip 2mm
     }
     \ifdefempty{\teasercaptionlist}{}{{\small \teasercaptionlist\par}\vskip 3mm}
-    \ifdefempty{\resourcelinkslist}{}{{\small \resourcelinkslist\par}}
   \end{tcolorbox}
   \clearpage
   \begin{tcolorbox}[breakable]
@@ -261,6 +260,7 @@ Title 上下横线、teaser/resource box、abstract box：
       \vskip 3mm
     \end{center}
     \abstractlist\par
+    \ifdefempty{\resourcelinkslist}{}{\vskip 4mm{\small \resourcelinkslist\par}}
   \end{tcolorbox}
   \tcbset{reset}
   \FloatBarrier
@@ -349,28 +349,27 @@ Title 上下横线、teaser/resource box、abstract box：
 \input{sections/appendix}
 ```
 
-单栏/双栏 `\maketitle` 适配：
+通用模板的单栏/双栏衔接：
 
 ```latex
-\makeatletter
-\if@twocolumn
-\renewcommand{\maketitle}{%
-  \twocolumn[%
-    \vskip 3mm
-    \ReportMakeTitle
-    \vskip 8mm
-  ]%
-}
-\else
-\renewcommand{\maketitle}{%
-  \ReportMakeTitle
-  \vskip 8mm
-}
-\fi
-\makeatother
+\documentclass[twocolumn]{generic_report} % Omit twocolumn for single-column.
+% ... preamble and metadata ...
+\begin{document}
+\maketitle                     % Full-width title and Abstract.
+\tableofcontents               % Optional for a long report.
+\ReportBeginMain               % Restore the selected main-text columns.
+% ... main text ...
+\clearpage
+\onecolumn                     % Full-width appendix tables and cases.
+\beginappendix
+% ... appendix ...
 ```
 
+模板的 `widefigure` / `widetable` 在单栏时使用普通浮动，在双栏时使用跨栏浮动；不要把含换页的 report 首页塞进 `twocolumn[...]` 的不可分页参数。
+
 自定义字体是可选项。只有当论文工程里真的包含对应字体文件时才使用；否则保持默认 Computer Modern 或模板默认字体，避免无法编译。若要复现更强的 report branding，可以把 sans-serif family 换成项目字体：
+
+整套模板可直接切换 `paper.tex` 中的 `usealternatefontstrue`，使用 TeX 提供的 Helvetica 标题字体；下列外部字体写法仅适用于另有合法字体文件的自建工程，不能直接替代已测试的默认配置。
 
 ```latex
 \usepackage[T1]{fontenc}
@@ -384,10 +383,10 @@ Title 上下横线、teaser/resource box、abstract box：
 \renewcommand{\rmdefault}{cmr}
 ```
 
-完整主文件结构：
+主文件结构示意（可编译版本以模板中的 `paper.tex` 为准）：
 
 ```latex
-\documentclass[]{[report_class_or_article]}
+\documentclass{generic_report}
 
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
@@ -404,7 +403,7 @@ Title 上下横线、teaser/resource box、abstract box：
 % Report theme, title-box, resource-link, table, case-box commands go here.
 
 \title{[Title with Core Packaging Term]}
-\teaser{figures/teaser.png}
+\teaser{\input{figures/teaser.tex}}
 \teasercaption{\textbf{Figure 1. [Project] overview.} [Caption.]}
 \resourcelinks{[Page / Code / Data links]}
 \author[1]{[Author]}
@@ -417,8 +416,9 @@ Title 上下横线、teaser/resource box、abstract box：
 \checkdata[arXiv]{Coming soon}
 
 \begin{document}
+\refstepcounter{figure}\label{fig:teaser}
 \maketitle
-\setcounter{figure}{1}
+\ReportBeginMain
 
 \input{sections/1-introduction}
 \input{sections/2-related-work}
@@ -431,6 +431,7 @@ Title 上下横线、teaser/resource box、abstract box：
 \bibliography{main}
 
 \clearpage
+\onecolumn
 \beginappendix
 \input{sections/appendix}
 
@@ -439,7 +440,7 @@ Title 上下横线、teaser/resource box、abstract box：
 
 复现 report style 时的检查项：
 
-- 首页是否只在第一页使用 logo 页眉，正文页不要被 logo 干扰。
+- 默认页眉是否保持无机构 logo；平台资源 logo 是否位于 Abstract 框内的资源链接处。
 - Title 上下横线、box frame、section title、link color 是否使用同一个主题色。
 - Teaser box 是否先出现，abstract box 是否单独成块，abstract 本文是否仍是一段。
 - 作者、机构、贡献和元信息是否是短行结构，不要混进摘要主体。
@@ -450,7 +451,7 @@ Title 上下横线、teaser/resource box、abstract box：
 
 ```latex
 \title{[Title with Core Packaging Term]}
-\teaser{figures/teaser.png}
+\teaser{\input{figures/teaser.tex}}
 \teasercaption{\textbf{Figure 1. [Method] overview.} [One-sentence description of the full pipeline and main capability.]}
 \resourcelinks{\begin{center}
 \homepage\ \textbf{Page} \texttt{\url{https://[PROJECT_PAGE]}}\quad
@@ -460,8 +461,9 @@ Title 上下横线、teaser/resource box、abstract box：
 \abstract{[One-paragraph abstract. Keep the abstract itself one paragraph even if resource links are shown separately. Avoid citations in the abstract.]}
 
 \begin{document}
-\ReportMakeTitle
-\setcounter{figure}{1} % The title-page teaser is treated as Figure 1 in the paper narrative.
+\refstepcounter{figure}\label{fig:teaser}
+\maketitle
+\ReportBeginMain
 \section{Introduction}
 ```
 
@@ -470,5 +472,5 @@ Title 上下横线、teaser/resource box、abstract box：
 - 主题色只定义一次，并复用到 title bar、section title、hyperref、box frame 和关键强调，不要每个模块单独发明颜色。
 - Title bar 的 `0.5pt` 横线足够克制；如果论文更偏正式报告，可以保持细线和白底，而不是用大面积色块。
 - Abstract box 和 teaser box 都用 `breakable`，避免内容略长时溢出。
-- 如果 abstract 前有 teaser 图，正文第一张图的计数需要手动对齐，例如 `\setcounter{figure}{1}`。
+- 如果 abstract 前有 teaser 图，正文第一张图的计数和标签需要对齐；通用模板在 `\maketitle` 前用 `\refstepcounter{figure}\label{fig:teaser}` 同时设置 Figure 1 与可引用入口。
 - 如果模板已有作者/机构命令，替换上面 `[AUTHOR_LIST]` 和 `[AFFILIATION_LIST]`，不要重复实现一套作者系统。

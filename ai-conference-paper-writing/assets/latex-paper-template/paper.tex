@@ -1,0 +1,85 @@
+\documentclass{generic_report}
+% Optional: \documentclass[twocolumn]{generic_report}
+% The front matter stays full width in either mode.
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array,adjustbox,longtable}
+\usepackage[table]{xcolor}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds}
+\usepackage{subcaption}
+\usepackage{paralist}
+\usepackage{enumitem}
+\usepackage{listings}
+\newif\ifusealternatefonts
+\usealternatefontsfalse % Optional TeX-provided sans font; no bundled fonts.
+\ifusealternatefonts\usepackage[scaled=.95]{helvet}\fi
+\input{seed/model-logos.tex}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlist[itemize]{leftmargin=*,topsep=3pt,itemsep=2pt}
+\setlist[enumerate]{leftmargin=*,topsep=3pt,itemsep=2pt}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible,
+  keepspaces=true,showstringspaces=false,frame=single,rulecolor=\color{ReportThemeLight}}
+
+\newcommand{\homepage}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/page-logo.pdf}}}
+\newcommand{\github}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/github-logo.pdf}}}
+\newcommand{\huggingface}{\raisebox{-1.5pt}{\includegraphics[height=1em]{figures/logos/hf-logo.pdf}}}
+\newcommand{\CoreTerm}{[Core Capability]}
+\newif\ifshowcontents
+\showcontentstrue % Set \showcontentsfalse for a short paper.
+\newif\ifshowgallery
+\showgallerytrue % Template-only macro gallery; remove from a real manuscript.
+
+\title{\CoreTerm: [Problem, Approach, and Scope]}
+\teaser{\input{figures/teaser.tex}}
+\teasercaption{\textbf{Figure 1. Research overview.} [Paper name] studies \CoreTerm{} through [challenge A], [challenge B], and [challenge C]. Replace the schematic with the real task, approach, and one evidence-backed finding.}
+\resourcelinks{\begin{center}
+  \begin{tabular}{@{}l@{}}
+    \homepage\ \textbf{Page}\quad \url{https://example.org/project}\\[1mm]
+    \github\ \textbf{Code}\quad \url{https://example.org/code}\\[1mm]
+    \huggingface\ \textbf{Data}\quad \url{https://example.org/data}
+  \end{tabular}
+\end{center}}
+
+\author[1,*]{First Author}
+\author[2,*]{Second Author}
+\affiliation[1]{First Institution}
+\affiliation[2]{Second Institution}
+\contribution[*]{Equal contribution.}
+\abstract{[Background and specific capability gap]. We introduce [method, dataset, or system] to study \CoreTerm{} under [setting and scope]. The approach connects [design A], [design B], and [design C] with [evaluation protocol]. Experiments on [verified evaluation setting] reveal [supported finding], with [measured benefit or diagnosed limitation]. These results provide evidence for [bounded implication]. This paragraph is an abstract-writing scaffold; every bracketed field must be replaced by verified content, and citations belong in the Introduction.}
+\date{\today}
+\correspondence{\email{author@example.org}}
+\checkdata[Version]{[Manuscript version]}
+
+\begin{document}
+\refstepcounter{figure}\label{fig:teaser}
+\maketitle
+\ifshowcontents
+  \tableofcontents
+\fi
+\ReportBeginMain
+
+% Four supported story routes: benchmark/data, method, system/agent, and
+% training/data-loop. Keep only the sections needed by the actual paper.
+% The planning matrix and final review checklist are in README.md.
+\input{sections/1-introduction}
+\FloatBarrier
+\input{sections/2-related-work}
+\FloatBarrier
+\input{sections/3-method}
+\FloatBarrier
+\input{sections/4-experiments}
+\FloatBarrier
+\input{sections/5-conclusion}
+\FloatBarrier
+
+\bibliographystyle{plainnat}
+\bibliography{main}
+
+\clearpage
+% Appendices use the full width in the optional two-column mode.
+\onecolumn
+\beginappendix
+\input{sections/appendix}
+\end{document}

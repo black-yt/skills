@@ -1,0 +1,32 @@
+% Edit these colors to adapt the report without changing generic_report.cls.
+\definecolor{ReportTheme}{HTML}{786391}
+\definecolor{ReportThemeLight}{HTML}{B8A5D5}
+\definecolor{ReportPanel}{HTML}{F8F6FC}
+\definecolor{DeepPurple}{HTML}{5C3A96}
+\definecolor{LighterGray}{HTML}{F7F7FA}
+\definecolor{White}{HTML}{FFFFFF}
+\definecolor{CustomScorePurple}{HTML}{5C3A96}
+\definecolor{CustomRowShade}{HTML}{F7F7FA}
+\definecolor{CustomAppendixRowShade}{HTML}{EFEFEF}
+\definecolor{CustomHighlightPurple}{RGB}{236,229,250}
+\definecolor{CustomCheckGreen}{HTML}{2E7D32}
+\definecolor{CustomCrossRed}{HTML}{C62828}
+\definecolor{CustomPartialYellow}{HTML}{B8860B}
+
+\newcommand{\ScoreCell}[2]{\cellcolor{CustomScorePurple!#1!white}#2}
+\newcommand{\BestScore}[2]{\ScoreCell{#1}{\textbf{#2}}}
+\newcommand{\SecondScore}[2]{\ScoreCell{#1}{\underline{#2}}}
+\newcommand{\DimCell}[2]{\cellcolor{CustomScorePurple!#1!white}#2}
+\newcommand{\MetricUp}{\textnormal{\textuparrow}}
+\newcommand{\MetricDown}{\textnormal{\textdownarrow}}
+\newcommand{\cmark}{\textcolor{CustomCheckGreen}{\(\checkmark\)}}
+\newcommand{\xmark}{\textcolor{CustomCrossRed}{\(\times\)}}
+\newcommand{\pmark}{\textcolor{CustomPartialYellow}{\(\triangle\)}}
+\newtcolorbox{ReportCaseBox}[1]{enhanced,breakable,title={#1},title after break={#1 (continued)},colback=LighterGray,colframe=DeepPurple,colbacktitle=DeepPurple,coltitle=White,fontupper=\small}
+\newcommand{\CaseSection}[1]{%
+  \par\smallskip\noindent{\color{DeepPurple}\rule{\linewidth}{0.35pt}}\par\nobreak\smallskip
+  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\nobreak\smallskip
+}
+\newcommand{\CaseFirstSection}[1]{%
+  \noindent{\color{DeepPurple}\textit{\textbf{#1}}}\par\nobreak\smallskip
+}

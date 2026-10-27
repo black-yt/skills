@@ -1,5 +1,7 @@
 # Latex Layout And Contribution
 
+可编译模板在 [`../assets/latex-paper-template/`](../assets/latex-paper-template/)：Introduction 实际使用下述 `compactitem`，class 用 `needspace`、`flafter` 和单双栏浮动包装避免孤立标题与过早浮动；最终仍需按本文件逐页检查边界和段末短尾。
+
 ### 版面微调与图表浮动
 
 这一节用于最终 `.tex` 排版检查。此时默认正文、caption、图大小和表格内容已经确定；排版调整应尽量不改变论文 claim、文字内容、图表数值或图像尺寸。

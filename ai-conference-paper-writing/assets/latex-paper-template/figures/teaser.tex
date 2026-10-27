@@ -1,0 +1,27 @@
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\sffamily,>=Stealth]
+\tikzset{
+ panel/.style={draw=ReportThemeLight,fill=ReportPanel,rounded corners=5pt,minimum width=4cm,minimum height=4.2cm},
+ tag/.style={draw=ReportTheme,fill=white,rounded corners=3pt,text width=3.25cm,align=center,minimum height=0.65cm,font=\small},
+ title/.style={font=\bfseries\small,text=ReportTheme}
+}
+\node[panel] at (0,0) {};
+\node[panel] at (4.65,0) {};
+\node[panel] at (9.3,0) {};
+\node[title] at (0,1.6) {Problem setting};
+\node[title] at (4.65,1.6) {Research challenges};
+\node[title] at (9.3,1.6) {Approach and evidence};
+\node[tag] (q) at (0,.65) {Input: [context and task]};
+\node[tag] (y) at (0,-.65) {Output: [response or plan]};
+\draw[->,color=ReportTheme] (q) -- (y);
+\node[tag] at (4.65,.85) {[Challenge A]};
+\node[tag] at (4.65,-.1) {[Challenge B]};
+\node[tag] at (4.65,-1.05) {[Challenge C]};
+\node[tag] (m) at (9.3,.65) {[Method / resource]};
+\node[tag] (e) at (9.3,-.65) {[Evaluation and feedback]};
+\draw[->,color=ReportTheme] (m) -- (e);
+\draw[->,thick,color=ReportTheme] (2.05,0) -- (2.6,0);
+\draw[->,thick,color=ReportTheme] (6.7,0) -- (7.25,0);
+\node[draw=ReportTheme,fill=ReportTheme,text=white,rounded corners=4pt,text width=12.8cm,align=center,minimum height=.9cm,font=\small] at (4.65,-3) {Key finding: [one verified observation and its bounded implication]};
+\end{tikzpicture}%
+}

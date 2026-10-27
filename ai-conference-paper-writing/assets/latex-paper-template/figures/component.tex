@@ -1,0 +1,15 @@
+\resizebox{0.94\textwidth}{!}{%
+\begin{tikzpicture}[font=\small\sffamily,>=Stealth]
+\tikzset{module/.style={draw=ReportTheme,fill=ReportPanel,rounded corners=3pt,text width=2.2cm,minimum height=.9cm,align=center}}
+\node[module] (candidate) at (0,0) {Candidate\\{[action / answer]}};
+\node[module] (update) at (3.2,0) {State update\\{[transition rule]}};
+\node[module] (check) at (6.4,0) {Constraint check\\{[guard]}};
+\node[module,fill=white] (accept) at (9.6,0) {Accepted output\\{[evidence]}};
+\node[module,fill=white] (repair) at (3.2,-1.8) {Repair or reject\\{[bounded policy]}};
+\draw[->,thick,color=ReportTheme] (candidate) -- (update);
+\draw[->,thick,color=ReportTheme] (update) -- (check);
+\draw[->,thick,color=ReportTheme] (check) -- node[above,font=\scriptsize] {valid} (accept);
+\draw[->,dashed,color=ReportTheme] (check.south) |- node[below,pos=.7,font=\scriptsize] {invalid} (repair);
+\draw[->,dashed,color=ReportTheme] (repair.west) -| (candidate.south);
+\end{tikzpicture}%
+}

@@ -4,7 +4,7 @@
 
 只有 logo 文件确实存在且图标能提升可读性时才用；否则保持纯文本模型名。复制到新论文时，请把示例宏名和 logo 路径改成当前项目自己的命名。
 
-本 skill 已保存一组常用模型 logo，可从 `assets/logos/models/` 复制到论文工程，例如放到 `figures/logos/models/`：
+本 skill 已保存一组常用模型 logo。若直接复制 [`../assets/latex-paper-template/`](../assets/latex-paper-template/)，`figures/logos/models/` 和 `seed/model-logos.tex` 已配齐；若用自己的工程，可从 `assets/logos/models/` 复制所需图标并按实际路径定义宏：
 
 - `anthropic.png`
 - `deepseek.png`

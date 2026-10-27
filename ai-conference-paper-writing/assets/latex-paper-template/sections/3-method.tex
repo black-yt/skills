@@ -1,0 +1,62 @@
+\section{Method}
+\label{sec:method}
+
+The approach connects [construction], [decision making], and [verification] to study \CoreTerm{}. Each component addresses one of the challenges from \cref{sec:introduction}. \Cref{fig:pipeline} separates data construction from model execution and closes the analysis or learning feedback loop.
+
+\begin{widefigure}[htbp]
+\centering
+\input{figures/pipeline.tex}
+\caption{\textbf{End-to-end pipeline scaffold.} Source records become validated instances, then pass through inference or training and evaluation. Feedback returns to repair or learning; replace these labels and edges with the real scientific design.}
+\label{fig:pipeline}
+\end{widefigure}
+
+\subsection{Task Formulation}
+Let $q$ denote the input, $c$ the task context, $y^\star$ the verified target, and $\mathcal{C}$ the allowed constraints. An instance is $d=(q,c,y^\star,\mathcal{C})$, and the dataset is $\mathcal{D}=\{d_i\}_{i=1}^{N}$. A model returns reasoning $r$ and a final response $\hat y$:
+\begin{equation}
+\begin{aligned}
+(r,\hat y) &= f_\theta(q,c),\\
+v &= \operatorname{Valid}(\hat y,\mathcal{C}),\\
+s &= v\cdot g(\hat y,y^\star).
+\end{aligned}
+\label{eq:formulation}
+\end{equation}
+Here $v\in\{0,1\}$ indicates format and constraint validity, while $g$ is a task-specific scoring function. Explain why these variables capture the task, define the score range, and use the same symbols in the evaluator and analyses. \Cref{eq:formulation} is a formulation scaffold, not a prescribed evaluation metric.
+
+\subsection{Source Construction and Instance Generation}
+To address [Challenge A], construct instances from [documented sources] using [schema and sampling rule]. Specify the transformation, preserve source identifiers, and enforce [construction constraint]. If LLMs generate candidates, state the prompt/schema, automatic checks, model or human review, and repair/discard rules.
+
+\subsection{Difficulty and Quality Control}
+Describe difficulty through [context length], [dependencies], [parameter perturbations], [negative examples], or [compositional split]. Quality control should document format checks, syntax parsing, deduplication, leakage detection, annotation consistency, pilot testing, human audits, repair decisions, and dataset versioning as applicable.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Data distribution scaffold.} Counts, lengths, difficulty, and attributes must explain how the split supports the capability claim.}
+\label{tab:distribution}
+\small
+\begin{tabularx}{\linewidth}{@{}lccYY@{}}
+\toprule
+Split & Count & Avg.\ length & Difficulty & Attribute\\
+\midrule
+Train & [N] & [L] & [level] & [coverage]\\
+Dev & [N] & [L] & [level] & [coverage]\\
+Test & [N] & [L] & [level] & [held-out factor]\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\Cref{tab:distribution} should be followed by an explanation of category balance, train/test relationships, deduplication, leakage prevention, and difficulty coverage. Report all counts from the actual processed version, with evidence for every filtering decision.
+
+\subsection{Core Component and Constraints}
+To address [Challenge B], use [component] to maintain [state or dependency]. The mechanism in \cref{fig:component} illustrates a technical core rather than repeating the pipeline. Define its inputs, state update, guard, and failure behavior, then explain the role of each constraint.
+
+\begin{widefigure}[htbp]
+\centering
+\input{figures/component.tex}
+\caption{\textbf{Core-component scaffold.} A state update is checked before acceptance; rejected candidates follow the explicit repair path. This diagram should be replaced with the actual mechanism or algorithm.}
+\label{fig:component}
+\end{widefigure}
+
+\subsection{Evaluation Protocol}
+For [Challenge C], state what each metric measures, why it fits the task, which errors it penalizes, and which irrelevant differences it ignores. Define invalid answers, whether they count as wrong, the parsing boundary, retries, and cache behavior. Separate final-answer extraction from reasoning text when the protocol requires it.
+
+Document the test size, exact model versions, prompt and output formats, decoding, token limits, number of runs, averaging, uncertainty, and fair baseline settings. Full settings and parser scaffolds appear in \cref{app:settings,app:protocol}; these placeholders must become an executable, reproducible protocol for the actual paper.

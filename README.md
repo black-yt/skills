@@ -18,7 +18,7 @@ skill-name/
 | --- | --- | --- |
 | `agent-orchestration` | [`agent-orchestration/SKILL.md`](agent-orchestration/SKILL.md) | 组织主 Codex、中层原生子 agent 或 Claude Code/Atria 陪跑者与底层确定性管线，覆盖临时凭据注入、长期会话、异常接管、资源并发和证据验收。 |
 | `agents-md-maintenance` | [`agents-md-maintenance/SKILL.md`](agents-md-maintenance/SKILL.md) | 创建、整理、拆分和维护仓库级 `AGENTS.md` 与 `AGENTS.local/`，覆盖常驻上下文边界、公开/私有跟踪策略、同步校验和安全编辑。 |
-| `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，覆盖 research story、核心包装关键词、Introduction、Related Work、Method、Experiments、图表布局、case study、citation 和 reviewer-risk 检查。 |
+| `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper；附覆盖写作与排版技巧的[完整通用 LaTeX 模板](ai-conference-paper-writing/assets/latex-paper-template/README.md)，包含公式、图表、Abstract 资源 logo、模型 logo、染色表、消融分析与完整案例附录。 |
 | `bilibili-video-download` | [`bilibili-video-download/SKILL.md`](bilibili-video-download/SKILL.md) | 下载哔哩哔哩普通 BV 投稿视频为 MP4，选择画质和分 P，或导出 MP3；附完整 Python 标准库脚本、ffmpeg 安装、私有 Cookie 文件调用与结果验证。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
 | `cloudflare-flux-image-generation` | [`cloudflare-flux-image-generation/SKILL.md`](cloudflare-flux-image-generation/SKILL.md) | 注册并调用 Cloudflare Workers AI 的 FLUX.1 schnell 文生图；附完整 Python 标准库脚本、临时凭据配置、免费额度核算和排错。 |

@@ -1,0 +1,41 @@
+\begin{subfigure}[t]{.32\textwidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\scriptsize\sffamily,>=Stealth]
+\draw[->] (0,0) -- (3.8,0) node[right] {type};
+\draw[->] (0,0) -- (0,2.5) node[above] {[rate]};
+\foreach \x/\name in {.45/drift,1.55/order,2.65/invalid} {
+  \draw[draw=ReportTheme,fill=ReportPanel] (\x,0) rectangle ++(.65,1.35);
+  \node[rotate=25,anchor=north east] at (\x+.6,-.15) {\name};
+}
+\node[text=ReportTheme] at (1.9,2) {replace with measured bars};
+\end{tikzpicture}}
+\caption{Error taxonomy scaffold.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\textwidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\scriptsize\sffamily,>=Stealth]
+\draw[->] (0,0) -- (3.8,0) node[right] {difficulty};
+\draw[->] (0,0) -- (0,2.5) node[above] {[metric]};
+\foreach \x/\name in {.6/low,1.8/mid,3/high} {
+ \draw[ReportTheme] (\x,.6) -- (\x,1.8);
+ \fill[ReportTheme] (\x,1.2) circle (2pt);
+ \node[below] at (\x,-.1) {\name};
+}
+\node[text=ReportTheme] at (1.9,2.1) {replace points and intervals};
+\end{tikzpicture}}
+\caption{Difficulty and uncertainty.}
+\end{subfigure}\hfill
+\begin{subfigure}[t]{.32\textwidth}
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[font=\scriptsize\sffamily,>=Stealth]
+\draw[->] (0,0) -- (3.8,0) node[right] {budget};
+\draw[->] (0,0) -- (0,2.5) node[above] {[metric]};
+\draw[dashed,thick,ReportTheme] (.4,1.2) -- (3.3,1.2);
+\foreach \x in {.4,1.35,2.3,3.3} \draw[ReportTheme,fill=white] (\x,1.2) circle (2.5pt);
+\node[text=ReportTheme] at (1.9,2.1) {replace with measured series};
+\end{tikzpicture}}
+\caption{Scaling or resource trend.}
+\end{subfigure}

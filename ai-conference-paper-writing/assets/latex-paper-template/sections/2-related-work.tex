@@ -1,0 +1,34 @@
+\section{Related Work}
+\label{sec:related-work}
+
+\subsection{Tasks, Resources, and Capability Coverage}
+[Summarize verified resources by the capability they measure]. Explain their inputs, supervision, and evaluation scope before making a comparison. \Cref{tab:coverage} illustrates a capability table whose columns should match the challenges in the Introduction.
+
+[Explain the difference in task goal, distribution, or supervision]. The symbols below are visual placeholders, rather than evidence about real datasets. Replace every row and symbol after checking the underlying sources; place the proposed resource last only when its coverage is established.
+
+\begin{widetable}[htbp]
+\centering
+\caption{\textbf{Capability comparison scaffold.} \cmark: full support; \pmark: partial support under [explicit restriction]; \xmark: no support. All entries are placeholders.}
+\label{tab:coverage}
+\small
+\begin{tabularx}{\textwidth}{@{}Ycccc@{}}
+\toprule
+Resource & [Challenge A] & [Challenge B] & [Challenge C] & Train split\\
+\midrule
+Prior resource A & \pmark & \xmark & \cmark & \xmark\\
+Prior resource B & \cmark & \pmark & \xmark & \cmark\\
+\rowcolor{CustomRowShade}
+\textbf{Proposed resource [replace]} & \cmark & \cmark & \cmark & \cmark\\
+\bottomrule
+\end{tabularx}
+\end{widetable}
+
+\subsection{Models and System Design}
+Model reports provide examples of source-linked names: GPT-4~\citep{openai2023gpt4}, Gemini 1.5~\citep{gemini2024gemini15}, and Qwen2.5~\citep{qwen2024qwen25}. These historical reports are included to exercise the citation and logo macros. They make no claim about the models' performance on the placeholder task.
+
+[Describe the relevant modeling distinction and how it changes the present task]. Keep comparisons about research objectives, capabilities, assumptions, or evidence. Replace this paragraph with a synthesis tied to the contribution rather than a chronological list of papers.
+
+\subsection{Evaluation and Learning Feedback}
+[Group evaluation and learning work into two or three relevant lines]. The textual citation form is also available: \citet{vaswani2017attention} provide the source used by this citation-format example. Select the appropriate formal publication when a paper has both a preprint and a proceedings version.
+
+[Explain the remaining gap in verification, diagnosis, or feedback]. The intended conclusion is a precise capability boundary that can be evaluated in the Method and Experiments, with each external claim supported beside its source.
