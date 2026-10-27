@@ -28,7 +28,6 @@ skill-name/
 | `docx-splitting` | [`docx-splitting/SKILL.md`](docx-splitting/SKILL.md) | 在 Windows + Microsoft Word 环境中，通过 [`scripts/split_docx.py`](docx-splitting/scripts/split_docx.py) 按页无损拆分 `.docx` 文档。 |
 | `feishu-bot` | [`feishu-bot/SKILL.md`](feishu-bot/SKILL.md) | 创建、配置、调用和排查飞书/Lark 机器人，区分自定义机器人 webhook 单向群通知、Markdown 表格卡片渲染与应用机器人收发消息、事件订阅、卡片交互和资源上传。 |
 | `frontend-markdown-rendering` | [`frontend-markdown-rendering/SKILL.md`](frontend-markdown-rendering/SKILL.md) | 在前端只渲染最终 assistant Markdown，保留工具过程为纯文本/JSON，并支持表格、代码块、图片、KaTeX 公式、Mermaid 和 workspace 图片安全访问。 |
-| `h3-video-api` | [`h3-video-api/SKILL.md`](h3-video-api/SKILL.md) | 调用内网部署的 MiniMax-H3 视频 Generation API（SSH 隧道 + curl，无 SDK）：隧道保活、素材上传、文本/首帧/参考模式提交、轮询下载的完整流程与提示词结构，含分层连通性诊断。 |
 | `github-readme-writing` | [`github-readme-writing/SKILL.md`](github-readme-writing/SKILL.md) | 创建或优化 GitHub 项目 README，包含居中标题、badge、teaser、highlights、news、Mermaid、GitHub 公式渲染、目录结构、quick start、联系方式、citation 和 star history。 |
 | `huggingface-dataset-publishing` | [`huggingface-dataset-publishing/SKILL.md`](huggingface-dataset-publishing/SKILL.md) | 创建、上传、验证和维护 Hugging Face Dataset，尤其是图片/多图字段、JSON metadata、`push_to_hub`、回读验证和 dataset card。 |
 | `lab-cluster-1` | [`lab-cluster-1/SKILL.md`](lab-cluster-1/SKILL.md) | 在 lab cluster 1 / PJLAB 上处理开发机登录、路径和环境、网络代理、模型权重、`rlaunch`/`rjob`、服务部署和排错等集群工作流。 |
