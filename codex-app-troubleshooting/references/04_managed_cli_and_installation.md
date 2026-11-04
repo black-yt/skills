@@ -1,5 +1,7 @@
 # App 更新后找不到 CLI、安装失败与版本定位
 
+若症状是“更新没完成、打开像旧版”、配套主运行环境下载失败或下载缓存占满磁盘，先读 [15：Windows 更新与运行环境下载](15_windows_updates_and_runtime_downloads.md)，区分 App 包与运行环境；本篇主要处理 CLI 定位和安装渠道。
+
 ## `Unable to locate the Codex CLI binary`
 
 历史案例在 App 更新后、Agent Environment 已选择 WSL 时出现该错误。不能因为 WSL 终端里的 `codex` 能用，就认为桌面 App 的 CLI 路径正确。

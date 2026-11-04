@@ -76,6 +76,12 @@
 | M07 | `cc_proxy_chain.py`：CONNECT/header/rest、30 秒、64 KiB、线程与关闭 | [12](12_claude_proxy_chain_and_migration.md)、cc_proxy_chain.py：保留中继逻辑，加强边界并关闭请求日志 |
 | M08 | `.conf`：target/upstream/listen/bypass；seed 与 settings 文件 | [12](12_claude_proxy_chain_and_migration.md)、配置模板：去除私有值、保留所有参数职责 |
 | M09 | OAuth 有效期、两机刷新互踢、传输/清理包、重新登录 | [12](12_claude_proxy_chain_and_migration.md)：保留机制，不发布旧账号期限 |
+| N01 | Windows 更新中断后疑似旧界面，重开后恢复但程序包版本未变 | [15](15_windows_updates_and_runtime_downloads.md)：Appx、实际进程与界面分别取证，保留未知根因 |
+| N02 | MSIX 版本、App package.json、Chromium 文件版本、CLI 与运行环境 bundleVersion 不同 | [15](15_windows_updates_and_runtime_downloads.md)：版本身份与比较边界 |
+| N03 | primary runtime 的 download_archive / ERR_CONNECTION_CLOSED 与安装后 sync_plugins 失败 | [15](15_windows_updates_and_runtime_downloads.md)：分阶段定位、独立验收与有限重试 |
+| N04 | OAuth 修复后更新下载仍慢，系统默认/显式代理短请求均成功 | [15](15_windows_updates_and_runtime_downloads.md)：网络栈与大文件探针边界，不凭系统代理关闭判因 |
+| N05 | 活动归档仍增长，多次中断留下 codex-runtime-install-* 与 payload | [15](15_windows_updates_and_runtime_downloads.md)：增长和占用核对、授权后精确清理、previous 环境保护 |
+| N06 | 小段下载成功且大归档增长，约 13 分钟后连接仍断开，活动目录随后消失 | [15](15_windows_updates_and_runtime_downloads.md)：持续传输与最终安装分开验收，区分失败后自动清理，不臆测具体网络组件 |
 
 ## 文件级完整清单
 
@@ -152,3 +158,5 @@ python3 -B scripts/tests/test_helpers.py
 | cc_off 只影响当前终端 | 环境恢复是局部，停共享 daemon 会影响其他使用者 |
 | node CPU 高直接排除文件即可 | 分清 UI/search/watcher/Git/语言服务器，实测生效 |
 | 固定 managed hash、端口、账号期限可直接复制 | 都是环境/版本状态，先发现再验证 |
+| 重开后界面恢复就说明刚完成 App 升级 | 对照前后包版本与进程；界面恢复和二进制更新分开报告 |
+| primary runtime 下载失败说明 App 包损坏，清整个缓存即可 | 区分程序包、运行环境和配置阶段；只清确认闲置且已授权的下载临时目录 |
