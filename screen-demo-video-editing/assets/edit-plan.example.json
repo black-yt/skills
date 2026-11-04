@@ -1,0 +1,16 @@
+{
+  "source": "source.mp4",
+  "output": "edited.mp4",
+  "source_end": 12,
+  "fps": 20,
+  "cuts": [
+    [
+      3,
+      7
+    ]
+  ],
+  "encoding": {
+    "crf": 18,
+    "preset": "medium"
+  }
+}

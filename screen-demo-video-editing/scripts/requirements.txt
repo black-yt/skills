@@ -1,0 +1,4 @@
+numpy>=1.26
+Pillow>=10.2
+# Optional: supplies a portable FFmpeg when it is not on PATH.
+imageio-ffmpeg>=0.5

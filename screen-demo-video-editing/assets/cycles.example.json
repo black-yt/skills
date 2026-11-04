@@ -1,0 +1,30 @@
+{
+  "source_start": 0,
+  "source_duration": 12,
+  "fps": 8,
+  "width": 320,
+  "height": 150,
+  "signal_roi": [
+    80,
+    20,
+    200,
+    120
+  ],
+  "static_regions": [
+    [
+      0,
+      0,
+      70,
+      150
+    ]
+  ],
+  "cursor_ignore_regions": [
+    [
+      15,
+      65,
+      20,
+      80
+    ]
+  ],
+  "minimum_period_seconds": 0.7
+}
