@@ -1107,6 +1107,13 @@
         content: '### ResearchHarness\n- 用于运行、嵌入或部署轻量 tool-using LLM agent harness。\n- 覆盖 rh-agent、rh-frontend、rh-server、create_agent、run_agent、工具全集、workspace、trace、compaction 和 API 协议。\n- 推荐通过源码阅读确认复杂行为，但源码只读，不要修改 site-packages、editable checkout 或共享环境。'
       },
       {
+        name: 'screen-demo-video-editing',
+        path: 'screen-demo-video-editing/SKILL.md',
+        tags: ['视频', '科研', 'Agent', 'Python', 'ffmpeg'],
+        desc: '将 GUI、科研软件或 agent 录屏剪成演示视频，覆盖静止与周期去重、分屏悬浮、缩放跟随、日志对话、中文字幕、背景音乐和现成旁白。',
+        content: '### 屏幕演示视频剪辑与包装\n- 从原片与源时间 EDL 重建剪辑，压缩静止等待并保留真实第一段鼠标动作；按相位比较周期，排除光标闪烁但保护参数变化。\n- 以固定画布合成悬浮面板、退场、连续特写和鼠标跟随，验证实际视频而非只看静帧。\n- 日志驱动的对话持续追加；支持中文可变字体与无底色字幕，避免播放器重复加载 SRT。\n- 背景音乐与现成旁白可规范响度、对齐、淡入淡出和侧链压低；音频后期复制视频数据，附合成素材 smoke test。'
+      },
+      {
         name: 'ssh-remote-troubleshooting',
         path: 'ssh-remote-troubleshooting/SKILL.md',
         tags: ['远程', 'Windows', 'WSL', '维护'],

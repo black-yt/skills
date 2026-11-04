@@ -1,0 +1,105 @@
+{
+  "source": "edited.mp4",
+  "output": "presentation.mp4",
+  "assets_dir": "render_assets",
+  "events": "events.json",
+  "canvas": [
+    1280,
+    960
+  ],
+  "fps": 20,
+  "background_color": "#f6e2ce",
+  "corner_radius": 16,
+  "main": {
+    "crop": [
+      0,
+      0,
+      480,
+      300
+    ],
+    "initial_rect": [
+      32,
+      192,
+      888,
+      556
+    ],
+    "final_rect": [
+      32,
+      80,
+      1216,
+      760
+    ]
+  },
+  "secondary": {
+    "source": "chat.mkv",
+    "rect": [
+      952,
+      192,
+      296,
+      556
+    ]
+  },
+  "transition": {
+    "start": {
+      "event_step": 2,
+      "field": "executed_at"
+    },
+    "duration": 0.5,
+    "secondary_exit_x": 1400
+  },
+  "camera": {
+    "moves_file": "events.json",
+    "initial_center": [
+      240,
+      150
+    ],
+    "visible_fraction": 0.4,
+    "ramp_seconds": 0.2,
+    "follow_seconds": 0.35,
+    "merge_gap": 0.5,
+    "max_segments": 5,
+    "windows": [
+      [
+        3,
+        4
+      ],
+      [
+        4.3,
+        5
+      ]
+    ]
+  },
+  "overlays": [
+    {
+      "source": "captions.mkv",
+      "crop": [
+        0,
+        0,
+        1280,
+        48
+      ],
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "source": "captions.mkv",
+      "crop": [
+        0,
+        48,
+        1280,
+        72
+      ],
+      "position": [
+        0,
+        864
+      ]
+    }
+  ],
+  "encoding": {
+    "crf": 18,
+    "preset": "medium"
+  },
+  "burned_only": true
+}

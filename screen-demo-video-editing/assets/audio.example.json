@@ -1,0 +1,21 @@
+{
+  "source_video": "presentation.mp4",
+  "output": "final.mp4",
+  "preserve_original_audio": true,
+  "source_gain_db": 0,
+  "music": {
+    "path": "music.wav",
+    "target_lufs": -22,
+    "fade_in_seconds": 1,
+    "fade_out_seconds": 2
+  },
+  "voiceover": {
+    "path": "voiceover.wav",
+    "target_lufs": -16,
+    "offset_seconds": 2
+  },
+  "duck_music": true,
+  "audio_bitrate": "256k",
+  "sample_rate": 44100,
+  "burned_only": true
+}

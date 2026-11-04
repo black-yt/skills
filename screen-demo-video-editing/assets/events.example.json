@@ -1,0 +1,50 @@
+{
+  "task_summary": "载入示例影像，调整显示参数并展示三维结构。",
+  "events": [
+    {
+      "time": 1,
+      "step": 1,
+      "executed_at": 1.4,
+      "role": "model",
+      "text": "先载入示例数据。"
+    },
+    {
+      "time": 2,
+      "step": 2,
+      "executed_at": 2.4,
+      "role": "model",
+      "text": "数据已载入，接下来调整显示。"
+    },
+    {
+      "time": 3,
+      "step": 3,
+      "executed_at": 3.4,
+      "role": "model",
+      "text": "继续设置显示参数。"
+    },
+    {
+      "time": 5,
+      "step": 4,
+      "executed_at": 5.4,
+      "role": "model",
+      "text": "现在查看完整结构。"
+    }
+  ],
+  "moves": [
+    {
+      "time": 1,
+      "x": 70,
+      "y": 60
+    },
+    {
+      "time": 3,
+      "x": 180,
+      "y": 130
+    },
+    {
+      "time": 4,
+      "x": 350,
+      "y": 180
+    }
+  ]
+}

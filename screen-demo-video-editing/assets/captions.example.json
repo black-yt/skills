@@ -1,0 +1,46 @@
+{
+  "output": "captions.mkv",
+  "frames_dir": "overlay_frames/captions",
+  "duration": 8,
+  "fps": 20,
+  "size": [
+    1280,
+    120
+  ],
+  "header_height": 48,
+  "stage_position": [
+    32,
+    8
+  ],
+  "body_font": {
+    "path": "fonts/NotoSansSC.ttf",
+    "size": 28,
+    "weight": 550
+  },
+  "title_font": {
+    "path": "fonts/NotoSerifSC.ttf",
+    "size": 24,
+    "weight": 650
+  },
+  "fade_seconds": 0.2,
+  "cues": [
+    {
+      "start": 0,
+      "end": 3,
+      "title": "01 / 数据载入",
+      "text": "载入示例影像，从多个方向查看同一份数据。"
+    },
+    {
+      "start": 3,
+      "end": 6,
+      "title": "02 / 调整显示",
+      "text": "调整明暗范围，让目标结构更容易区分。"
+    },
+    {
+      "start": 6,
+      "end": 8,
+      "title": "03 / 结果展示",
+      "text": "回到完整视图，观察结构的空间关系。"
+    }
+  ]
+}

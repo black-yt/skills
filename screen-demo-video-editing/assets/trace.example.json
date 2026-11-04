@@ -1,0 +1,27 @@
+{
+  "trace": "trace.jsonl",
+  "task_summary": "载入示例数据并展示结果。",
+  "anchor": {
+    "log_timestamp": "2030-01-01T12:00:01+00:00",
+    "source_seconds": 1
+  },
+  "edit_plan": "edit-plan.json",
+  "grid": {
+    "initial_cursor": [
+      240,
+      150
+    ],
+    "global_spacing": [
+      20,
+      20
+    ],
+    "local_spacing": [
+      4,
+      4
+    ],
+    "local_cursor_label": [
+      10,
+      10
+    ]
+  }
+}
