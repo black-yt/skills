@@ -5,6 +5,7 @@
 - [rjob 工作流](#rjob-工作流)
 - [rjob 查询、事件与卡位巡检](#rjob-查询事件与卡位巡检)
 - [rjob CPU 任务](#rjob-cpu-任务)
+- [GPU 分区中的 0 GPU CPU rjob fallback](#gpu-分区中的-0-gpu-cpu-rjob-fallback)
 - [rjob GPU 任务](#rjob-gpu-任务)
 - [作业脚本骨架](#作业脚本骨架)
 
@@ -475,6 +476,87 @@ rjob get "$JOB"
 rjob logs job "$JOB" --tail-lines 100
 rjob delete "$JOB"
 ```
+
+## GPU 分区中的 0 GPU CPU rjob fallback
+
+正常情况下，需要 CPU、外网或外部 API 的任务应提交到 `llmagent_cpu_task`。当 CPU 队列长时间排不上，且任务只是短探针、单 task canary 或低资源串行任务时，可以临时在 `llmagent_gpu` 申请 CPU 资源并设置 `--gpu=0`。这只是调度 fallback，不替代正式的大批量 CPU rjob，也不能用来绕过任务的资源规划。
+
+本节是当前 `llmagent_gpu` 0 GPU 任务的已验证例外。上游网络规则仍把普通 GPU worker/rjob 视为默认无外网；只有在当前集群上先通过短探针验证、并显式注入获准代理后，才可以让这个 0 GPU CPU fallback 访问外部 API。不要把该例外推广到有 GPU 的普通训练任务或其他分区。
+
+### 资源预测和提交约束
+
+先用 `rlaunch --predict-only` 判断 group 权限和节点余量。`rjob submit --dry-run` 只检查本地命令和 YAML 形状，不能可靠证明 group quota 足够：
+
+```bash
+rlaunch --predict-only=true \
+  --charged-group=llmagent_gpu \
+  --private-machine=group \
+  --namespace=ailab-llmagent \
+  --cpu=1 \
+  --gpu=0 \
+  --memory=1024 \
+  --max-wait-duration=30s \
+  -- bash -lc 'echo ok'
+```
+
+提交 0 GPU CPU rjob 时保留以下约束：
+
+- charged group 使用 `llmagent_gpu`；`llmagent_gpu_task`、`llmagent_h100_task` 等未经当前账号验证的 group 不要继续尝试。
+- 必须使用 `--private-machine=group`，否则可能无法通过 GPU 私有节点的 quota admission。
+- `--cpu` 不能为 0；最小已验证申请为 `1 CPU / 0 GPU / 1024 MiB`。实际任务按其 CPU 和内存需求上调。
+- 保持 `--host-network=false`。不要把 `host-network` 改成 `true` 作为外网修复方案。
+- `--backoff_limit=0` 会被 rjob schema 拒绝；需要设置为大于 0 的值，例如 `1`。
+- job 名应同时包含时间戳和清洗后的 shard/run 标识。只使用秒级时间戳会让同秒提交的多个任务发生 PodGroup 或日志串线；名称过长时截断描述，保留稳定区分符。
+
+一次性探针可以使用下面的结构。把任务命令放在单独的脚本里，并先运行 `bash -n`；submit 层只负责资源、挂载和代理，不要为每个任务复制一条长命令：
+
+```bash
+source .env.proxy 2>/dev/null || true
+test -n "${GPU_RJOB_PROXY_URL:-}" || {
+  echo "GPU_RJOB_PROXY_URL is not configured" >&2
+  exit 2
+}
+
+JOB="cpu-on-gpu-$(date +%H%M%S)-s000"
+rjob submit \
+  --name "$JOB" \
+  --namespace=ailab-llmagent \
+  --charged-group=llmagent_gpu \
+  --private-machine=group \
+  --image="$RJOB_IMAGE" \
+  --cpu=1 \
+  --gpu=0 \
+  --memory=1024 \
+  --host-network=false \
+  --preemptible=yes \
+  --backoff_limit=1 \
+  --mount=gpfs://gpfs1/xuwanghan:/mnt/shared-storage-user/xuwanghan \
+  --env http_proxy="$GPU_RJOB_PROXY_URL" https_proxy="$GPU_RJOB_PROXY_URL" \
+        HTTP_PROXY="$GPU_RJOB_PROXY_URL" HTTPS_PROXY="$GPU_RJOB_PROXY_URL" \
+        all_proxy="$GPU_RJOB_PROXY_URL" ALL_PROXY="$GPU_RJOB_PROXY_URL" \
+  -- bash command.sh
+```
+
+GPU 分区不会自动挂载个人或团队 GPFS。任务需要读取代码、conda 环境或共享产物时，必须显式添加对应的 `--mount`；公网 `curl` 探针成功也不能证明项目路径已经可见。代理值应只从 ignored 本地配置或当前 shell 注入，不能写入仓库、任务脚本、日志或回复。
+
+如果 GPU0 任务需要由集群代理转发到外部 API，再启动共享的 HTTP proxy 服务，启动顺序和脱敏脚本见 [`references/gpu-proxy.md`](gpu-proxy.md)。不要把 metabot checkout 路径、代理地址或启动脚本中的运行时值写死到这个 skill。
+
+如果容器直接调用共享 conda 环境的 Python，先把该环境的 `bin` 放到 `PATH` 前面；否则 Python 可能可用，但 `pdfinfo`、`pdftoppm`、`pdftotext` 等同环境程序会被 preflight 误判为缺失。作业脚本默认使用 `set -eo pipefail`，不要在 source 集群初始化脚本前开启 `set -u`。
+
+### 查询和排错
+
+```bash
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob get "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob events "$JOB"
+KUBEBRAIN_NAMESPACE=ailab-llmagent rjob logs job "$JOB" --tail-lines 200
+```
+
+- `Pending` 或 `Starting` 时日志可能尚未聚合，`rjob logs` 抛 `TypeError: 'NoneType' object is not iterable` 通常是 CLI 的无日志处理问题，不代表容器任务失败。
+- events 中出现 `cpu cannot be 0` 时修正资源申请；出现 `insufficient group quota` 时先判断是 group 当前配额不足，不要把它当作脚本错误。
+- 0 GPU 任务可能运行在 GPU 节点，但容器没有 `nvidia-smi`、`/dev/nvidia*` 或 `CUDA_VISIBLE_DEVICES`；这是预期行为，不能用它绕过隔离检查 GPU 利用率。
+- 无效的 pending job 应及时删除，避免持续占用配额：`KUBEBRAIN_NAMESPACE=ailab-llmagent rjob delete "$JOB"`。
+
+普通 GPU 任务仍遵循“依赖和模型提前准备、不要依赖外网”的规则；只有本节所述 0 GPU CPU fallback 经过当前环境的代理和共享挂载探针后，才可继续执行需要外部 API 的短任务。
 
 ## rjob GPU 任务
 
