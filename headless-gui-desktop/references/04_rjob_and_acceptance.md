@@ -4,6 +4,8 @@
 
 集群登录、分区权限和代理规则以当前环境为准。目标为 lab cluster 1 时，结合现有 [lab-cluster-1](https://github.com/black-yt/skills/blob/main/lab-cluster-1/SKILL.md) 使用；本 skill 不复制账号、个人目录、镜像凭据或长期配置。
 
+下列命令使用保留的 Slicer 参考 runner；接入其他 GUI 软件时，按 [02](02_runtime_and_control.md) 更换应用准备、启动和验收部分。rjob 资源、挂载、网络、内网控制与清理模式可复用。
+
 ```bash
 # 在开发机设置获准的配置；只提交/监控，不在这里启动 GUI。
 export CUA_NAMESPACE="[NAMESPACE]"
@@ -55,7 +57,14 @@ python3 "$RUNTIME/desktop_client.py" ./session.json \
 
 本地客户端还需读取 `session.json` 指向的 token 文件；安全复制所需 session/token 后，将本地 `token_file` 改为本地文件路径并保留 0600 权限。不要在终端、PR 或截图中展示 token 内容。转发只解决连通性，不替代接口鉴权。
 
-## 真实验收
+## CUA 桌面与应用验收
+
+- **通用桌面：** 确认实际分辨率、PyAutoGUI 后端、可读取的 PNG，以及鼠标位置和键盘事件到达目标窗口。
+- **应用操作：** 根据目标软件选择可验证结果，例如编辑器保存包含测试文本的文件、浏览器在本地测试表单中显示输入值。必须确认应用结果，不能仅检查 HTTP 200。
+- **按需加测：** 有 3D 需求时核对应用内实际渲染器；需要录屏时检查 codec、尺寸和时长。一个应用的快捷键、就绪信号和性能数值不代表其他应用。
+- **真实证据：** 截图应能识别目标应用和操作结果；使用替代窗口的测试只能证明桌面基础组件，不能宣称目标应用已经验证。
+
+## Slicer 示例：真实验收
 
 ```bash
 # 在开发机提交，验收本身在 rjob 容器中执行。
