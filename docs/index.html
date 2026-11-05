@@ -977,8 +977,8 @@
         name: 'headless-gui-desktop',
         path: 'headless-gui-desktop/SKILL.md',
         tags: ['CUA', 'GUI', '远程', 'Python'],
-        desc: '为 CUA（Computer Use Agent）和桌面自动化部署通用无头 GUI 桌面，覆盖不同应用的安装适配、PyAutoGUI 操控、截图、CPU 渲染、低存储缓存、可选录屏和真实应用验收。',
-        content: '### 面向 CUA 的无头 GUI 桌面\n- 为 Computer Use Agent、computer use 和桌面自动化提供可截图、可通过 PyAutoGUI 操控的应用桌面，适用于浏览器、编辑器、办公工具及其他 GUI 软件。\n- 使用 Ubuntu、Xvfb、Openbox 和 Mesa llvmpipe 作为 Linux 起点，按目标应用选择系统、依赖、渲染方式和启动命令。\n- 覆盖低存储缓存、窗口焦点、录屏、rjob 部署和真实输入验收；保留 Slicer 已测示例，不包含模型调用或 agent loop。'
+        desc: '为 CUA（Computer Use Agent）部署通用无头 GUI 桌面，覆盖 Python 环境、PyAutoGUI 操控、CPU 渲染、低存储缓存、文件隔离、干净重建、产物导出及按需接入现有 agent 的真实验收。',
+        content: '### 面向 CUA 的无头 GUI 桌面\n- 为 Computer Use Agent 和桌面自动化提供可截图、可通过 PyAutoGUI 操控的应用桌面，使用 Ubuntu、Xvfb、Openbox 与按需 Mesa 软件渲染。\n- 按应用准备独立 Python 环境和缓存，区分共享挂载、agent 可写权限、容器与硬件 VM；验证干净重建和认证产物导出。\n- 默认只部署桌面；用户要求时接入已有 agent，复用上游循环，核对真实模型工具调用、中英文输入和文件保存。\n- 保留 Slicer 与 IrisGUI/编辑器的已测案例、资源测量和超时边界，不限定目标应用。'
       },
       {
         name: 'huggingface-dataset-publishing',

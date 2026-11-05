@@ -23,10 +23,32 @@ bash "$RUNTIME/submit_rjob.sh" "$CUA_RUN_ID"
 
 - **前置准备：** 使用当前环境认可的 rjob 初始化方式；例如 CLI 需要初始化脚本时先加载，不修改共享 `.bashrc`。软件和 Python 缓存按 [03](03_download_and_dependencies.md) 在联网 CPU 准备任务中建立。
 - **资源：** 提交脚本固定 `--gpu=0`，默认 2 CPU / 8000 MiB；`CUA_CPU`、`CUA_MEMORY` 可覆盖。名字含时间戳和 run 标识，重试使用新 run ID。
-- **挂载：** 必须显式挂载包含代码、软件和证据目录的共享盘。能访问公网不证明 GPFS 已挂载；容器中的绝对路径必须与提交命令一致。
+- **共享挂载模式：** 上述 runner 从共享盘读取代码/缓存并写证据，必须显式挂载所需目录。能访问公网不证明 GPFS 已挂载；路径必须与提交命令一致。这不是所有部署模式都必须挂载项目目录，agent 的可写边界见 [05](05_isolation_reset_and_export.md)。
 - **网络：** 样例使用 `--host-network=false`。私网服务绕过外部代理；不要把切换 host-network 当作修复外网认证的方法。
 - **参数不泄漏：** 脚本不转发 API key、完整代理 URL 或任意环境变量列表。联网准备需另行按环境注入获准代理，桌面提交默认 `CUA_OFFLINE=1`。
 - **dry-run 边界：** 只验证命令/YAML，不证明配额或节点足够；真实调度要看 job、replica 和 events。
+
+## 独立代码包模式
+
+需要让 agent 不直接访问项目共享目录时，可用 `rjob --folder` 上传一份明确筛选的源码、启动脚本和 wheel，不挂项目盘。它与共享挂载模式并存；镜像、分区、网络和权限仍遵循当前集群规则。
+
+```bash
+BUNDLE="[PROJECT_ROOT]/desktop-bundle"
+(
+  cd "$BUNDLE"
+  rjob submit --dry-run true --name '[JOB_NAME]' \
+    --namespace '[NAMESPACE]' --charged-group '[CPU_CHARGED_GROUP]' \
+    --image '[APPROVED_UBUNTU_22_04_IMAGE]' --cpu 2 --gpu 0 --memory 3000 \
+    --host-network=false --privileged=false --folder "$BUNDLE" \
+    -- timeout 1200 bash ./boot.sh
+)
+```
+
+- **准备：** `boot.sh` 及其需要的资源必须在上传包中；从已验证缓存建立包清单，排除 `.env`、控制 token、代理配置、运行产物与不需要的源码历史。模型密钥用运行时机制注入；控制令牌同样应单独配置。
+- **当前 CLI 行为：** 已测代码包展开到容器工作目录，使用相对 `./boot.sh` 启动；开发机的绝对目录不会因此出现在容器。维护其他 CLI 版本时重新核对，不假定所有平台布局相同。
+- **打包 cwd：** 本次 CLI 的 `.rjobignore` 解析会相对当前 cwd 解析归档成员；从包目录提交可避免 `is not in the subpath`。不要为此修改共享 CLI/site-packages。
+- **真实提交：** dry-run 确认后，以同一配置去掉 `--dry-run true`；某些 CLI 在 dry-run 也上传归档，应提前排除凭据。有效 pod volume 配置仍需核对。
+- **证据：** 无共享输出时，运行产物留在容器；先用受认证下载或 SSH 导出并校验，再删除 job。具体边界与 A/B 重建流程见 [05](05_isolation_reset_and_export.md)。
 
 ## CPU 排不上时的 0 GPU 回退
 
