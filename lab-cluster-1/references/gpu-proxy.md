@@ -16,7 +16,7 @@ export META_BOT_DIR="[APPROVED_METABOT_CHECKOUT]"
 bash scripts/start_gpu_proxy.sh
 ```
 
-脚本会先清除旧的大小写 HTTP 代理变量，再加载集群代理；它只报告代理是否已配置，不打印完整代理 URL，最后以 `exec` 启动 HTTP proxy。运行前应确认：
+脚本会先清除旧的大小写 HTTP/ALL 代理变量，再完整下载并检查集群配置脚本语法；下载失败、超时或语法错误时立即退出，不执行未完整取得的内容或启动 HTTP proxy。加载成功后，它只报告代理是否已配置，不打印完整代理 URL，最后以 `exec` 启动 HTTP proxy。运行前应确认：
 
 - `CLUSTER_PROXY_SETUP_URL` 来自当前集群运维或已验证的本地 ignored 配置，不从聊天内容、提交信息或公共文档复制未知 URL。
 - `META_BOT_DIR/tools/http_proxy/http_proxy.sh` 存在且来自当前获准 checkout；不要在共享环境中为了补齐它而安装或升级依赖。

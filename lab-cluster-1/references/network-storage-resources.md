@@ -17,7 +17,7 @@
 - 开发机联网，但只能做轻量下载、编辑、提交和监控，不要在开发机跑高负载任务。
 - CPU `rlaunch` worker 可以按本节命令设置代理并测试外网。
 - CPU `rjob` 外网任务使用 `--host-network=false`，job 启动后先 `sleep 5`，再执行 `setup_proxy.sh` 并测试外网。`--host-network=true` 更适合服务/内网访问场景，外网代理可能返回 407。
-- GPU worker 和 GPU rjob 节点不可联网；GPU 任务脚本应显式 `unset` 代理，依赖和模型提前放到共享存储。
+- 普通 GPU worker 和 GPU rjob 默认不依赖外网；GPU 任务脚本应显式 `unset` 代理，依赖和模型提前放到共享存储。CPU 队列受阻时，0 GPU CPU fallback 仅按 [专节](rjob-tasks.md#gpu-分区中的-0-gpu-cpu-rjob-fallback) 限制和 [获准代理流程](gpu-proxy.md) 短测后使用，不推广到有 GPU 的任务。
 - 访问私网服务时，私网地址必须进入 `no_proxy`；不要让 GPU/CPU 内网调用走外部代理。
 
 原始代理命令：
