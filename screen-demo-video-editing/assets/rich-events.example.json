@@ -1,0 +1,11 @@
+{
+  "task_summary": "载入示例数据并生成可交互的三维结果。",
+  "events": [
+    {"time": 0.5, "role": "observation", "text": "读取当前屏幕", "image": "images/raw-screen.png"},
+    {"time": 1.0, "role": "model", "text": "已找到数据导入按钮。"},
+    {"time": 1.2, "role": "tool", "tool": {"name": "click", "arguments": {"button": "left"}}},
+    {"time": 5.6, "role": "observation", "text": "观察操作结果", "image": "images/raw-result.png"},
+    {"time": 6.0, "role": "result", "text": "最终交付结果", "image": "images/raw-result.png", "editorial": true},
+    {"time": 6.6, "role": "model", "text": "已生成三维展示，可继续观察目标结构。", "editorial": true}
+  ]
+}

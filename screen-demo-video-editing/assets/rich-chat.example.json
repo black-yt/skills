@@ -1,0 +1,21 @@
+{
+  "events": "rich-events.json",
+  "output": "rich-chat.mkv",
+  "frames_dir": "overlay_frames/rich-chat",
+  "duration": 9,
+  "fps": 20,
+  "size": [512, 1000],
+  "display_name": "Demo Model",
+  "tagline": "观察屏幕并调用 GUI 工具",
+  "rich_cards": true,
+  "tool_argument_fields": ["button", "direction", "amount"],
+  "body_font": {"path": "fonts/Body.ttf", "size": 26, "weight": 500},
+  "title_font": {"path": "fonts/Body.ttf", "size": 32, "weight": 650},
+  "label_font": {"path": "fonts/Body.ttf", "size": 22, "weight": 550},
+  "card_labels": {"user": "用户任务", "observation": "屏幕观察", "tool": "结构化工具调用", "result": "交付结果"},
+  "header_height": 120,
+  "margin": 18,
+  "padding": 18,
+  "line_height": 38,
+  "image_max_height": 240
+}

@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import os
 import re
 import shutil
 import subprocess
 import uuid
+from fractions import Fraction
 from pathlib import Path
 
 
@@ -32,6 +34,20 @@ def read_json(path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def file_sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as stream:
+        for block in iter(lambda: stream.read(1024*1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def packet_hashes(ffmpeg, path):
+    report = subprocess.check_output([ffmpeg, "-v", "error", "-i", str(path), "-map", "0:v:0",
+                                      "-c:v", "copy", "-f", "framehash", "-"], text=True)
+    return [line.split(",")[-1].strip() for line in report.splitlines() if line and not line.startswith("#")]
+
+
 def write_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -52,7 +68,7 @@ def probe(ffmpeg, path):
         rate = video.get("avg_frame_rate") or video.get("r_frame_rate", "0/1")
         return {"duration": float(data["format"]["duration"]), "width": video["width"],
                 "height": video["height"], "fps": float(Fraction(rate)),
-                "codec": video["codec_name"],
+                "codec": video["codec_name"], "pixel_format": video.get("pix_fmt"),
                 "has_audio": any(s["codec_type"] == "audio" for s in data["streams"]),
                 "has_subtitles": any(s["codec_type"] == "subtitle" for s in data["streams"]),
                 "report": report}
@@ -63,9 +79,11 @@ def probe(ffmpeg, path):
     rate = re.search(r"([\d.]+) fps", line)
     if not duration or not dimensions or not rate:
         raise ValueError(f"Cannot inspect video; install ffprobe for this input:\n{report}")
+    pixel_format = re.search(r",\s*(\w+)(?:\([^)]*\))?,\s*\d+x\d+", line)
     return {"duration": int(duration[1])*3600+int(duration[2])*60+float(duration[3]),
             "width": int(dimensions[1]), "height": int(dimensions[2]), "fps": float(rate[1]),
             "codec": line.split("Video:")[1].strip().split()[0].rstrip(","),
+            "pixel_format": pixel_format[1] if pixel_format else None,
             "has_audio": "Audio:" in report, "has_subtitles": "Subtitle:" in report, "report": report}
 
 
@@ -130,6 +148,60 @@ def encode_args(cfg, fps):
     if cfg.get("maxrate"):
         args += ["-maxrate", cfg["maxrate"], "-bufsize", cfg.get("bufsize", cfg["maxrate"])]
     return args
+
+
+def frame_rate(value):
+    fps = Fraction(str(value))
+    if fps <= 0:
+        raise ValueError("fps must be positive")
+    return fps
+
+
+class FrameWriter:
+    """Atomic raw-image encoder; alpha is preserved in FFV1 Matroska outputs."""
+    def __init__(self, ffmpeg, output, size, fps, encoding=None, alpha=False):
+        self.output = Path(output)
+        self.temporary = self.output.with_name(f".{self.output.stem}.{uuid.uuid4().hex[:8]}.partial{self.output.suffix}")
+        self.mode = "RGBA" if alpha else "RGB"
+        self.size = tuple(size)
+        self.log = self.output.with_suffix(self.output.suffix+".encode.log").open("w")
+        command = [ffmpeg, "-v", "warning", "-nostdin", "-y", "-f", "rawvideo", "-pix_fmt",
+                   "rgba" if alpha else "rgb24", "-s", f"{size[0]}x{size[1]}", "-framerate", str(fps),
+                   "-i", "pipe:0", "-an"]
+        if self.output.suffix.lower() == ".mkv":
+            command += ["-c:v", "ffv1", "-level", "3", "-g", "1", "-threads", "2",
+                        "-pix_fmt", "bgra" if alpha else "bgr0"]
+        elif alpha:
+            self.log.close()
+            raise ValueError("Transparent animation requires .mkv (FFV1)")
+        else:
+            command += ["-vf", "scale=in_range=full:out_range=tv:out_color_matrix=bt709"]
+            command += encode_args(encoding or {}, fps)
+            command += ["-colorspace", "bt709", "-color_trc", "bt709", "-color_primaries", "bt709"]
+        self.process = subprocess.Popen([*command, str(self.temporary)], stdin=subprocess.PIPE, stderr=self.log)
+
+    def __enter__(self):
+        return self
+
+    def write(self, image):
+        if image.size != self.size:
+            raise ValueError("Animation frame size changed")
+        self.process.stdin.write(image.convert(self.mode).tobytes())
+
+    def __exit__(self, kind, value, traceback):
+        try:
+            if kind:
+                self.process.kill()
+                self.process.wait()
+            else:
+                self.process.stdin.close()
+                if self.process.wait():
+                    raise RuntimeError(f"Animation encoder failed; inspect {self.log.name}")
+                self.temporary.replace(self.output)
+        finally:
+            self.log.close()
+            if self.temporary.exists():
+                self.temporary.unlink()
 
 
 def video_hash(ffmpeg, source):

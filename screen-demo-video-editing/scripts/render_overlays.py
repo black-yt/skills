@@ -58,8 +58,17 @@ def make_clip(ffmpeg, directory, entries, duration, fps, output, alpha=False):
 
 def render_chat(cfg, root, directory):
     transcript = read_json(root/cfg["events"])
-    events = sorted([e for e in transcript["events"] if e.get("role") == "model" and e.get("text")],
+    rich = cfg.get("rich_cards", False)
+    roles = {"model", "user", "observation", "tool", "result"} if rich else {"model"}
+    events = sorted([e for e in transcript["events"] if e.get("role") in roles
+                     and (e.get("text") or rich and (e.get("image") or e.get("tool")))],
                     key=lambda e: e["time"])
+    # Manifests must not re-export SDK responses or omitted tool arguments.
+    events = [{k:v for k,v in e.items() if k in {"time", "step", "role", "text", "image",
+               "image_sha256", "executed_at", "recorded_model", "editorial"}} |
+              ({"tool": {"name": e["tool"].get("name", "tool"), "arguments": {
+                  k:v for k,v in e["tool"].get("arguments", {}).items() if k in cfg.get("tool_argument_fields", [])}}}
+               if rich and e.get("tool") else {}) for e in events]
     width, height = cfg["size"]
     body, title = font_for(cfg["body_font"], root), font_for(cfg.get("title_font", cfg["body_font"]), root)
     margin, pad = cfg.get("margin", 24), cfg.get("padding", 20)
@@ -68,27 +77,72 @@ def render_chat(cfg, root, directory):
     name = cfg.get("display_name", "Model")
     description = cfg.get("tagline", "")
     label = font_for(cfg.get("label_font", cfg["body_font"]), root)
+    emoji = font_for(cfg["emoji_font"], root) if cfg.get("emoji_font") else None
     logo = Image.open(root/cfg["logo"]).convert("RGBA") if cfg.get("logo") else None
     bg = cfg.get("background", "#f6f7fb")
     messages = [{"role": "user", "text": cfg.get("task_summary", transcript.get("task_summary", ""))}]+events
     measure = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     box_width = width-2*margin
     layouts = []
+    labels = {"user": "User", "model": name, "observation": "Screen observation", "tool": "Tool call", "result": "Delivery"}
+    symbols = {"user": "💬", "observation": "📷", "tool": "🛠️", "result": "✅"}
+    labels.update(cfg.get("card_labels", {}))
+    image_hashes = []
     bottom = header_height+margin
     for message in messages:
-        lines = wrap(measure, message["text"], body, box_width-2*pad)
+        lines = wrap(measure, message.get("text", ""), body, box_width-2*pad)
         h = max(1, len(lines))*line_height+2*pad
+        image, tool_lines = None, []
+        label_height = line_height if rich else 0
+        h += label_height
+        if rich and message.get("image"):
+            path = root/message["image"]
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if message.get("image_sha256") and message["image_sha256"]!=digest:
+                raise ValueError("Screenshot bytes do not match the trace's recorded hash")
+            image_hashes.append({"path": message["image"], "sha256": digest})
+            image = Image.open(path).convert("RGB")
+            image.thumbnail((box_width-2*pad, cfg.get("image_max_height", height//3)), Image.Resampling.LANCZOS)
+            h += image.height+pad
+        if rich and message.get("tool"):
+            tool = message["tool"]
+            tool_lines = wrap(measure, tool.get("name", "tool")+"( )", body, box_width-4*pad)
+            allowed = cfg.get("tool_argument_fields", [])
+            for key, value in tool.get("arguments", {}).items():
+                if key in allowed:
+                    tool_lines += wrap(measure, f"{key}: {json.dumps(value, ensure_ascii=False)}", body, box_width-4*pad)
+            h += len(tool_lines)*line_height+pad
         top = bottom
-        layouts.append({"top": top, "bottom": top+h, "lines": lines, "role": message["role"]})
+        layouts.append({"top": top, "bottom": top+h, "lines": lines, "role": message["role"],
+                        "image": image, "tool_lines": tool_lines})
         bottom = top+h+margin
     document = Image.new("RGB", (width, max(height, bottom+height)), bg)
     draw = ImageDraw.Draw(document)
     for item in layouts:
-        color = "#e7efff" if item["role"] == "user" else "#ffffff"
+        palette = {"user": "#fff2e1", "model": "#ffffff", "observation": "#edf5ff",
+                   "tool": "#f3eeff", "result": "#edf9f4"} if rich else {"user": "#e7efff"}
+        color = palette.get(item["role"], "#ffffff")
         draw.rounded_rectangle([margin, item["top"], width-margin, item["bottom"]], radius=16,
                                fill=color, outline="#dfe5ef", width=1)
+        y = item["top"]+pad
+        if rich:
+            x = margin+pad
+            if emoji and item["role"] in symbols:
+                draw.text((x, y), symbols[item["role"]], font=emoji, embedded_color=True, anchor="lt")
+                x += cfg["emoji_font"]["size"]+8
+            draw.text((x, y), labels[item["role"]], font=label, fill="#52627a", anchor="lt")
+            y += line_height
         for i, line in enumerate(item["lines"]):
-            draw.text((margin+pad, item["top"]+pad+i*line_height), line, font=body, fill="#243043", anchor="lt")
+            draw.text((margin+pad, y+i*line_height), line, font=body, fill="#243043", anchor="lt")
+        y += max(1, len(item["lines"]))*line_height
+        if item["image"]:
+            document.paste(item["image"], (margin+pad, y))
+            y += item["image"].height+pad
+        if item["tool_lines"]:
+            draw.rounded_rectangle((margin+pad, y, width-margin-pad,
+                                    y+len(item["tool_lines"])*line_height), radius=8, fill="#e7def7")
+            for i, line in enumerate(item["tool_lines"]):
+                draw.text((margin+2*pad, y+i*line_height), line, font=body, fill="#5d487b", anchor="lt")
     states, entries = [], []
     for count, item in enumerate(layouts):
         scroll = max(0, item["bottom"]-(height-margin))
@@ -116,6 +170,8 @@ def render_chat(cfg, root, directory):
         if seconds > 0:
             entries.append((name_png, seconds))
     return entries, {"events": events, "display_name": name, "continuous_playback": True,
+                     "rich_cards": rich, "source_images": image_hashes,
+                     "tool_argument_fields": cfg.get("tool_argument_fields", []),
                      "note": "Exit timing belongs to the compositor, not the message player"}
 
 

@@ -4,6 +4,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import re
 from pathlib import Path
 
@@ -43,6 +44,16 @@ def main():
     mouse = list(grid["initial_cursor"]) if grid else None
     events, moves, unmapped = [], [], 0
     for row in rows:
+        if cfg.get("include_screenshots") and row.get("direction")=="input":
+            filename = (row.get("images") or {}).get("screenshot")
+            if filename:
+                path = (root/cfg.get("screenshot_dir", ".")/filename).resolve()
+                if not path.is_file():
+                    raise FileNotFoundError(f"Raw screenshot is missing: {path}")
+                events.append({"time": mapped(row["timestamp"]), "step": row.get("step"),
+                               "role": "observation", "text": cfg.get("observation_label", "Screen observation"),
+                               "image": os.path.relpath(path, root),
+                               "image_sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
         output = (row.get("direction") == "output" or
                   (not row.get("direction") and row.get("role") == "assistant"))
         if not output:
@@ -57,6 +68,14 @@ def main():
             event["recorded_model"] = model
         events.append(event)
         for tool in row.get("tool") or []:
+            if cfg.get("include_tools"):
+                arguments = tool.get("arguments") or {}
+                if isinstance(arguments, str):
+                    arguments = json.loads(arguments)
+                allowed = cfg.get("tool_argument_fields", [])
+                events.append({"time": time, "step": row.get("step"), "role": "tool", "text": "",
+                               "tool": {"name": tool.get("name", "tool"),
+                                        "arguments": {k:arguments[k] for k in allowed if k in arguments}}})
             if tool.get("name") not in {"move", "mouse_move", "move_mouse"}:
                 continue
             fields = tool.get("arguments", {})
@@ -80,6 +99,7 @@ def main():
                 continue
             mouse = target
             moves.append({"time": time, "x": target[0], "y": target[1]})
+    events.sort(key=lambda e:e["time"])
     write_json(args.output, {"task_summary": cfg.get("task_summary", ""), "events": events,
                              "moves": moves, "unmapped_pointer_calls": unmapped,
                              "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest()})

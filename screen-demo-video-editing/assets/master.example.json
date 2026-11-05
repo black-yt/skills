@@ -1,0 +1,8 @@
+{
+  "source": "recording.mp4",
+  "output": "desktop-master.mkv",
+  "source_end": 12,
+  "fps": 20,
+  "cuts": [[0, 1], [4, 6]],
+  "crop": [0, 0, 640, 360]
+}

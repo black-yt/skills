@@ -1,0 +1,14 @@
+{
+  "output": "retimed-picture.mp4",
+  "canvas": [1280, 800],
+  "fps": 20,
+  "target_seconds": 12,
+  "encoding": {"crf": 16, "preset": "medium"},
+  "segments": [
+    {"id": "title", "kind": "still", "source": "title-poster.png", "duration_seconds": 2},
+    {"id": "actions", "source": "gui-master.mkv", "source_start": 0, "source_end": 8, "fit": true},
+    {"id": "result-motion", "source": "gui-master.mkv", "source_start": 8, "source_end": 9, "duration_seconds": 1},
+    {"id": "delivery", "source": "gui-master.mkv", "source_start": 9, "source_end": 9.6, "duration_seconds": 0.5, "hold_seconds": 2},
+    {"id": "logo", "kind": "still", "source": "logo-poster.png", "duration_seconds": 1}
+  ]
+}
