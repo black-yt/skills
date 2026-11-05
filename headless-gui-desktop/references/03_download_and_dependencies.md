@@ -68,6 +68,34 @@ bash "[PROJECT_ROOT]/desktop/prepare_software.sh"
 - **准备顺序：** 一个联网容器运行 `prepare_software.sh` 和 `install_runtime.sh`；后续 job 复用缓存。apt 仍通过当前容器配置的软件源安装，离线 Python 不等于完全无需 apt 网络。
 - **预构建镜像：** 高频启动可将这些系统依赖和 Python target 预装到派生镜像，Slicer 归档继续挂载共享缓存。该方式可省安装时间，但本次没有构建/验证派生镜像，不能写成已经可用的镜像地址。
 
+## 独立 Python 环境与 wheel 缓存
+
+现有 `install_runtime.sh` 是 PyAutoGUI target 安装样例。安装另一个 Python GUI/agent 应用时，也可在专用容器中使用 venv，避免修改开发机或共享环境；不能把“容器桌面”误解为不能联网或不能安装 Python。
+
+```bash
+# 仅在获准的独立 Ubuntu 容器内；路径由当前项目配置，不用共享基础环境。
+VENV_DIR="[SESSION_OR_PROJECT_VENV]"
+WHEEL_CACHE="[PROJECT_WHEEL_CACHE]"
+APP_REQUIREMENTS="[PINNED_APP_REQUIREMENTS_FILE]"
+apt-get install -y --no-install-recommends python3-venv python3-tk scrot xclip fonts-noto-cjk
+/usr/bin/python3 -m venv "$VENV_DIR"
+
+# 首次联网准备。旧 PyAutoGUI 依赖的已测打包引导版本，不要求全局升级。
+"$VENV_DIR/bin/python" -m pip install 'wheel==0.45.1' 'setuptools==80.9.0'
+"$VENV_DIR/bin/python" -m pip wheel --wheel-dir "$WHEEL_CACHE" -r "$APP_REQUIREMENTS"
+
+# 匹配镜像/Python/架构的后续会话可离线安装。
+"$VENV_DIR/bin/python" -m pip install --no-compile --no-index \
+  --find-links "$WHEEL_CACHE" -r "$APP_REQUIREMENTS"
+"$VENV_DIR/bin/python" -m pip check
+"$VENV_DIR/bin/python" -m pip freeze > '[RUN_DIR]/requirements.lock.txt'
+```
+
+- **复用范围：** venv 可能引用原 `/usr/bin/python3`，不能假定可跨系统搬运。独立代码包模式可只上传源码与 wheel，在相同运行镜像内重建 venv，节省长期副本。
+- **打包失败：** `invalid command 'bdist_wheel'` 常见于 venv 缺 wheel；先补打包工具。某些包如 evdev 仍可能需要小型 CPU 编译，按其要求在准备容器安装编译依赖并缓存 wheel，不把它归因为 GPU 不足。
+- **容量口径：** 同时记录实际分配空间 `du -sk` 与有需要时的逻辑文件大小；小文件较多的共享文件系统分配空间可能明显大于下载包。截图、pip 缓存、wheel、venv 和容器镜像层分别统计。
+- **普通用户运行：** 让软件目录可读/可执行、会话工作目录可写；截图、剪贴板与 Tk 排错见 [06](06_existing_agent_integration.md#常见安装与输入问题)。
+
 ## 下载器的低开销回归
 
 ```bash
