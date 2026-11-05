@@ -1,0 +1,18 @@
+{
+  "images_glob": "images/card-*.png",
+  "output": "slice-intro.mp4",
+  "canvas": [1280, 800],
+  "fps": 20,
+  "background": "background.png",
+  "grid": {"rows": 6, "columns": 10, "rect": [48, 120, 1184, 560], "gap": 4},
+  "first_view": {"row": 2, "column": 3, "rows": 2, "columns": 3, "margin": 8},
+  "stack": {
+    "quad": [[120, 280], [520, 200], [640, 500], [240, 580]],
+    "depth_offset": [-20, -80],
+    "visible_layers": 12
+  },
+  "flight_scope": "first",
+  "edge_policy": "whole",
+  "timing": {"stack": 2, "spread": 1.5, "near_hold": 1, "pullback": 1.8, "full_hold": 1.7},
+  "encoding": {"crf": 16, "preset": "medium"}
+}

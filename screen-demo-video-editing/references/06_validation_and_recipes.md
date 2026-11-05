@@ -13,6 +13,12 @@
 | `chat.example.json` | 对话尺寸、字体、身份、任务摘要；输出独立连续消息视频 |
 | `captions.example.json` | 阶段、正文、起止时间、字重、字号和透明 strip；默认没有外部字幕 |
 | `presentation.example.json` | 背景、主窗/辅窗裁切、外框、退场、特写、文字图层位置 |
+| `cards.example.json` | 图片清单、堆叠四边形、网格、近景子集、全部/部分展开与拉远阶段 |
+| `flow.example.json` | 透明圆角虚线信息流、方向、标签与循环节距 |
+| `master.example.json` | 原片裁切和 EDL → FFV1 母版，原生像素逐帧验证 |
+| `retiming.example.json` | 固定总帧数、弹性片段、明确交付停留与品牌时长 |
+| `rich-events.example.json` | 合成的用户任务、观察截图、公开工具调用与结果图片事件 |
+| `rich-chat.example.json` | 富卡片类别、公开参数白名单、截图高度与窄侧栏字体 |
 | `audio.example.json` | 原声、音乐、现成旁白、偏移与 ducking；只重新编码音频 |
 
 典型顺序：
@@ -42,6 +48,30 @@ python3 "$SKILL_DIR/scripts/smoke_test.py" --work-dir ./video-smoke --ffmpeg /pa
 
 该脚本生成自己的彩色界面、指针、周期信号、消息和测试音频，不需要本次科研数据、录屏、歌曲、字体文件副本、logo 或账号。它验证的是处理链及实际像素/音频行为，不伪装成临床、科研或 TTS 能力评估。结果留在指定测试目录，便于实际查看。
 
+## 动画、母版和精确时长回归
+
+```bash
+python3 "$SKILL_DIR/scripts/smoke_animation.py" --work-dir ./animation-smoke \
+  --ffmpeg /path/to/ffmpeg --font /path/to/ChineseFont.ttf
+```
+
+目录必须是新建或空目录；测试只生成合成图片、录屏、日志和结果，不依赖真实数据。第二组测试检查实际解码像素：每张卡片身份、近景/全景完整边界、全部与子集展开、虚线方向与循环透明度、原生像素无损母版、复制前缀、精确帧预算、交付末帧停留、富卡片白名单和常驻侧栏。报告保存在 `animation_smoke_report.json`，不是只看 FFmpeg 退出码。
+
+按需建立完整链路，避免为简单剪辑引入全部步骤：
+
+```bash
+python3 "$SKILL_DIR/scripts/animate_cards.py" --config ./cards.json
+python3 "$SKILL_DIR/scripts/render_flow.py" --config ./flow.json
+python3 "$SKILL_DIR/scripts/lossless_master.py" --config ./master.json
+# presentation 使用已对齐的主画面/聊天；需要后续调速时输出 FFV1 MKV。
+python3 "$SKILL_DIR/scripts/render_presentation.py" --config ./presentation.json
+python3 "$SKILL_DIR/scripts/retime_video.py" --config ./retiming.json
+# audio 的 video 指向调好时长的 MP4，复制视频流加入声音。
+python3 "$SKILL_DIR/scripts/mix_audio.py" --config ./audio.json
+```
+
+配置字段/镜头设计见 [07](07_storyboard_and_animation.md)，源画质证据与时间映射见 [08](08_exact_timing_and_source_quality.md)。程序测试通过后还需检查自己的实际素材：长中文、极窄聊天面板、特定 logo 透明边缘和复杂 CT 纹理都不能由合成测试代替。
+
 ## 覆盖与交付清单
 
 | 能力/历史问题 | 需要的可观察证据 |
@@ -57,6 +87,12 @@ python3 "$SKILL_DIR/scripts/smoke_test.py" --work-dir ./video-smoke --ffmpeg /pa
 | 播放器叠出大字幕 | 从 MP4 直接解码与播放器截图对照；烧入交付无额外轨道、无同名 sidecar |
 | 音乐与现成旁白 | 实际可听音轨、延迟正确、淡入淡出、说话时音乐降低、混后无削波 |
 | 只改声音保护画质 | 音频后期前后压缩视频数据 SHA-256 相同，不仅是分辨率相同 |
+| 逐张展开与拉远揭示 | 稳定图片 ID、首尾四边形、飞行参与集合、近景到远景实际连续帧 |
+| 边缘半张卡片 | 实际解码首屏与拉远中间帧，完整进入或不显示，最终全量数量正确 |
+| 信息流动方向 | 箭头和虚线沿路径同向、圆角连续、循环接缝无重复停顿 |
+| 常驻富对话框 | 中后段侧栏仍可见，观察截图真实且哈希一致、工具参数白名单、结果来源明确 |
+| 精确总时长与交付停留 | 整数总帧数、固定段不变、fit 吸收预算、最后冻结帧已完整交付 |
+| 无损源/合成母版 | 原生格式与逐帧 framehash、实际合成母版像素，各自证明范围明确 |
 | 末尾卡顿与错误诊断 | 最后几帧时间连续、全片无解码错误，换播放器核对后再判断是否改剪辑 |
 
 失败时先定位最小出错层，不对未完成片宣称成功；修改后重跑受影响检查。正确文件在单台播放器卡顿时，不无证据地继续裁掉尾部或降低所有画质。

@@ -2,7 +2,7 @@
 
 ## 规范化日志
 
-- `prepare_trace.py` 读取 JSONL 的 `direction=output`（或无 direction 的 assistant 消息），以及同一 `step` 的 execution 时间。输出公开消息正文和时间，不复制完整 API response、隐藏推理或工具参数。
+- `prepare_trace.py` 读取 JSONL 的 `direction=output`（或无 direction 的 assistant 消息），以及同一 `step` 的 execution 时间。默认只输出公开消息正文和时间；截图与工具卡片需显式启用，不复制完整 API response 或隐藏推理。
 - 配置的 `anchor.log_timestamp` 与 `anchor.source_seconds` 指向同一个已确认动作；可引用剪辑计划扣除 cuts。不要混用 UTC、当地时间和没有时区的字符串。
 - 时间压缩会把剪掉区间内的消息映射到同一个剪口，播放时以该时刻最后的状态为准。片尾之外的消息留在清单中，不强行提前显示。
 - `task_summary` 由 agent 根据任务要求简写，保留目标和关键行为，不堆全部操作细节。
@@ -57,3 +57,24 @@ python3 scripts/render_overlays.py captions --config ./captions.json
 2. `validate_export.py --burned-only` 同时检查 subtitle stream 和同目录同 stem 的外部字幕文件。删除文件后播放器可能仍缓存内容，需关闭并重新打开视频或关闭该播放器字幕层。
 3. 工具默认只把字幕写入画面，不导出 SRT。用户明确需要软字幕时才使用 `--srt-output ./separate_subtitles/captions.srt`，避免和已经带字的交付视频同目录同名自动叠加。
 4. 内部 PNG、FFV1 strip 和 JSON 是工作素材，不是需要用户在播放器加载的字幕文件。
+
+## 观察、工具与最终交付卡片
+
+- **显式启用：** trace 配置设 `include_screenshots: true`、`include_tools: true`，并以 `tool_argument_fields` 列出可公开参数。截图读取输入轮次的 `images.screenshot`，路径相对于 `screenshot_dir`；没有文件报错，不悄悄用带网格或后期改过的截图替代。
+- **来源校验：** 规范化事件保留截图 SHA-256，渲染前再次校验；显示路径相对于公共 `media_root`。移动事件 JSON 时应同时保持媒体根和相对路径关系。
+- **选择公开内容：** 实际屏幕可能含敏感信息，检查后再授权发布。工具参数采用白名单；允许的路径、输入文本本身也要复查。不能因为截图与日志已在本地就默认可上传。
+- **类别可辨：** `rich_cards: true` 允许 `user/model/observation/tool/result`。观察卡片显示原始截图缩略图；工具卡片用独立颜色、工具名和键值布局，避免看起来只是普通聊天文本。
+- **双重白名单：** 规范化和渲染配置分别设 `tool_argument_fields`，渲染 manifest 只保留选中的字段，不把未公开参数藏进交付 JSON。
+- **Emoji 可选：** 可给 `emoji_font` 指定合法字体以画相机/工具标记，示例默认用文字标签；缺彩色字形时不要让方框替代类别。
+- **调用不是成功：** 工具卡片表示请求/执行，不证明按钮已生效。完成文案必须有新截图或真实状态支持。渲染器按时间排卡，不自动验证操作成功。
+- **完整交付：** 最后一条可显式加 `role: "result"`、`image` 与短说明，截图应来自实际成片/原片对应的结果画面。为叙事添加的结果卡设 `editorial: true`，保留原日志身份与时间，不伪装为真实模型消息。
+- **展示节奏：** 不要求把每个内部 token 展示出来；任务摘要、公开输出、观察和调用要保留可理解的因果关系。常驻侧栏不设置退场；需要退场时以包含所需时间字段的事件为锚，避免同轮截图抢占执行反馈锚点。
+
+```bash
+# trace.json 中启用截图/工具，并先审阅获准公开字段。
+python3 "$SKILL_DIR/scripts/prepare_trace.py" --config ./trace.json --output ./rich-events.json
+# 从 assets/rich-chat.example.json 和 rich-events.example.json 开始配置。
+python3 "$SKILL_DIR/scripts/render_overlays.py" chat --config ./rich-chat.json
+```
+
+富卡片仍按时间追加、遮住未来消息并自动上滚。先看最后一张状态图是否完整显示图片和说明，再决定交付停留时点；精确帧预算见 [08](08_exact_timing_and_source_quality.md)。

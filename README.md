@@ -49,7 +49,7 @@ skill-name/
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
 | `rebuttal-writing` | [`rebuttal-writing/SKILL.md`](rebuttal-writing/SKILL.md) | 撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名性、开头感谢、问题弱化改写、Markdown Q&A、强证据回答、小表格、引用和礼貌结尾。 |
 | `researchharness` | [`researchharness/SKILL.md`](researchharness/SKILL.md) | 使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。 |
-| `screen-demo-video-editing` | [`screen-demo-video-editing/SKILL.md`](screen-demo-video-editing/SKILL.md) | 将 GUI、科研软件或 agent 录屏剪成演示视频，覆盖静止与周期去重、分屏悬浮、缩放跟随、日志对话、中文字幕、背景音乐和现成旁白；附可配置脚本与合成素材验收。 |
+| `screen-demo-video-editing` | [`screen-demo-video-editing/SKILL.md`](screen-demo-video-editing/SKILL.md) | 将 GUI、科研软件或 agent 录屏剪成演示视频，覆盖静止/周期去重、悬浮与跟随、逐张展开与拉远揭示、虚线信息流、截图/工具对话卡片、中文字幕及音频；附精确帧预算、无损母版与合成素材验收。 |
 | `ssh-remote-troubleshooting` | [`ssh-remote-troubleshooting/SKILL.md`](ssh-remote-troubleshooting/SKILL.md) | 排查终端能 SSH 但 VS Code 失败、Windows 临时目录权限、Profile 与服务安装、系统盘缓存及挂载遮蔽，支持保留任务的迁移与连接验收。 |
 | `structai` | [`structai/SKILL.md`](structai/SKILL.md) | 使用 StructAI Python 工具箱搭建 LLM workflow，覆盖 `LLMAgent`、结构化输出、Judge、并发、文件/PDF 工具、文本解析、私网 no_proxy 和 timeout。 |
 | `wave-mosaic-web-theme` | [`wave-mosaic-web-theme/SKILL.md`](wave-mosaic-web-theme/SKILL.md) | 复刻 black-yt 风格前端主题，覆盖 canvas wave-mosaic 动态方块背景、4 种背景颜色切换、Space Grotesk 字体、顶部圆角导航栏、论文筛选滑块和高级卡片/表格视觉。 |

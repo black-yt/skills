@@ -78,8 +78,12 @@ def build_filter(cfg, root, size, source_info, overlay_indices, has_secondary_in
     if transition:
         start = transition["start"]
         if isinstance(start, dict):
-            event = next(e for e in read_json(root/cfg["events"])["events"] if e.get("step") == start["event_step"])
-            start = event[start.get("field", "executed_at")]
+            field = start.get("field", "executed_at")
+            event = next((e for e in read_json(root/cfg["events"])["events"]
+                          if e.get("step") == start["event_step"] and field in e), None)
+            if event is None:
+                raise ValueError(f"No event for step {start['event_step']} contains {field}")
+            start = event[field]
         if not 0 <= start < source_info["duration"] or transition["duration"] <= 0:
             raise ValueError("Invalid transition timing")
         end = start+transition["duration"]
@@ -168,7 +172,10 @@ def build_filter(cfg, root, size, source_info, overlay_indices, has_secondary_in
         ox, oy = overlay.get("position", [0, 0])
         graph.append(f"[{base}][{source}]overlay=x={ox}:y={oy}:format=rgb:shortest=0:eof_action=repeat[layer{n}]")
         base = f"layer{n}"
-    graph.append(f"[{base}]scale=iw:ih:in_range=full:out_range=tv:out_color_matrix=bt709,format=yuv420p[v]")
+    if cfg.get("encoding", {}).get("codec")=="ffv1":
+        graph.append(f"[{base}]format=bgr0[v]")
+    else:
+        graph.append(f"[{base}]scale=iw:ih:in_range=full:out_range=tv:out_color_matrix=bt709,format=yuv420p[v]")
     return ";".join(graph), {"transition_start": start, "transition_end": end, "camera_windows": windows}
 
 
@@ -195,7 +202,8 @@ def main():
     if cfg.get("secondary"):
         image_names += ["secondary_mask.png", "secondary_shadow.png"]
     for name in image_names:
-        cmd += ["-loop", "1", "-framerate", str(fps), "-i", str(directory/name)]
+        cmd += ["-framerate", str(fps), "-i", str(directory/name)]
+    static_indices = list(range(1, 1+len(image_names)))
     index = 1+len(image_names)
     has_secondary = bool(cfg.get("secondary", {}).get("source"))
     if has_secondary:
@@ -205,20 +213,41 @@ def main():
     for overlay in cfg.get("overlays", []):
         path = root/overlay["source"]
         if path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
-            cmd += ["-loop", "1", "-framerate", str(fps), "-i", str(path)]
+            cmd += ["-framerate", str(fps), "-i", str(path)]
+            static_indices.append(index)
         else:
-            cmd += ["-ss", str(offset), "-i", str(path)]
+            seek = offset
+            if overlay.get("loop"):
+                loop_duration = probe(ffmpeg, path)["duration"]
+                if loop_duration<=0:
+                    raise ValueError("Loop overlay needs a positive duration")
+                seek %= loop_duration
+                cmd += ["-stream_loop", "-1"]
+            cmd += ["-ss", str(seek), "-i", str(path)]
         overlays.append((index, overlay))
         index += 1
     graph, timeline = build_filter(cfg, root, size, info, overlays, has_secondary, offset)
+    # Decode large static PNGs once; cache their decoded frame in the loop filter.
+    for index in static_indices:
+        graph = graph.replace(f"[{index}:v]", f"[static{index}]")
+    cache = [f"[{index}:v]loop=loop=-1:size=1:start=0,setpts=N/({fps}*TB)[static{index}]"
+             for index in static_indices]
+    graph = ";".join(cache+[graph])
     cmd += ["-filter_complex_threads", "2", "-filter_complex", graph, "-map", "[v]"]
     if args.preview_at is not None:
         output = check_output(directory/f"preview_{offset:07.2f}.png", [source], args.overwrite)
         cmd += ["-frames:v", "1", "-update", "1"]
     else:
         output = check_output(root/cfg["output"], [source], args.overwrite)
-        cmd += ["-map", "0:a?", "-c:a", "copy", *encode_args(cfg.get("encoding", {}), fps),
-                "-t", str(args.duration or info["duration"])]
+        cmd += ["-map", "0:a?", "-c:a", "copy"]
+        if cfg.get("encoding", {}).get("codec")=="ffv1":
+            if output.suffix.lower()!=".mkv":
+                raise ValueError("Use .mkv for a lossless FFV1 composition")
+            cmd += ["-c:v", "ffv1", "-level", "3", "-g", "1", "-pix_fmt", "bgr0", "-threads", "4",
+                    "-r", str(fps), "-fps_mode", "cfr"]
+        else:
+            cmd += encode_args(cfg.get("encoding", {}), fps)
+        cmd += ["-t", str(args.duration or info["duration"])]
         if args.progress:
             cmd += ["-progress", str(Path(args.progress).resolve()), "-nostats"]
     export(cmd, output)

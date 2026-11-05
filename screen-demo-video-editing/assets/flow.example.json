@@ -1,0 +1,17 @@
+{
+  "output": "information-flow.mkv",
+  "canvas": [900, 260],
+  "fps": 20,
+  "cycle_seconds": 2,
+  "color": "#45494f",
+  "stroke": 10,
+  "corner_radius": 18,
+  "dash_length": 32,
+  "dash_period": 56,
+  "arrow_size": 20,
+  "label_font": {"path": "fonts/Body.ttf", "size": 28, "weight": 650},
+  "paths": [
+    {"points": [[40, 105], [40, 65], [860, 65], [860, 105]], "label": "观察", "label_position": [450, 26]},
+    {"points": [[860, 155], [860, 195], [40, 195], [40, 155]], "label": "动作", "label_position": [450, 234]}
+  ]
+}
