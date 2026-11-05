@@ -1,5 +1,13 @@
 # 桌面 runtime 与操控
 
+## 接入目标应用
+
+- **通用控制层：** `desktop_server.py` 和 `desktop_client.py` 面向整个 X11 桌面，截图、点击、键盘和拖动均不依赖应用类型，可用于 CUA / Computer Use Agent 操控不同软件。
+- **准备应用：** 使用目标软件对应的系统镜像、官方安装方式和依赖。浏览器、编辑器、办公工具各自的安装包、启动命令、用户配置与就绪状态需要按应用设置。
+- **启动适配：** `run_slicer.sh` 是已有 Slicer 参考实现。接入其他应用时，在项目副本中替换 Slicer 归档解压与启动部分，使用该软件的可执行文件和参数；保留 Xvfb/Openbox、PyAutoGUI 服务、会话信息、进程组清理、TTL 和录屏限制。
+- **无需示例包：** 其他应用不需要下载 Slicer；`prepare_software.sh` 的固定包配置、`submit_rjob.sh` 的归档检查以及 Slicer 专用 smoke runner 都属于样例，需要随目标应用一起适配。
+- **验证适配：** 选择目标应用的真实操作来确认输入，例如在编辑器输入并保存文档、在浏览器填写本地测试表单。Ctrl+3、Python 控制台和 VTK 球面只是 Slicer 示例，不能照搬到其他应用。
+
 ## 项目内布局
 
 将 runtime 复制到用户自己的项目，参数由当前会话或项目私有配置提供。以下命令中的路径占位符需要替换，运行命令不写入 skill 安装目录。
@@ -13,15 +21,15 @@ cp -a "$SKILL_DIR/assets/runtime/." "$PROJECT_ROOT/desktop/"
 
 | 文件 | 用途与执行位置 |
 | --- | --- |
-| `prepare_software.sh` | 联网准备容器中下载并校验 Slicer；已有有效缓存直接退出 |
-| `requirements.txt`、`install_runtime.sh` | 只在获准的临时 Ubuntu 容器中安装 apt、缓存并安装固定 Python 依赖 |
-| `run_slicer.sh` | 启动完整桌面，绑定会话目录、进程组、时间和录屏上限，退出清理 |
+| `prepare_software.sh` | Slicer 应用样例：在联网准备容器中下载并校验，已有有效缓存直接退出 |
+| `requirements.txt`、`install_runtime.sh` | 只在获准的临时 Ubuntu 容器中安装桌面组件、Qt 示例库和固定 Python 依赖；其他应用按需调整依赖 |
+| `run_slicer.sh` | Slicer 启动样例，演示会话目录、进程组、时间和录屏上限，退出清理 |
 | `desktop_server.py` | 在桌面容器中调用真实 PyAutoGUI；不调用模型 |
 | `desktop_client.py` | 从开发机、其他容器或 SSH 转发端口发送手动请求；只依赖 Python 标准库 |
 | `verify_desktop.py`、`rjob_run_smoke.sh` | 在目标容器中执行真实 Slicer 输入/渲染/视频验收；不在开发机运行 GUI |
-| `submit_rjob.sh` | 参数化的原始 rjob 提交，支持 dry-run；不保存代理凭据或 API key |
+| `submit_rjob.sh` | Slicer 参考 runner 的参数化 rjob 提交，支持 dry-run；其他应用适配 runner 和归档检查 |
 
-## 准备与启动
+## Slicer 参考实现：准备与启动
 
 **执行位置：以下 apt、解压和 GUI 命令仅在获准的独立 Ubuntu 22.04 容器内运行。**
 
