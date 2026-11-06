@@ -39,7 +39,7 @@ skill-name/
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-docx` | [`markdown-to-docx/SKILL.md`](markdown-to-docx/SKILL.md) | 使用 [`scripts/build_docx.py`](markdown-to-docx/scripts/build_docx.py) 将 Markdown 文档转为 Word `.docx`，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。 |
 | `markdown-to-pdf` | [`markdown-to-pdf/SKILL.md`](markdown-to-pdf/SKILL.md) | 使用 [`scripts/md_to_pdf.py`](markdown-to-pdf/scripts/md_to_pdf.py) 将 Markdown 转为 PDF，支持表格、代码块、图片路径和基础 CSS。 |
-| `overleaf-project-sync` | [`overleaf-project-sync/SKILL.md`](overleaf-project-sync/SKILL.md) | 从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。 |
+| `overleaf-project-sync` | [`overleaf-project-sync/SKILL.md`](overleaf-project-sync/SKILL.md) | 通过 Cookie 只读下载和同步项目、读取评论；在授权后新增、编辑、回复、解决评论或用版本化协作接口修改远端 LaTeX。 |
 | `paper-figure-style-1` | [`paper-figure-style-1/SKILL.md`](paper-figure-style-1/SKILL.md) | 绘制浅桃紫渐变风格的论文流程图与统计图，覆盖柱状图、区间曲线、Pareto 散点、横条矩阵、训练仪表盘和双环图；包含可复用 Python 组件、17 个独立示例、10 款模型 logo 及文字可复制的 PDF 输出，可直接浏览 [8 张效果预览](paper-figure-style-1/SKILL.md#效果预览)。 |
 | `paper-figure-style-2` | [`paper-figure-style-2/SKILL.md`](paper-figure-style-2/SKILL.md) | 绘制浅彩分区架构图、生命周期泳道及白底蓝青统计图，覆盖能力径向图、响应曲线、54 面板柱状图、热力图、饼图、界面与任务证据表；包含可复用组件、9 个独立示例及文字可复制的矢量 PDF，可直接浏览 [成品预览](paper-figure-style-2/SKILL.md#效果预览)。 |
 | `paper-figure-style-3` | [`paper-figure-style-3/SKILL.md`](paper-figure-style-3/SKILL.md) | 用原生 draw.io 重建可编辑论文图；含四张 `.drawio` 示例、复用图元、实测图标获取与原生转换、真实渲染验收和[效果预览](paper-figure-style-3/SKILL.md#效果预览)。 |
