@@ -1047,8 +1047,8 @@
         name: 'overleaf-project-sync',
         path: 'overleaf-project-sync/SKILL.md',
         tags: ['Overleaf', 'LaTeX', '同步', 'Python'],
-        desc: '从 Overleaf 网页端获取项目 ZIP 下载链接和 Cookie，检查本地 LaTeX/论文目录与远端项目是否一致，并按需从远端覆盖同步本地文件。',
-        content: '### Overleaf 项目同步\n- 用浏览器开发者工具从 Overleaf 网页端复制项目 ZIP 下载链接和当前登录 Cookie，不把凭据写进仓库。\n- 使用 bundled 脚本下载 ZIP 到临时目录，默认只做 check 对比，只有 update --overwrite 才写入本地。\n- 默认不会删除本地额外文件，并忽略 .git、agent 文档、脚本和 LaTeX 缓存等本地维护内容。'
+        desc: '通过 Cookie 只读下载和同步项目、读取评论；在授权后新增、编辑、回复、解决评论或用版本化协作接口修改远端 LaTeX。',
+        content: '### Overleaf 项目同步\n- 用浏览器开发者工具从 Overleaf 网页端复制项目 ZIP 下载链接和当前登录 Cookie，不把凭据写进仓库。\n- 使用 bundled 脚本下载 ZIP 到临时目录，默认只做 check 对比，只有 update --overwrite 才写入本地。\n- 默认不会删除本地额外文件，并忽略 .git、agent 文档、脚本和 LaTeX 缓存等本地维护内容。\n- 明确区分远端只读与写入模式，评论通过 threads/ranges 独立读取，ZIP 不包含评论。\n- 已授权时使用 Cookie + CSRF 回复、编辑本人评论、解决或重新打开线程，通过版本化 OT 修改 LaTeX 或新增源码锚点，并回读核验。'
       },
       {
         name: 'paper-figure-style-1',
