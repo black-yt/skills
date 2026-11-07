@@ -20,6 +20,7 @@ description: "当需要撰写、重构或打磨 AI conference paper，或从通�
 | 9 | 说明 LaTeX 中资源和模型 logo 的使用，覆盖 Abstract 框内 Page/GitHub/Hugging Face PDF 图标、10 款模型 provider PNG、表格第一列模型名宏、图标尺寸及 `figures/logos/models/` 路径。 | logo assets、Page logo、GitHub logo、Hugging Face logo、model provider、PNG、PDF、`\includegraphics`、resource link、model table、icon macro、asset path | 需要在摘要资源链接放 Page/GitHub/Hugging Face 图标时；模型结果表要在模型名前加 logo 时；查询 logo 资产路径、固定图标大小或新增模型图标宏时必须读取 | [references/latex-model-logos.md](references/latex-model-logos.md) |
 | 10 | 说明 appendix 和 case 展示规范，覆盖 appendix 顺序、训练/实验 setting 表、补充实验、完整 case study、实验 insight 的 `\paragraph` 段首写法和 `tcolorbox` 展示 meta/task/data/rubrics/report/score。 | appendix、case study、full case、`\paragraph` insight、tcolorbox、setting table、supplementary result、rubrics、generated report、score items、complete logs as cases | 写 appendix 前；准备完整 case study 前；主文 case 压缩但附录要完整展开时；实验分析要用 `\paragraph` 给出 insight 时；需要 tcolorbox 美化 case 时必须读取 | [references/latex-appendix-cases.md](references/latex-appendix-cases.md) |
 | 11 | 提供覆盖本 skill 成稿技巧的可编译通用 LaTeX 工程与逐项覆盖表：六段式引言、图表公式、染色与 logo、真实引用示例、消融分析、双案例和完整附录；保留 `sections/`、`figures/`、`seed/` 结构，并提供单双栏配置。 | LaTeX template、paper.tex、generic_report.cls、sections、figures、seed、theme.tex、model-logos.tex、main.bib、ScoreCell、BestScore、compactitem、case box、coverage、latexmk | 从零建立可编译论文工程前必须读取；核对教学与模板覆盖关系前必须读取；复制或替换章节、图表、引用和案例前必须读取；使用单双栏、字体或目录选项前必须读取；决定是否适用于目标会议投稿前必须读取 | [assets/latex-paper-template/README.md](assets/latex-paper-template/README.md) |
+| 12 | 给出独立模拟审稿和多轮修订的冻结、隔离提示、问题分流与证据复算流程；区分写作修复、实验缺口和真实停止条件，不保证录取。 | independent review、subagent、snapshot、SHA256、raw response、parser、scorer、split overlap、视觉消融、百分点、复审、停止 | 启动多个独立审稿 agent 前必须读取；案例与分数矛盾或来源复用未明时必须读取；多轮修订、复审和总结经验前必须读取 | [references/independent-review-and-revision.md](references/independent-review-and-revision.md) |
 
 ## 使用原则
 
@@ -415,6 +416,18 @@ LaTeX 成稿最终排版检查：
 - 图、表、case box 和 algorithm 不得超出正文边框、页边距、单栏或双栏范围。
 - 修图表溢出时优先调整浮动位置和相邻段落位置，不改正文 claim、caption、图大小或表格数值。
 - 如果仅靠移动位置无法解决真实宽度溢出，先说明需要用户确认是否允许改图大小、表格布局或内容。
+
+## 独立模拟审稿与对抗修订（按需）
+
+用户要求模拟审稿、多轮对抗改稿，或复杂稿件确实需要独立检查时，在已获准且可使用子 agent 的环境中执行；普通润色不必启动多 agent 流程。详细提示和记录模板见 [references/independent-review-and-revision.md](references/independent-review-and-revision.md)。
+
+- **独立输入。** 冻结同一主稿、补充和必要源码，记录版本与文件哈希。审稿人使用独立上下文，初审不看作者预期评分、其他意见或改稿结论；分别负责视觉/任务价值、实验有效性、整体论证等视角，同时保留完整审稿权。
+- **独立结论。** “三位都支持录用”只能是观察到的结果，不能写成给审稿人的任务。不得要求转正、筛掉负评、不断更换审稿人或把同模型的多份意见当成真实独立录取概率。模拟意见不能作为官方审稿结果。
+- **证据分流。** 将每条问题区分为误读、现有记录披露不足、数据/评分缺陷、必须新增实验、模板风险。修改主张必须对应证据，不能用多加免责声明代替标签有效性、视觉贡献或泛化实验。
+- **重放优先。** 先对照模型实际收到的字段和原始响应，再核查解析、无效输出、重试/缓存、评分器及金标版本。可读案例摘要可能丢掉触发零分的语法；代码默认值不是实际运行配置，旧版本成绩也不能混入新版本核验。
+- **统计校验。** 核对样本数、计分粒度、绝对百分点与相对变化；解释不了的口述新结果保留为待核记录，不猜测多次平均方式。协议/窗口/图像来源重用、逐字重复与记忆比例必须分开描述。
+- **逐轮修订。** 作者维护问题—证据—动作—剩余缺口表，先修影响结论的问题，再改语言。每轮让原审稿人独立复审新冻结版本，并逐项区分已解决、部分解决、未解决；不把修正文风当作实验补齐。
+- **停止与披露。** 若相同科学缺口持续存在且没有新增证据，停止仅为获得正评的重复审稿，报告未达成的目标和最小补证据清单。保留全部轮次与负面结论，并按当届要求披露审稿式 LLM 反馈用途；作者自审工具的使用不能套用为官方审稿人上传保密材料的许可。
 
 ## 输出风格
 

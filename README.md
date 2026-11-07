@@ -18,7 +18,7 @@ skill-name/
 | --- | --- | --- |
 | `agent-orchestration` | [`agent-orchestration/SKILL.md`](agent-orchestration/SKILL.md) | 组织主 Codex、中层原生子 agent 或 Claude Code/Atria 陪跑者与底层确定性管线，覆盖临时凭据注入、长期会话、异常接管、资源并发和证据验收。 |
 | `agents-md-maintenance` | [`agents-md-maintenance/SKILL.md`](agents-md-maintenance/SKILL.md) | 创建、整理、拆分和维护仓库级 `AGENTS.md` 与 `AGENTS.local/`，覆盖常驻上下文边界、公开/私有跟踪策略、同步校验和安全编辑。 |
-| `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper；附覆盖写作与排版技巧的[完整通用 LaTeX 模板](ai-conference-paper-writing/assets/latex-paper-template/README.md)，包含公式、图表、Abstract 资源 logo、模型 logo、染色表、消融分析与完整案例附录。 |
+| `ai-conference-paper-writing` | [`ai-conference-paper-writing/SKILL.md`](ai-conference-paper-writing/SKILL.md) | 撰写、重构和打磨 AI conference paper，按需进行独立模拟审稿与证据驱动的多轮修订；附覆盖写作与排版技巧的[完整通用 LaTeX 模板](ai-conference-paper-writing/assets/latex-paper-template/README.md)，包含公式、图表、Abstract 资源 logo、模型 logo、染色表、消融分析与完整案例附录。 |
 | `bilibili-video-download` | [`bilibili-video-download/SKILL.md`](bilibili-video-download/SKILL.md) | 下载哔哩哔哩普通 BV 投稿视频为 MP4，选择画质和分 P，或导出 MP3；附完整 Python 标准库脚本、ffmpeg 安装、私有 Cookie 文件调用与结果验证。 |
 | `browser-render-visualization` | [`browser-render-visualization/SKILL.md`](browser-render-visualization/SKILL.md) | 使用 Playwright 渲染网页前端并保存桌面/移动端截图，检查 GitHub Pages、本地静态页面、Canvas/Three.js 空白渲染、布局溢出和浏览器报错。 |
 | `cloudflare-flux-image-generation` | [`cloudflare-flux-image-generation/SKILL.md`](cloudflare-flux-image-generation/SKILL.md) | 注册并调用 Cloudflare Workers AI 的 FLUX.1 schnell 文生图；附完整 Python 标准库脚本、临时凭据配置、免费额度核算和排错。 |
@@ -34,7 +34,7 @@ skill-name/
 | `lab-cluster-1` | [`lab-cluster-1/SKILL.md`](lab-cluster-1/SKILL.md) | 在 lab cluster 1 / PJLAB 上处理开发机登录、路径和环境、网络代理、模型权重、`rlaunch`/`rjob`、服务部署和排错等集群工作流。 |
 | `lab-cluster-1-web-portal` | [`lab-cluster-1-web-portal/SKILL.md`](lab-cluster-1-web-portal/SKILL.md) | 访问、登录和只读查询 lab-cluster-1 的 `h.pjlab.org.cn` 集群管理网站，覆盖 OIDC 会话、token 安全、Prometheus/DCGM 监控、pod/rjob 映射和报告数据分层。 |
 | `latex-compiling` | [`latex-compiling/SKILL.md`](latex-compiling/SKILL.md) | 使用系统级 `latexmk` + `pdflatex` 编译 LaTeX，并隔离 build 目录与 TeX 缓存。 |
-| `latex-template-migration` | [`latex-template-migration/SKILL.md`](latex-template-migration/SKILL.md) | 将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标投稿模板，覆盖全匿名检查、只换模板、页数判断、压页、压行、文本/图表/公式守恒和 PDF 可视化检查。 |
+| `latex-template-migration` | [`latex-template-migration/SKILL.md`](latex-template-migration/SKILL.md) | 将 arXiv、旧会议、旧期刊或自定义 LaTeX 论文工程迁移到目标投稿模板，覆盖全匿名检查、只换模板、页数判断、压页、压行、文本/图表/公式守恒和 PDF 可视化检查；包含独立审稿改稿后的再验收。 |
 | `llm-deploy-training` | [`llm-deploy-training/SKILL.md`](llm-deploy-training/SKILL.md) | 部署和训练 LLM/VLM，覆盖 vLLM OpenAI-compatible 服务、多模态限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、Megatron 长序列训练和 messages loss/loss mask。 |
 | `llm-image-generation` | [`llm-image-generation/SKILL.md`](llm-image-generation/SKILL.md) | 通过 OpenAI-compatible LLM 网关生成图片，优先读取 `LLM_API_KEY`/`LLM_BASE_URL`，覆盖图像模型选择、长等待时间、base64/URL 保存和排错。 |
 | `markdown-to-docx` | [`markdown-to-docx/SKILL.md`](markdown-to-docx/SKILL.md) | 使用 [`scripts/build_docx.py`](markdown-to-docx/scripts/build_docx.py) 将 Markdown 文档转为 Word `.docx`，支持本地图片、caption、标题样式、列表、引用、图文块表格和可见字数估算。 |
