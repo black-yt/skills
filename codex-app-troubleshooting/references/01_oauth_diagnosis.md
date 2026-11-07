@@ -19,6 +19,8 @@
 
 | 证据 | 下一步 | 不能据此断言 |
 | --- | --- | --- |
+| 浏览器回调报 `ERR_CONNECTION_REFUSED` | 在实际 CLI 环境确认登录服务仍运行，再对照 Windows/WSL 监听、连通性与保留端口，见 [08](08_auth_network_and_remote_proxy.md) | 一定是账号或 token endpoint 故障 |
+| 回调恢复后变为 `token_exchange_failed` | 重新定位发起 token 请求的进程，核对其代理继承与认证端点通路 | 回调恢复就代表整个登录完成 |
 | 代理端口 TCP 连接被拒绝 | 检查真实监听端口、监听地址与进程 | 账号失效 |
 | 显式 HTTP 代理测试正常，App 仍失败 | 检查实际 App/后端环境、代理优先级和旧进程 | 必须换账号或重装 |
 | `Could not resolve host` | 在发起请求的环境检查 DNS；区分本地解析和代理解析 | 一定是防火墙 |
@@ -44,6 +46,14 @@ curl --proxy 'http://[PROXY_HOST]:[PORT]' --noproxy '' \
 - 不使用 `-v`、转储 headers 或 response body 收集不必要信息；需要深入诊断时先做针对性脱敏。
 - 不用 `--fail` 把预期的端点方法错误混同为无法连接；但必须解释 HTTP 码含义，不能把它当认证成功。
 - TLS 问题使用已验证的可信 CA。当前官方认证文档描述 `CODEX_CA_CERTIFICATE` 及 `SSL_CERT_FILE` fallback；先核对安装版本支持情况，不能无条件套到旧版 App。
+
+## 设备码登录的前置条件与选择边界
+
+- 先核对已安装 CLI 的 `codex login --help`。当前[官方认证文档](https://learn.chatgpt.com/docs/auth)提供 `codex login --device-auth`，用于远端或本地回调受限的场景；它仍需访问认证服务。
+- 若出现 `Enable device code sign-in for Codex, Excel, PowerPoint, and Word in ChatGPT Security Settings`，说明设备码流程受账号或工作区的启用条件限制，不是靠反复重试就能修复的网络错误。
+- 个人账号由用户在 ChatGPT 安全设置中启用；工作区可能需要管理员开放权限。不要声称已修改无法访问的账号设置，也不要要求用户把账号密码交给 agent。
+- 用户不愿启用设备码时，回到浏览器回调和 token exchange 排查；不要把设备码设为必须经过的步骤，或擅自改用 API key、复制其他客户端凭据。
+- 因改用其他方案而取消的登录，仅清理本次创建且身份已核实的等待进程；保留用户原有 CLI、App、app-server 和历史。
 
 ## 保留 provider 与认证状态
 

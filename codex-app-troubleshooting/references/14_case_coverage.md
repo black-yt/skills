@@ -82,6 +82,13 @@
 | N04 | OAuth 修复后更新下载仍慢，系统默认/显式代理短请求均成功 | [15](15_windows_updates_and_runtime_downloads.md)：网络栈与大文件探针边界，不凭系统代理关闭判因 |
 | N05 | 活动归档仍增长，多次中断留下 codex-runtime-install-* 与 payload | [15](15_windows_updates_and_runtime_downloads.md)：增长和占用核对、授权后精确清理、previous 环境保护 |
 | N06 | 小段下载成功且大归档增长，约 13 分钟后连接仍断开，活动目录随后消失 | [15](15_windows_updates_and_runtime_downloads.md)：持续传输与最终安装分开验收，区分失败后自动清理，不臆测具体网络组件 |
+| O01 | WSL CLI `0.167.0` 安装/登录案例：`npm -g` 创建 `/usr/local/lib/node_modules` 报 EACCES | [04](04_managed_cli_and_installation.md)：用户 prefix、全局安装范围、nvm/conda 边界、PATH 与恢复 |
+| O02 | Windows 浏览器回调拒绝，WSL 无监听与有监听但宿主机不可达是不同阶段 | [01](01_oauth_diagnosis.md)、[08](08_auth_network_and_remote_proxy.md)：实际 CLI/端口、两侧无凭据探针、根路径 404 的判断边界 |
+| O03 | Windows 临时 bind 报 10013，实际回调端口落入 exclusion，恢复后进入 token exchange | [08](08_auth_network_and_remote_proxy.md)：1455/1457 的版本边界、WinNAT 中断条件与前后复核，不承诺重启必定修复 |
+| O04 | 设备码生成后提示 Security Settings 未启用，用户选择保留网页登录 | [01](01_oauth_diagnosis.md)：账号/工作区前置条件、选择边界、仅清理本次等待进程 |
+| O05 | 回调恢复后 token_exchange_failed；WSL 未继承代理，直连 DNS 超时而显式 HTTP 代理得到 CONNECT 200/405 | [01](01_oauth_diagnosis.md)、[02](02_proxy_and_launch.md)：实际进程环境、认证端点探针与新的真实登录分别验收 |
+| O06 | 后续直接运行独立 CLI 需要代理，旧进程不会随 shell 配置改变 | [02](02_proxy_and_launch.md)：仅作用于 codex 的函数、参数透传、已有配置检查、备份与回滚，不扩展到 App 启动链 |
+| O07 | 新的代理登录流程完成，`codex login status` 确认 ChatGPT 认证，临时转发撤除 | [08](08_auth_network_and_remote_proxy.md)：最终登录状态、旧 code 不重放、本次临时进程清理与原有任务保护 |
 
 ## 文件级完整清单
 

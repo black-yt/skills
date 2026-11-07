@@ -50,7 +50,7 @@ if (-not (Test-Path -LiteralPath $cliPath -PathType Leaf)) { throw 'CLI entry do
 ```bash
 command -v codex
 type -a codex
-ls -l "$(command -v codex)"
+ls -l "$(type -P codex)"
 codex --version
 codex --help
 npm root -g
@@ -76,6 +76,26 @@ codex --version
 - npm 403、安装脚本 403 和 GitHub 匿名 API 限额是不同分支。原记录尝试过换 VPN 节点；先检查响应来源和限额 headers，网络切换只是用户允许时的诊断，不是通用修复。
 - 国内 npm mirror 是原记录中的可选下载路径，不要自动执行全局 `npm config set registry`。若需要，保留当前 registry，确认可信镜像和该次命令的作用范围。
 - 安装成功后执行 `hash -r`、`command -v codex`、`codex --version`，并核对 App 实际入口；终端 CLI 更新不等于 App 内置版本更新。
+
+## WSL npm 全局安装报 EACCES
+
+- **先分清权限和下载失败**：`EACCES: permission denied, mkdir '/usr/local/lib/node_modules'` 指向全局安装目录的写权限；不是 npm registry、账号登录或 Codex token 失效。先检查 `node --version`、`npm --version`、`npm config get prefix` 和当前运行环境。
+- **用户级全局安装**：若系统 Node/npm 的 prefix 指向管理员目录，可按 [npm 官方 EACCES 指引](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally)选择用户目录。`npm -g` 在该用户的各项目中可用，不等于给所有系统用户共享安装；用户明确需要后者时再按系统管理方案处理。
+- **变更范围**：先备份用户 `~/.npmrc`，记录原 prefix 及是否存在用户覆盖；修改 prefix 会影响该用户后续的其他全局 npm 安装。已使用 nvm/conda 时先核对其管理方式，不盲目叠加一个冲突的 prefix。
+
+```bash
+npm config set prefix "$HOME/.local"
+mkdir -p "$HOME/.local/bin"
+npm install -g @openai/codex@latest
+export PATH="$HOME/.local/bin:$PATH"
+hash -r
+command -v codex
+codex --version
+npm ls -g --depth=0
+```
+
+- **PATH 与验收**：将 PATH 配置合并到实际使用的 shell 启动文件，已有等效项不重复追加；核对当前 shell 和新交互 shell 都能运行 `codex --version`。本次安装样本为 CLI `0.167.0`，不是要求其他机器固定安装这个版本。
+- **避免扩大修复**：不要为一个用户目录权限错误递归修改 `/usr/local` 权限或默认执行 `sudo npm install`。回滚恢复本次 npm 配置与 PATH 变更；原来没有 prefix 覆盖时只撤回本次覆盖，不删除其他全局包。
 
 ## Microsoft Store 下载失败的历史分支
 
