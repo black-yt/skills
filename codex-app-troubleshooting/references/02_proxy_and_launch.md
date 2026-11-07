@@ -80,6 +80,31 @@ foreach ($scope in 'Process', 'User', 'Machine') {
 - 原探针从 Windows 与 WSL 分别测试旧端口、新 loopback 和新宿主机地址；完整比较这五种观察结果，才能解释“一边能用另一边不能用”。
 - 收到 `200 Connection established` 及目标 `405 Method Not Allowed` 说明本次 CONNECT/HTTPS 请求到达了响应阶段；协议可能是 HTTP/1.1 或 HTTP/2。这是无凭据 GET，不代表账号/授权成功；403 或证书错误仍须继续调查。
 
+## 独立 WSL CLI 的进程验证与局部持久化
+
+- **先查真实登录进程**：Windows 用户代理变量有值，不证明 WSL CLI 已继承。用 `inspect_proxy_env.py --pid [LOGIN_PID]` 检查已核实的进程；普通 shell、交互 shell 和正在运行的 CLI 分别取证。
+- **先验证再重开登录**：案例中 WSL 直连认证端点 DNS 超时，显式使用现有 Windows HTTP 代理得到 `CONNECT 200` 与目标 `405`。这只证明该探针通路有响应；用同一代理启动新的真实登录，才能验证 token exchange。
+- **限定进程范围**：将占位 URI 换为从 WSL 实测可达的现有代理，不修改用户的全局代理或 bypass 列表：
+
+```bash
+proxy_uri='http://[VERIFIED_WINDOWS_HOST]:[PORT]'
+HTTP_PROXY="$proxy_uri" HTTPS_PROXY="$proxy_uri" \
+http_proxy="$proxy_uri" https_proxy="$proxy_uri" codex login
+```
+
+- **按需保留独立 CLI 用法**：确认用户以后需要直接运行 `codex`，且进程验证成功后，备份 `~/.bashrc`，检查 `type -a codex` 及已有同名函数，再合并配置。以下模板仅给该命令设置代理，保留所有参数：
+
+```bash
+codex() {
+    local proxy_uri='http://[VERIFIED_WINDOWS_HOST]:[PORT]'
+    HTTP_PROXY="$proxy_uri" HTTPS_PROXY="$proxy_uri" \
+    http_proxy="$proxy_uri" https_proxy="$proxy_uri" command codex "$@"
+}
+```
+
+- **说明生效位置**：`source ~/.bashrc` 或新开交互终端后再启动 CLI；已经运行的旧进程不会改变。这个函数不保证桌面 App、非交互 shell 或直接调用二进制的程序继承代理，App 仍按本篇的真实启动链验收。
+- **地址与恢复**：模板只保存已验证地址；NAT 网关变化时重新发现并验证，也不能把 NAT 地址照搬到 mirrored 环境。保留用户已有有效代理与 `NO_PROXY`/`ALL_PROXY`；回滚只撤回本次函数或恢复本次备份，不覆盖后续用户改动。
+
 ## 备份与最小持久化
 
 先以单次启动/进程范围验证目标 URI。只有明确需要让未来桌面启动继承时，才修改用户变量；用户变量会影响其他新启动程序，不是 App 专属设置。
