@@ -47,7 +47,7 @@ skill-name/
 | `paper-review-writing` | [`paper-review-writing/SKILL.md`](paper-review-writing/SKILL.md) | 仔细阅读论文，在对应目录写简洁匿名的双语审稿 MD；完整中文在前、完整英文在后，一个优点、两个具体深入的缺点与逐项对应的问题，用原文、章节标题和表格描述定位，避免数字引用及模板化表达。 |
 | `pdf-parsing` | [`pdf-parsing/SKILL.md`](pdf-parsing/SKILL.md) | 使用 `structai.read_pdf` 将 PDF 解析为本地 Markdown，并处理图片抽取、代理重试和解析质量检查。 |
 | `pdf-to-images` | [`pdf-to-images/SKILL.md`](pdf-to-images/SKILL.md) | 使用系统级 Ghostscript (`gs`) 或 Poppler `pdftoppm` 将 PDF 页面导出为 PNG/JPEG 图片，支持单页、页码范围、整篇导出和论文排版可视化检查。 |
-| `rebuttal-writing` | [`rebuttal-writing/SKILL.md`](rebuttal-writing/SKILL.md) | 撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名 Q&A、证据归因、小表格、引用、限字符分块及独立子 agent 对抗评审。 |
+| `rebuttal-writing` | [`rebuttal-writing/SKILL.md`](rebuttal-writing/SKILL.md) | 撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名 Q&A、证据归因、小表格、引用和限字符分块；由独立子 agent 找出未解决问题，驱动多轮改写与复评。 |
 | `researchharness` | [`researchharness/SKILL.md`](researchharness/SKILL.md) | 使用 InternScience ResearchHarness 作为轻量 tool-using LLM agent runtime，覆盖安装配置、CLI、本地前端、OpenAI-compatible API、Python API、工具选择、workspace、trace 和测试。 |
 | `screen-demo-video-editing` | [`screen-demo-video-editing/SKILL.md`](screen-demo-video-editing/SKILL.md) | 将 GUI、科研软件或 agent 录屏剪成演示视频，覆盖静止/周期去重、悬浮跟随、图片展开、截图/工具卡片及字幕音频；将已有结果制成纹理染色、三维点云和排序试错动画，附精确时长、无损母版与实际像素验收。 |
 | `ssh-remote-troubleshooting` | [`ssh-remote-troubleshooting/SKILL.md`](ssh-remote-troubleshooting/SKILL.md) | 排查终端能 SSH 但 VS Code 失败、Windows 临时目录权限、Profile 与服务安装、系统盘缓存及挂载遮蔽，支持保留任务的迁移与连接验收。 |

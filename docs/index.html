@@ -1103,8 +1103,8 @@
         name: 'rebuttal-writing',
         path: 'rebuttal-writing/SKILL.md',
         tags: ['写作', '论文', 'Markdown', '科研'],
-        desc: '撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名 Q&A、证据归因、小表格、引用、限字符分块及独立子 agent 对抗评审。',
-        content: '### Rebuttal 写作\n- 用于写 reviewer response、author rebuttal、discussion reply 或 AC response。\n- 推荐第一段先感谢 reviewer，并点出其认可的贡献；随后用 `> **Q1: ...**` 摘要问题，摘要时弱化尖锐措辞但不偷换原意。\n- 回答优先使用数据、补充实验、case、统计检验、小表格和真实引用，最后礼貌请求更新评分并保持匿名。\n- 核实对照条件、代码默认值与论文设置；区分核心策略、辅助模块和完整系统，保留原始计数及证据范围。\n- 按实际字符上限切分编号回复块；需要独立模拟时，每轮使用全新 agent，冻结输入并保留所有 verdict，评审实际最终稿。'
+        desc: '撰写、重构和压缩 AI/ML conference rebuttal、reviewer response 或 AC response，覆盖匿名 Q&A、证据归因、小表格、引用和限字符分块；由独立子 agent 找问题，驱动多轮改写与复评。',
+        content: '### Rebuttal 写作\n- 用于写 reviewer response、author rebuttal、discussion reply 或 AC response。\n- 推荐第一段先感谢 reviewer，并点出其认可的贡献；随后用 `> **Q1: ...**` 摘要问题，摘要时弱化尖锐措辞但不偷换原意。\n- 回答优先使用数据、补充实验、case、统计检验、小表格和真实引用，最后礼貌请求更新评分并保持匿名。\n- 核实对照条件、代码默认值与论文设置；区分核心策略、辅助模块和完整系统，保留原始计数及证据范围。\n- 按实际字符上限切分编号回复块；需要独立模拟时，每轮使用全新 agent，冻结输入并保留所有 verdict，评审实际最终稿。\n- 独立子 agent 定位审稿人仍可能不满意的原句、证据缺口及最低补强条件；主 agent 维护问题处置表，实质修改后交新 agent 复评，直到满足约定或到达证据/资源边界，不反复抽同稿求高分。\n- 附多轮优化细则、独立评审提示和修改分流表；保留负评、回退与未复评状态，不能拼接不同版本的最高分。'
       },
       {
         name: 'researchharness',
