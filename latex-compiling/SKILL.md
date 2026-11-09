@@ -90,3 +90,7 @@ latexmk -C -outdir=../latex_build main.tex
 - `latex_build/main.pdf` 是否生成。
 - 日志中是否有 `Fatal error`、`Emergency stop`、`Undefined control sequence`。
 - 参考文献、目录、交叉引用、图片、表格、公式和中文字体是否正常。
+
+## 无日志告警的页面越界
+
+`samepage` 等不可分页块可能将正文推到正文区之外，而日志没有 `Overfull`。用于收束结论或声明前，除检查正文结束页，还应核对 PDF 文本包围盒与官方正文底边，并查看渲染页；页码相同不能证明文字仍在允许区域。发现越界时恢复自然分页，局部调整重复叙述或浮动体，不移动官方正文边界。
