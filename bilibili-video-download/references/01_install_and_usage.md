@@ -102,6 +102,8 @@ python3 "$SKILL_DIR/scripts/bilibili_download.py" "$VIDEO_URL" \
 
 Cookie 文件可包含 `SESSDATA=...` 或完整 Cookie 字符串。它必须位于 skill 仓库外，且只由当前用户读取。不要在聊天记录、脚本、提交或故障日志里粘贴真实值。
 
+需要 Cookie 的获取步骤（浏览器开发者工具、移动端）、各画质与账号权益的对应关系、过期时间换算与失效判断，见 [登录态 Cookie：获取、保管与下载高清画质](03_cookie_and_quality.md)。
+
 ## 结果验证
 
 脚本正常完成应退出 0 并列出生成的 `.mp4`/`.mp3`。检查目标文件非空，再用 ffprobe 读取流和时长：
