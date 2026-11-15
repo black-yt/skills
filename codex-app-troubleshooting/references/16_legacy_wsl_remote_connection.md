@@ -43,3 +43,24 @@ wsl.exe -d Ubuntu -- bash -lc 'export PATH="${CODEX_INSTALL_DIR:-$HOME/.local/bi
 - 完全退出并重新打开桌面端，在「设置 → 连接 → WSL」确认目标发行版出现并连接成功，再从该连接打开项目。该案例由用户确认重启后的连接可用。
 
 官方文档提供 WSL 2 和 CLI 安装说明。桌面启动路径和迁移报错的处理来自上述版本的实测。[OpenAI WSL 指南](https://learn.chatgpt.com/docs/windows/wsl)
+
+## 重启连接后仍提示更新 CLI
+
+如果「设置 → 连接 → WSL」显示「需要重新启动」，点击「重启」后提示依旧，先在目标 WSL 发行版内查询受管理的后台服务。下列命令适用于服务使用 WSL 默认 `~/.codex` 的情况，`env -u CODEX_HOME` 避免继承 Windows 的数据目录。若服务使用自定义的 Linux 数据目录，查询和更新时应使用同一目录。
+
+```bash
+env -u CODEX_HOME codex app-server daemon version
+```
+
+对照 JSON 中的 `cliVersion`（当前命令的 CLI 版本）、`managedCodexVersion`（后台选中的安装包版本）和 `appServerVersion`（正在运行的服务版本）。本案例查到 CLI 已为 `0.169.0`，后两项仍为 `0.164.0`。后台有独立的安装包，单独重启连接会再次使用后台选中的版本。
+
+确认当前 CLI 是希望采用的版本，并等这个后台服务上的活动及排队任务处理完毕。在 CLI `0.169.0` 上，可用自带命令把当前 CLI 包复制到受管理的安装位置，固定版本并重启服务。命令会在交互终端显示确认提示。
+
+```bash
+env -u CODEX_HOME codex app-server daemon update --from-cli
+env -u CODEX_HOME codex app-server daemon version
+```
+
+- 自动执行时，确认任务状态和目标版本后可使用 `update --from-cli --yes`。本案例只传 `update --yes` 时被 CLI 拒绝，并提示需要 `--from-cli`。
+- 更新后确认 `status` 为 `running`，上述三个版本字段均为目标版本，再回到 WSL 连接页面确认红点消失。本案例三个字段均为 `0.169.0`，并由用户确认红点消失。
+- `--from-cli` 会固定后台包版本。日后若要恢复正式发行版的更新渠道，先查看当前版本的 `update --help` 及更新完成提示。案例中 CLI 提示使用不带 `--from-cli` 的 `codex app-server daemon update` 恢复该渠道。
