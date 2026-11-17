@@ -1,0 +1,3 @@
+interface:
+  display_name: "文本型 PowerPoint 编辑"
+  short_description: "维护文本型 PowerPoint 的条目、跨页布局、间距与链接，验证 PDF 导出"
