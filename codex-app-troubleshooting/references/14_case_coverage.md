@@ -95,12 +95,12 @@
 | P04 | 旧模型缓存标记与截图一致，新版独立服务返回新模型 | [17](17_stale_models_and_app_server_versions.md)：只读必要字段，缓存与另起服务均不单独证明原连接的状态或模型推理成功 |
 | P05 | 为一次重启生成全局 Python 助手，用户拒绝后已撤销 | [17](17_stale_models_and_app_server_versions.md)：不默认向 `.codex`、shell rc 或其他项目安装助手；不把自定义命令称作官方修复 |
 | P06 | 曾提供强制 pkill 与隐藏日志的一行命令，后撤回日常建议 | [17](17_stale_models_and_app_server_versions.md)：不默认强杀、不无条件启动第二实例；保留日志、授权和独立终端边界，不固定模型 |
-| Q01 | WSL2 + nvm + npm 多次安装失败，临时移除四个 HTTP/HTTPS 代理变量并使用国内镜像后成功 | [18](18_wsl_nvm_npm_mirror_installation.md)：适用环境、用户已接受镜像的日常优先命令、变量和 registry 仅对本次进程生效；不声称已绕过所有代理层 |
-| Q02 | 首次安装与更新共用 `@latest`、`--registry=https://registry.npmmirror.com`、`--include=optional` | [18](18_wsl_nvm_npm_mirror_installation.md)：完整多行与一行命令、参数语义、平台依赖和 PATH/版本验收，不把 npm 成功视为二进制可用 |
-| Q03 | `ENOTEMPTY` 或 `Missing optional dependency`：卸载、删除 Codex 与同级 `.codex-*`、有限重试重装 | [18](18_wsl_nvm_npm_mirror_installation.md)：全局目录查询失败即停、当前 npm 目录限定、无并发安装、2 次请求重试与 120000 毫秒请求超时；保护其他包、配置和活动会话 |
-| Q04 | 下载旋转动画或卡住：全新 `mktemp` 缓存、0 次重试、60000 毫秒请求超时、verbose | [18](18_wsl_nvm_npm_mirror_installation.md)：完整诊断命令、错误和请求阶段判读、临时缓存与日志脱敏、失败后停止盲目重试 |
-| Q05 | 六项常见错误与命令缺失：可选依赖、ENOTEMPTY、SSL_ERROR_SYSCALL、旋转动画、超时/连接重置、PATH | [18](18_wsl_nvm_npm_mirror_installation.md)：完整速查表、nvm 版本隔离与全局路径；代理/TLS 按证据判断，不关闭校验 |
-| Q06 | 国内镜像稍晚同步最新版本，CLI 安装成功不代表 App/后台已更新 | [18](18_wsl_nvm_npm_mirror_installation.md)：两源 latest 查询、平台包同步检查、等待或可达官方源分支；[16](16_legacy_wsl_remote_connection.md) 保留同版本完整性校验，[17](17_stale_models_and_app_server_versions.md) 验收实际后台 |
+| Q01 | WSL2 + nvm 中多次 npm 安装失败，临时移除四个 HTTP/HTTPS 代理变量并使用国内镜像后成功 | [18](18_slow_npm_installation.md)，作为 WSL 实测案例保留一行命令、临时代理变量的范围及 npm 配置代理检查 |
+| Q02 | 首次安装与更新共用 `@latest`、`--registry=https://registry.npmmirror.com`、`--include=optional` | [18](18_slow_npm_installation.md)，跨平台安装命令、平台依赖语义、PATH 与版本验收 |
+| Q03 | `ENOTEMPTY` 或 `Missing optional dependency` 时重装 | [18](18_slow_npm_installation.md)，区分平台包下载失败与本地残留，按实际 npm 目录清理。保留 WSL 定向重装命令和 2 次重试、120000 毫秒请求超时 |
+| Q04 | 下载转圈或卡住，使用新缓存、0 次重试、60000 毫秒请求超时和 verbose | [18](18_slow_npm_installation.md)，按元数据、平台包 tarball 和本地安装三个阶段定位，保留通用日志命令与 WSL 空缓存示例 |
+| Q05 | 安装缓慢常伴随超时、连接重置、TLS 错误、残留、平台包缺失或命令找不到 | [18](18_slow_npm_installation.md)，速查表按实际错误选择 registry、代理、平台包或 PATH 检查 |
+| Q06 | 镜像可能稍晚同步最新版本 | [18](18_slow_npm_installation.md)，对比两个源的 tag，核对目标平台包是否已同步。等待同步或使用可达的官方源 |
 
 ## 文件级完整清单
 

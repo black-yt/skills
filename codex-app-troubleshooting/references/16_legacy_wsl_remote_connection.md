@@ -4,7 +4,7 @@
 
 ## Linux x64 可选依赖缺失
 
-WSL2 + nvm + npm 的日常安装/更新、国内镜像、`ENOTEMPTY` 定向清理和下载卡住诊断见 [18](18_wsl_nvm_npm_mirror_installation.md)；本节保留同版本平台包的校验与离线恢复方法。
+npm 安装慢、平台包下载失败和 WSL2 + nvm 镜像安装案例见 [18](18_slow_npm_installation.md)。下面说明如何校验同版本平台包并离线恢复。
 
 在目标发行版的交互式 Bash 中运行 `command -v node npm codex`、`npm prefix -g` 和 `codex --version`，确认 npm 指向 WSL 内的 Node 安装。遇到 `Missing optional dependency @openai/codex-linux-x64` 时，检查当前 Codex 包的版本和 npm 安装日志。平台包属于可选依赖，下载失败时 npm 仍可能返回成功。
 
