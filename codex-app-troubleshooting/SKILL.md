@@ -23,7 +23,7 @@ description: "排查 Codex App 登录、更新中断、模型列表未刷新、C
 ## 问题路由
 
 1. 记录 App 版本、实际后端版本、Windows/WSL 模式、代理软件与当前端口，以及故障前发生的变化。
-2. 按日志选择 reference：OAuth/代理继承看 1–2；执行器与历史保护看 3；CLI、WSL 重连、项目迁移和 MCP 分别看 4–7；Windows 回调/保留端口与远端认证/转发看 8；安装限流看 9；provider/CC Switch 看 10；Claude/Gemini 看 11–12；扫描高占用看 13；更新中断、旧界面与运行环境下载清理看 15；旧版 WSL 迁移看 16；模型列表未刷新、CLI 已新但后台仍旧或 daemon 报 not managed 看 17。
+2. 按日志选择 reference：OAuth/代理继承看 1–2；执行器与历史保护看 3；CLI、WSL 重连、项目迁移和 MCP 分别看 4–7；Windows 回调/保留端口与远端认证/转发看 8；安装限流看 9；provider/CC Switch 看 10；Claude/Gemini 看 11–12；扫描高占用看 13；更新中断、旧界面与运行环境下载清理看 15；旧版 WSL 迁移看 16；模型列表未刷新、CLI 已新但后台仍旧或 daemon 报 not managed 看 17；WSL2 + nvm + npm 安装/更新、国内镜像、ENOTEMPTY 或下载卡住看 18。
 3. 修复后检查新启动的实际后端环境，而不只检查当前 shell。
 4. 用新的登录流程和正常桌面快捷方式验证；临时启动脚本成功不等于双击启动已经修复。
 5. 核对受保护进程与历史，报告根因、最小变更、回滚入口和未验证项。
@@ -49,6 +49,7 @@ description: "排查 Codex App 登录、更新中断、模型列表未刷新、C
 | 15 | 区分 Windows 桌面包、配套主运行环境更新与同版界面恢复，按 Appx 状态、实际进程和安装日志取证。覆盖下载中断、有限重试、增长判断与闲置临时目录清理，保护活动安装及 previous 运行环境。 | update, MSIX, Appx, 旧界面, primary-runtime, runtime.json, ERR_CONNECTION_CLOSED, download_archive, sync_plugins, codex-runtime-install, previous | 更新中断或重开后界面变化时读取；运行环境下载反复失败时读取；清理失败下载临时文件前读取 | [references/15_windows_updates_and_runtime_downloads.md](references/15_windows_updates_and_runtime_downloads.md) |
 | 16 | 处理旧版 WSL 智能体退役后桌面端找不到远程 WSL 连接。覆盖 npm Linux 平台依赖缺失、nvm 启动路径、Windows SQLite 迁移冲突、服务初始化验收和受管理后台包版本不一致。 | WSL 2, remote WSL, nvm, npm optional dependency, CODEX_INSTALL_DIR, CODEX_HOME, WSLENV, state_5.sqlite, app-server daemon, restart-required, --from-cli | 看到旧版 WSL 环境弃用提示时读取；WSL CLI 报 Linux x64 依赖缺失时读取；远程服务启动时报 SQLite 迁移冲突时读取；重启 WSL 连接后仍提示更新 CLI 时读取 | [references/16_legacy_wsl_remote_connection.md](references/16_legacy_wsl_remote_connection.md) |
 | 17 | 排查 CLI 已更新但模型列表和实际 app-server 仍旧，区分受管理选包与直接启动的远程服务。覆盖 not managed 分支、正常终止与原启动器恢复、缓存线索、全局目录边界及版本和目录分别验收。 | /model, 模型列表, cliVersion, appServerVersion, managedCodexVersion, daemon restart, --from-cli, not managed, SSH, --no-daemon, models_cache.json, SIGTERM | 新模型未出现在列表时读取；CLI 已更新但重开 App 无效时读取；daemon 更新或重启报 not managed 时读取；准备终止远程后台或写入重启助手前读取 | [references/17_stale_models_and_app_server_versions.md](references/17_stale_models_and_app_server_versions.md) |
+| 18 | 处理 WSL2 + nvm + npm 安装与更新的代理、镜像和 Linux 平台可选依赖问题。保留日常命令、ENOTEMPTY 定向重装、新缓存详细日志、镜像同步检查和会话保护边界。 | WSL2, nvm, npm, npmmirror, include=optional, Missing optional dependency, ENOTEMPTY, HTTP_PROXY, SSL_ERROR_SYSCALL, ETIMEDOUT, ECONNRESET, verbose | WSL npm 安装或更新反复失败时读取；缺少平台依赖或清理安装残留前读取；下载卡住或需要核对镜像同步时读取 | [references/18_wsl_nvm_npm_mirror_installation.md](references/18_wsl_nvm_npm_mirror_installation.md) |
 
 ## 辅助脚本
 
@@ -68,6 +69,7 @@ description: "排查 Codex App 登录、更新中断、模型列表未刷新、C
 - WSL CLI 安装与登录补充核对（2026-11-07 GitHub API 与本地 help 读取）：最新 release 为 `rust-v0.167.0`，HEAD 为 `e6bf88ae022cdab968e5a48d5cbeea4d2e304fc9`，案例 CLI 为 `0.167.0`。已复查匹配 release 的 README、配置指引与[登录源码](https://github.com/openai/codex/blob/rust-v0.167.0/codex-rs/login/src/server.rs)，并实际 GET 核对[官方认证文档](https://learn.chatgpt.com/docs/auth)、[WSL 网络文档](https://learn.microsoft.com/en-us/windows/wsl/networking)和 [npm EACCES 指引](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally)；覆盖项见 [14 的 O01–O07](references/14_case_coverage.md)。
 - 远程 WSL 连接补充核对（2026-11-14）：GitHub API 返回 CLI release `rust-v0.169.0`，HEAD 为 `b1573f102413e96a6481087922bf425231222dee`。桌面版实测启动路径与验收见 [16](references/16_legacy_wsl_remote_connection.md)。
 - 模型目录与远程后台补充核对（2026-11-20）：GitHub API 返回 CLI release `rust-v0.171.0`，HEAD 为 `45ace810b3d394f177fb6b1c8a10db9c698e6e05`；当前 CLI / 新运行后台为 `0.171.0`。已复查官方命令、模型和 app-server 文档、当前 help 及固定 release 的管理归属/缓存源码；受管理与直接启动的两种重启分支见 [17](references/17_stale_models_and_app_server_versions.md)。
+- WSL npm 镜像安装补充核对（2026-11-20）：最新 CLI release 仍为 `rust-v0.171.0`，HEAD 为 `bb5b9c6240136de8ff4d30215e2341c44559aa04`，本地 CLI 为 `0.171.0`。已复查官方 README、配置指引、当前 CLI help、npm 启动器与 npm 参数文档；用户实测安装方案和适用边界见 [18](references/18_wsl_nvm_npm_mirror_installation.md)。
 - 更新此 skill 时重新核对版本与 HEAD；变化后复查官方文档、当前 CLI help 和相关只读源码，再调整参数与故障分支。
 - 2026-10-03 实际 GET 核对：[认证](https://learn.chatgpt.com/docs/auth)、[Windows App](https://learn.chatgpt.com/docs/windows/windows-app)、[故障排查](https://learn.chatgpt.com/docs/reference/troubleshooting)。这些是滚动文档，不是与某个旧 App 版本绑定的固定实现说明。
 - 旧入口 `https://developers.openai.com/codex/auth/`、`https://developers.openai.com/codex/app/windows/` 与 `https://developers.openai.com/codex/app/troubleshooting/` 在核对时跳转到上述完整 URL；页面当前使用 ChatGPT desktop app 名称，排查用户所称 Codex App 时仍需确认安装版本与产品界面。
