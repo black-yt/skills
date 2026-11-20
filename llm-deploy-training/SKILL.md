@@ -1,6 +1,6 @@
 ---
 name: llm-deploy-training
-description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略，以及 ms-swift SFT/DPO/GRPO full training、Megatron 长序列训练、messages loss/loss_scale、数据校验、显存排错和训练检查。"
+description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-compatible 服务、多模态输入限制、Qwen3.5 工具调用、thinking/reasoning 控制、CUDA Graph 策略、DeepSeek 的 SGLang 多实例与 SMG 缓存感知路由，以及 ms-swift SFT/DPO/GRPO full training、Megatron 长序列训练、messages loss/loss_scale、数据校验、显存排错和训练检查。"
 ---
 
 # LLM Deploy And Training
@@ -12,9 +12,11 @@ description: "当需要部署或训练 LLM/VLM 时使用；覆盖 vLLM OpenAI-co
 | 1 | 规定 LLM/VLM 部署和训练的共通安全边界，说明不要改共享环境、如何匹配 vLLM/ms-swift/transformers/torch 版本、何时读官方文档、何时只读追溯源码，并记录 ms-swift 官方文档入口。 | LLM deploy、VLM deploy、training、shared env、conda、version match、official docs、CLI help、source tracing、site-packages、vLLM、ms-swift、loss、loss_scale、transformers、torch | 触发本 skill 后默认读取；部署或训练前；准备安装/升级依赖前；参数不确定要查文档或源码前；涉及共享 conda、CUDA、torch/vLLM/ms-swift 环境时读取 | `SKILL.md` |
 | 2 | 记录 vLLM OpenAI-compatible 服务的完整部署和验证经验，覆盖 `vllm serve` 参数、多模态 `limit-mm-per-prompt`、Qwen3.5 工具调用、thinking/reasoning、35B 2 卡、CUDA Graph、`extra_body`、内网访问和 SSH local port forwarding。 | vLLM、OpenAI-compatible server、`vllm serve`、multimodal、`limit-mm-per-prompt`、auto tool choice、`qwen3_coder`、Qwen thinking、reasoning parser、35B、tensor parallel、CUDA Graph、`extra_body`、SSH forwarding、`/v1/models` | 写或审查 vLLM 部署脚本前；验证 `/v1/models`/短文本/工具调用/图片输入前；配置 Qwen thinking 开关或 35B 服务前；排查 CUDA Graph、OOM、多模态报错、工具调用失败或本地访问内网服务时必须读取 | [references/vllm-deployment.md](references/vllm-deployment.md) |
 | 3 | 记录 ms-swift SFT/DPO/GRPO full training 的完整训练经验，覆盖默认超参、bf16/zero3/save_only_model、messages 的 `loss`/`loss_scale`、工具调用与工具返回的 loss mask、Megatron TP/CP/SP/TE fused CE 长序列训练、JSONL validator、max length 过滤、显存排错、dry-run、训练后检查和 rjob 资源模板。 | ms-swift、SFT、DPO、GRPO、full training、Megatron、TP、CP、PP、EP、sequence_parallel、fused attention、TE fused CE、cross_entropy_loss_fusion、optimizer_cpu_offload、bf16、DeepSpeed zero3、save_only_model、save_safetensors、messages、loss、loss_scale、loss mask、tool_call、tool_response、agent template、JSONL、validator、max_length、OOM、dry-run、rjob、checkpoint、consumed data | 编写/审查 SFT、DPO 或 GRPO 脚本前；普通 HF Trainer/ms-swift + DeepSpeed ZeRO 在长样本 forward/loss/activation/logits OOM 时；准备 full training 超参前；设计 messages 训练目标前；给不同 assistant 回复段设置 loss/loss_scale 前；处理 tool_call/tool_response 数据前；训练数据格式校验前；排查 OOM、LoRA/full 混用、checkpoint 膨胀、`save_safetensors` 参数解析失败、训练失败或 consumed 标记问题时必须读取 | [references/ms-swift-training.md](references/ms-swift-training.md) |
+| 4 | 覆盖 DeepSeek TP4 长期 RJob、SGLang 与 SMG/HAProxy 代码、前缀测量、负载保护及扩容切换。 | DeepSeek、SGLang、SMG、cache_aware、prefix cache、KV、HAProxy、TP4、RJob、SSE、扩容、排空 | 部署 DeepSeek 前；给长上下文服务配置前缀路由前；测缓存与排队前；新增或下线模型副本前 | [references/deepseek-sglang-routing.md](references/deepseek-sglang-routing.md) |
 
 ## 核心原则
 
+- 在集群运行的正式 DeepSeek 模型、路由、统一入口及监控使用长期 RJob。先核对实际资源、就绪和恢复策略，再接入业务。
 - 部署和训练都优先复用已有环境；不要擅自升级 `torch`、`vllm`、`transformers`、`ms-swift` 或共享 conda 环境。
 - 部署脚本使用环境变量配置模型路径、端口、上下文长度、工具调用、多模态限制和 CUDA Graph 策略。
 - 多模态服务必须显式设置 `--limit-mm-per-prompt`，不要依赖 vLLM 默认值或旧脚本默认值。
