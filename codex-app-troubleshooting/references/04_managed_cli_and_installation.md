@@ -74,7 +74,7 @@ codex --version
 - 原记录使用 `curl -fsSL ... | sh`、`powershell -ExecutionPolicy Bypass -c "irm ... | iex"`；保留其安装来源，但推荐先下载、检查脚本再运行。Bypass 若确有必要只限该进程，不能顺手修改永久 ExecutionPolicy。
 - npm 安装路径可能属于 conda 或 nvm 环境；切换环境后找不到命令，不等于包被删除。检查 `node`、`npm`、`codex` 是否属于同一运行环境。
 - npm 403、安装脚本 403 和 GitHub 匿名 API 限额是不同分支。原记录尝试过换 VPN 节点；先检查响应来源和限额 headers，网络切换只是用户允许时的诊断，不是通用修复。
-- 国内 npm mirror 是原记录中的可选下载路径，不要自动执行全局 `npm config set registry`。若需要，保留当前 registry，确认可信镜像和该次命令的作用范围。
+- npm 安装或更新慢、下载卡住时，读取 [18：npm 安装下载排障](18_slow_npm_installation.md)。先对照 registry 元数据、平台包下载和本地安装三个阶段，再按证据临时选择可信镜像、检查代理或处理残留。
 - 安装成功后执行 `hash -r`、`command -v codex`、`codex --version`，并核对 App 实际入口；终端 CLI 更新不等于 App 内置版本更新。
 
 ## WSL npm 全局安装报 EACCES
