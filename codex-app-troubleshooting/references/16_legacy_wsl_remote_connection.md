@@ -46,6 +46,8 @@ wsl.exe -d Ubuntu -- bash -lc 'export PATH="${CODEX_INSTALL_DIR:-$HOME/.local/bi
 
 ## 重启连接后仍提示更新 CLI
 
+本节更新命令只适用于已确认受 daemon 管理的服务。若命令报 `app server is running but is not managed by codex app-server daemon`，或 CLI 已新但模型列表仍旧，先转到 [17：模型列表与实际后台版本](17_stale_models_and_app_server_versions.md)；`status: running` 和输出中的 managed 路径本身不能证明管理归属。
+
 如果「设置 → 连接 → WSL」显示「需要重新启动」，点击「重启」后提示依旧，先在目标 WSL 发行版内查询受管理的后台服务。下列命令适用于服务使用 WSL 默认 `~/.codex` 的情况，`env -u CODEX_HOME` 避免继承 Windows 的数据目录。若服务使用自定义的 Linux 数据目录，查询和更新时应使用同一目录。
 
 ```bash

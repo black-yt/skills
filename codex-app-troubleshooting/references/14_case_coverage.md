@@ -89,6 +89,12 @@
 | O05 | 回调恢复后 token_exchange_failed；WSL 未继承代理，直连 DNS 超时而显式 HTTP 代理得到 CONNECT 200/405 | [01](01_oauth_diagnosis.md)、[02](02_proxy_and_launch.md)：实际进程环境、认证端点探针与新的真实登录分别验收 |
 | O06 | 后续直接运行独立 CLI 需要代理，旧进程不会随 shell 配置改变 | [02](02_proxy_and_launch.md)：仅作用于 codex 的函数、参数透传、已有配置检查、备份与回滚，不扩展到 App 启动链 |
 | O07 | 新的代理登录流程完成，`codex login status` 确认 ChatGPT 认证，临时转发撤除 | [08](08_auth_network_and_remote_proxy.md)：最终登录状态、旧 code 不重放、本次临时进程清理与原有任务保护 |
+| P01 | CLI 与界面已为 `0.171.0`，模型列表仍旧，实际后台为 `0.164.0` | [17](17_stale_models_and_app_server_versions.md)：PATH CLI、实际 socket、选包与运行版本分开取证；重开 App 不保证远端重启 |
+| P02 | `update --from-cli` 报 app server is running but is not managed | [17](17_stale_models_and_app_server_versions.md)、[16](16_legacy_wsl_remote_connection.md)：受管理与直接启动分支、错误原文、原启动器及正常终止流程 |
+| P03 | 后台重启后运行版本已新，`managedCodexVersion` 仍旧 | [17](17_stale_models_and_app_server_versions.md)：不为统一无关选包字段额外更新全局安装；按原连接的运行版本与模型目录验收 |
+| P04 | 旧模型缓存标记与截图一致，新版独立服务返回新模型 | [17](17_stale_models_and_app_server_versions.md)：只读必要字段，缓存与另起服务均不单独证明原连接的状态或模型推理成功 |
+| P05 | 为一次重启生成全局 Python 助手，用户拒绝后已撤销 | [17](17_stale_models_and_app_server_versions.md)：不默认向 `.codex`、shell rc 或其他项目安装助手；不把自定义命令称作官方修复 |
+| P06 | 曾提供强制 pkill 与隐藏日志的一行命令，后撤回日常建议 | [17](17_stale_models_and_app_server_versions.md)：不默认强杀、不无条件启动第二实例；保留日志、授权和独立终端边界，不固定模型 |
 
 ## 文件级完整清单
 
@@ -167,3 +173,6 @@ python3 -B scripts/tests/test_helpers.py
 | 固定 managed hash、端口、账号期限可直接复制 | 都是环境/版本状态，先发现再验证 |
 | 重开后界面恢复就说明刚完成 App 升级 | 对照前后包版本与进程；界面恢复和二进制更新分开报告 |
 | primary runtime 下载失败说明 App 包损坏，清整个缓存即可 | 区分程序包、运行环境和配置阶段；只清确认闲置且已授权的下载临时目录 |
+| CLI 顶部已是新版，或重开桌面端，就证明远端后台已更新 | 查询实际目标 socket 的 `appServerVersion`，结合 PID/starttime 验证真正重启 |
+| version 输出 running 且有 managed 路径，就可以使用 daemon update/restart | 先确认服务归属；not managed 时回到原启动器，不能重复套用受管理流程 |
+| 后台恢复要求三个版本字段全部相等，或必须绑定新模型 | 直接启动的服务只核对相关运行版本与目录；不为统一 managed 字段改包，不替用户固定模型 |
