@@ -22,6 +22,12 @@ NO_PROXY=localhost,127.0.0.1,::1
 - 原案例的 loopback-only `NO_PROXY` 不是所有机器的推荐覆盖值；已有内网域、网段和 API 中转 bypass 必须保留。
 - 单独设置 `WSLENV` 时须先核对当前值和 flags；不能清空已有条目。已证实 App 能传递变量时不新增多余全局配置。
 
+## WSL 已连接时的工作区路由超时
+
+- 如果桌面日志显示 WSL app-server 已连接，同时出现 `Failed to read service tier for request`、`workspace routing discovery timed out` 和模型列表刷新超时，检查桌面端实际启动的 WSL app-server 是否继承了代理。已连接只确认桌面端与后端的通信。
+- 实测案例中 Windows 用户级代理已配置，桌面后端没有收到 `HTTP_PROXY` 和 `HTTPS_PROXY`。从 WSL 直连 `chatgpt.com:443` 超时，经已有代理访问模型列表端点收到 HTTP 响应。此时先用临时 Windows 进程验证 `WSLENV` 转发，再按需把缺失的 `HTTP_PROXY/u`、`HTTPS_PROXY/u` 合并到 Windows 用户级 `WSLENV`，保留已有条目和 flags。`/u` 表示 Windows 启动 WSL 时传入该变量。
+- 完全退出桌面端，从日常入口重开后，检查新 WSL app-server 的代理环境和模型列表请求。本例两项均通过，用户确认功能恢复。回滚时移除本次追加的转发条目。
+
 ## 独立分支：`refresh_token_reused` 与 HTTP 401
 
 原记录中 WSL 自身 `~/.codex/auth.json` 也曾失效，出现：
