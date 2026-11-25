@@ -91,16 +91,20 @@
 | O07 | 新的代理登录流程完成，`codex login status` 确认 ChatGPT 认证，临时转发撤除 | [08](08_auth_network_and_remote_proxy.md)：最终登录状态、旧 code 不重放、本次临时进程清理与原有任务保护 |
 | P01 | CLI 与界面已为 `0.171.0`，模型列表仍旧，实际后台为 `0.164.0` | [17](17_stale_models_and_app_server_versions.md)：PATH CLI、实际 socket、选包与运行版本分开取证；重开 App 不保证远端重启 |
 | P02 | `update --from-cli` 报 app server is running but is not managed | [17](17_stale_models_and_app_server_versions.md)、[16](16_legacy_wsl_remote_connection.md)：受管理与直接启动分支、错误原文、原启动器及正常终止流程 |
-| P03 | 后台重启后运行版本已新，`managedCodexVersion` 仍旧 | [17](17_stale_models_and_app_server_versions.md)：不为统一无关选包字段额外更新全局安装；按原连接的运行版本与模型目录验收 |
+| P03 | 后台重启后运行版本已新，`managedCodexVersion` 仍旧 | [17](17_stale_models_and_app_server_versions.md)：当时未更新托管包；后续确认 daemon 生命周期命令会使用该包，见 P08。按原连接的运行版本与模型目录验收 |
 | P04 | 旧模型缓存标记与截图一致，新版独立服务返回新模型 | [17](17_stale_models_and_app_server_versions.md)：只读必要字段，缓存与另起服务均不单独证明原连接的状态或模型推理成功 |
 | P05 | 为一次重启生成全局 Python 助手，用户拒绝后已撤销 | [17](17_stale_models_and_app_server_versions.md)：不默认向 `.codex`、shell rc 或其他项目安装助手；不把自定义命令称作官方修复 |
 | P06 | 曾提供强制 pkill 与隐藏日志的一行命令，后撤回日常建议 | [17](17_stale_models_and_app_server_versions.md)：不默认强杀、不无条件启动第二实例；保留日志、授权和独立终端边界，不固定模型 |
+| P07 | 桌面端 SSH 启动的后台未受 daemon 托管，`/proc/[PID]/exe` 显示 `(deleted)`，CLI 已新版而运行版本仍旧 | [17](17_stale_models_and_app_server_versions.md)：从 `CODEX_REMOTE_PAYLOAD` 回收原启动器、`CODEX_MANAGED_BY_NPM` 说明归属；按原参数重启后整条 proxy 链路验收 |
+| P08 | 托管包停在 `0.162.1` 而 CLI 与运行后台为 `0.172.0`；`daemon update --from-cli` 因非托管服务在跑被拒绝 | [17](17_stale_models_and_app_server_versions.md)：daemon 生命周期命令使用选中托管包，旧包是回退点；先正常终止后台再刷新为 `local-[hash]` 固定包，三者版本一致后按原启动器重启 |
 | Q01 | WSL2 + nvm 中多次 npm 安装失败，临时移除四个 HTTP/HTTPS 代理变量并使用国内镜像后成功 | [18](18_slow_npm_installation.md)，作为 WSL 实测案例保留一行命令、临时代理变量的范围及 npm 配置代理检查 |
 | Q02 | 首次安装与更新共用 `@latest`、`--registry=https://registry.npmmirror.com`、`--include=optional` | [18](18_slow_npm_installation.md)，跨平台安装命令、平台依赖语义、PATH 与版本验收 |
 | Q03 | `ENOTEMPTY` 或 `Missing optional dependency` 时重装 | [18](18_slow_npm_installation.md)，区分平台包下载失败与本地残留，按实际 npm 目录清理。保留 WSL 定向重装命令和 2 次重试、120000 毫秒请求超时 |
 | Q04 | 下载转圈或卡住，使用新缓存、0 次重试、60000 毫秒请求超时和 verbose | [18](18_slow_npm_installation.md)，按元数据、平台包 tarball 和本地安装三个阶段定位，保留通用日志命令与 WSL 空缓存示例 |
 | Q05 | 安装缓慢常伴随超时、连接重置、TLS 错误、残留、平台包缺失或命令找不到 | [18](18_slow_npm_installation.md)，速查表按实际错误选择 registry、代理、平台包或 PATH 检查 |
 | Q06 | 镜像可能稍晚同步最新版本 | [18](18_slow_npm_installation.md)，对比两个源的 tag，核对目标平台包是否已同步。等待同步或使用可达的官方源 |
+| Q07 | npm 全局安装在解包阶段被中断，平台包只有 `vendor/`、缺 `package.json`，原生二进制已能报版本但包装器仍报 `Missing optional dependency` | [18](18_slow_npm_installation.md)，按半成品指纹、`verbose exit 1` 且无 error 行的日志特征区分解包中断与下载失败，再清残留重装 |
+| Q08 | 企业 HTTP 代理下 npm 从镜像下载平台包约 1 MB/s，同机 `curl` 采样同一 tarball 达 5 MB/s 以上 | [18](18_slow_npm_installation.md)，用 tarball 速度采样区分源慢与代理慢，避免反复更换 registry |
 
 ## 文件级完整清单
 
