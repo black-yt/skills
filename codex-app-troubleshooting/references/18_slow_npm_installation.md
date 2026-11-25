@@ -24,6 +24,7 @@ npm install -g @openai/codex@latest --registry=https://registry.npmjs.org --incl
 ## 按证据加快下载
 
 - 官方源慢而镜像响应正常时，可用可信镜像完成首次安装或更新。下面以 npm mirror 为例，命令可用于 Windows PowerShell、macOS、Linux 和 WSL。命令行参数只针对本次调用。
+- **区分源慢与代理慢**：`npm view` 只测元数据。怀疑下载慢时，从 `npm view @openai/codex@latest optionalDependencies --json --registry=[REGISTRY]` 取得平台包 tarball 地址，用 `curl -o /dev/null -w '%{size_download} bytes %{speed_download} B/s\n' '[TARBALL_URL]'` 直接采样，再与 npm 的实际写入速度对比。镜像直连采样很快、npm 经代理只有其零头时，瓶颈在代理链路而不是镜像同步，换源收益有限；这时先按下一项核对代理，不要反复更换 registry。
 - 遇到 TLS 错误、连接重置或超时时，核对目标主机、代理环境变量和 npm 配置的 `proxy` / `https-proxy`。需要代理的网络应使用可用的代理。确认可直连后，可仅对本次命令临时绕过有问题的代理，保留 TLS 校验。
 - `--include=optional` 让 npm 安装匹配平台的可选依赖。npm 可能在平台包下载失败后仍报告安装成功，因此需要执行 `codex --version` 验收。命令找不到时检查当前 npm 全局 bin 和 PATH，Bash 中先运行 `hash -r`。若打开的是旧版本，用 `type -a codex` 或 PowerShell 的 `Get-Command codex -All` 查找实际入口。
 
@@ -41,9 +42,16 @@ codex --version
 | npm 一直显示 `⠸` | 用 `--loglevel=verbose` 和有限请求超时定位阶段，怀疑缓存时用临时空目录验证 |
 | `ETIMEDOUT` / `ECONNRESET` | 对照实际请求主机、代理、镜像响应和同步状态 |
 | `SSL_ERROR_SYSCALL` | 核对失败请求和 TLS 握手路径，只在直连可用时临时绕过故障代理 |
-| `Missing optional dependency` | 检查平台包是否下载成功，用 `--include=optional` 和可达 registry 重装，再运行 `codex --version` |
+| `Missing optional dependency` | 检查平台包是否下载成功，按下一节区分解包中断与下载失败，用 `--include=optional` 和可达 registry 重装，再运行 `codex --version` |
 | `ENOTEMPTY` | 先结束同一全局目录的并发安装，核对报错指向的残留路径后再清理 |
 | `codex: command not found` | 检查当前 Node 环境、npm 全局目录及 PATH，再按原安装渠道处理 |
+
+### 区分解包中断与下载失败
+
+- **半成品指纹**：安装被打断后，平台包目录可能只留下 `vendor/` 而缺少 `package.json`。此时包装器报 `Missing optional dependency`，但 `vendor/[平台]/bin/codex --version` 已经能打印新版本；不要用原生二进制可运行来判断安装成功，要检查平台包目录里 `package.json` 与 `vendor/` 是否同时存在。
+- **日志特征**：被终止的安装常以 `verbose exit 1` 结束，且全文没有 `error`、`ETIMEDOUT` 或 `ECONNRESET` 行；后两者才是网络失败。先按日志判断是“没下完”还是“被中断”，再决定重试或清残留重装。
+- **改名残留**：npm 的 reify 阶段会先把旧包目录改名为同级 `.codex-[随机串]`，把全局 bin 下的 `codex` 改名成 `.codex-[随机串]` 符号链接；中断时这两类对象都会留下，而 `ps` 里的 argv 仍显示原路径。清理范围仍以 `npm root -g` 下的 `@openai/codex` 和同级 `.codex-*` 为准，不要按 argv 反推。
+- **验收**：重装后依次运行 `hash -r`、`type -a codex` 和 `codex --version`；只看 `--version` 可能仍命中另一个旧安装。
 
 只有确认是本地安装残留，且普通重试仍失败时，才卸载并清理对应包。先记录旧版本、确认 `npm root -g` 和报错路径，并正常退出使用该安装的 Codex 及操作同一目录的 npm。运行 `npm uninstall -g @openai/codex` 后，只清理该全局目录下实际存在的 `@openai/codex` 和已确认的同级 `.codex-*` 残留，保留其他包和 Codex 用户数据。用可达的 registry 重装并验证版本。重装失败时保留日志，原版本仍可获取时可用确切版本恢复。权限错误见 [04](04_managed_cli_and_installation.md)。
 
@@ -93,4 +101,5 @@ CODEX_NPM_DIAG_CACHE="$(mktemp -d)" &&
 ## 官方依据与版本边界
 
 - 2026-11-20 核对 CLI release `rust-v0.171.0` 及 HEAD `bb5b9c6240136de8ff4d30215e2341c44559aa04`。用 `codex --version` 确认本地版本，再查对应 release 的安装说明和启动器。已发布的主包所声明的 `optionalDependencies` 决定平台包版本。[Codex README](https://github.com/openai/codex/blob/rust-v0.171.0/README.md)、[npm 启动器](https://github.com/openai/codex/blob/bb5b9c6240136de8ff4d30215e2341c44559aa04/codex-cli/bin/codex.js)
+- **2026-11-25 补充**：`latest` 为 `0.172.0`，对应 tag `rust-v0.172.0`，commit `3d86e43b075adeba2193ec5c22ac92f55afd82e6`；GitHub API 限流时可用 `git ls-remote --tags` 取得同样的 tag/commit。实测企业 HTTP 代理下 npm 从镜像下载平台包约 1 MB/s，同机 `curl` 采样同一 tarball 可达 5 MB/s 以上，完整安装约 9 分钟。本次未重新核对 0.172.0 的 README 与启动器源码。
 - 用 `npm --version` 选择匹配主版本的文档。2026-11-20 核对的 npm 11 入口包括 [install](https://docs.npmjs.com/cli/v11/commands/npm-install/)、[view](https://docs.npmjs.com/cli/v11/commands/npm-view/)、[config](https://docs.npmjs.com/cli/v11/using-npm/config/) 和 [scope](https://docs.npmjs.com/cli/v11/using-npm/scope/)。

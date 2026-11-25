@@ -15,7 +15,7 @@ codex app-server daemon --help
 
 - **PATH CLI**：`codex --version` 和终端顶部版本只证明当前 CLI 程序已更新，不证明已运行的后台换了二进制，也不能代表桌面 App 版本。
 - **运行中后台**：`appServerVersion` 来自目标 socket 上服务的实际响应。显式连接其他 `--remote` 地址时，还要核对那个端点；本机默认 socket 的查询不能替代远端取证。
-- **后台选包**：`managedCodexVersion` / `managedCodexPath` 描述 daemon 管理入口选中的安装包，不能直接当成当前运行进程的版本。
+- **后台选包**：`managedCodexVersion` / `managedCodexPath` 描述 daemon 管理入口选中的安装包，不能直接当成当前运行进程的版本。但它也不是无关字段：daemon 生命周期命令会使用这个包，因此托管包落后时是一个潜在回退点，见下方“托管包落后时是否刷新”。
 - **管理归属**：`status: running` 只说明发现可响应的服务。即使输出中有 `managedCodexPath`，服务也可能是桌面端、SSH 启动器或用户直接启动的；结合 `/daemon` 的管理状态、启动来源及错误判断。
 - **旧进程**：更新磁盘上的 npm 包不会替换已加载的进程。退出桌面客户端或重开终端也可能只断开连接；用后台 PID 和 starttime 的前后变化验证是否真的重启，不反复要求用户“再退出一次”。
 
@@ -72,6 +72,9 @@ app server is running but is not managed by codex app-server daemon
 
 - **定位进程**：核对监听端点对应的 app-server PID、父进程和 starttime，区分真正的服务、Node 包装器及 `app-server proxy`。Linux 可用 `ps -eo pid,ppid,lstart,comm` 做初筛；`readlink /proc/[PID]/exe` 可确认实际二进制，`(deleted)` 是运行进程仍引用已替换文件的线索。不要执行 `/proc/[PID]/exe --version` 来探测旧程序；那会启动另一个进程。
 - **核对启动参数**：只在本机检查必要的可执行文件、工作目录、`CODEX_HOME`、监听地址和相关启动参数；不要转储完整环境、认证文件或带凭据的 argv。PID/starttime 的身份复核见 [03](03_backend_and_history.md)。
+- **回收原启动器**：由桌面端 SSH 连接拉起的远程后台，`/proc/[PID]/environ` 中的 `CODEX_REMOTE_PAYLOAD`（名称随版本变化）就是客户端下发的启动脚本，内含原 `nohup ... app-server --listen ...` 命令、日志路径 `[CODEX_HOME]/app-server-control/app-server.log` 和 PATH 组装方式。只读这一个变量，分享前脱敏，不转储完整环境。
+- **npm 管理标记**：同一进程环境里的 `CODEX_MANAGED_BY_NPM=1` 与 `CODEX_MANAGED_PACKAGE_ROOT` 表示它由 npm 全局包启动，而不是 daemon 选包；这与 `daemon version` 仍打印 `managedCodexPath` / `managedCodexVersion` 并不矛盾，不能单凭该输出判断服务受管理。
+- **调用入口**：该启动脚本通常调用 PATH 上的 `codex`，因此 npm 全局包更新后，由客户端重连触发的重启会自动采用新版；不需要为此改写 PATH 或固定绝对路径。
 - **找到所有者**：有 supervisor、服务单元或桌面连接专用重启入口时，通过原启动器正常停止并重启。仅知道进程名或父 PID 为 1，不足以选择 `systemctl restart` 的单元，更不能停止整个登录 session 或进程组。
 - **明确中断范围**：共用后台的其他聊天、终端工具、任务控制器都可能中断。优先在独立 SSH 终端操作；从当前 agent 内停止承载自身的服务后，后续工具调用未必还能执行，不能假定“杀掉后再运行下一条”必然成功。
 
@@ -93,7 +96,23 @@ app server is running but is not managed by codex app-server daemon
    ```
 
    原参数为空则省略对应占位符。原服务若含 `-c features.code_mode_host=true` 等参数，应按实际版本保留，不能将该案例参数设成所有环境的默认值。需要后台常驻时沿用已确认的启动器、脱离终端方式及日志位置；不要把前台启动误称为 SSH 断开后仍可用的服务。
-4. 从原客户端重新连接，检查新后台版本、PID/starttime 和模型列表。重启后 CLI 与运行版本已一致时，不为统一无关的 `managedCodexVersion` 额外修改 managed 安装包。
+4. 从原客户端重新连接，检查新后台版本、PID/starttime 和模型列表。重启后 CLI 与运行版本已一致时，先按下一节判断托管包是否需要刷新，再决定是否处理 `managedCodexVersion`。
+5. 用整条链路的进程取证收尾：客户端重连后通常会再拉起一个新的 `app-server proxy`（父进程为 sshd 或同类连接进程）。确认新后台与 proxy 的 starttime 已更新，且 `readlink /proc/[PID]/exe` 都不再带 `(deleted)`；只更新了其中一个进程时，客户端仍可能复用旧链路。
+
+### 托管包落后时是否刷新
+
+- **为什么不能忽略**：daemon 生命周期命令使用选中的托管包，与调用它们的 CLI 版本无关。托管包停在旧版时，之后任何一次 `codex app-server daemon start` / `restart`、TUI `/daemon` 或桌面端“重启后台”都会让运行版本静默回退到该旧版。
+- **先判断是否会被使用**：这台机器若始终由 PATH 上的 CLI 或桌面端 SSH 启动器拉起服务、从不调用 daemon 生命周期命令，旧托管包不影响当前链路；但要在排查记录里注明，避免后续有人执行 `daemon restart` 时无意回退。
+- **刷新被拒绝的原因**：非托管服务正在运行时，`daemon update --from-cli` 会直接报 `app server is running but is not managed by codex app-server daemon`。这不是权限或网络问题，需要先按本分支正常终止后台再执行。
+- **刷新命令**：刷新只替换托管包，不改变当前启动归属；命令会把当前 CLI 包复制并固定成 `releases/local-[hash]-[平台]`，旧版本目录保留可回退。
+
+  ```bash
+  kill -TERM [APP_SERVER_PID]
+  codex app-server daemon update --from-cli --yes
+  ```
+
+  刷新成功后 `daemon version` 中 `managedCodexVersion` 应与 `cliVersion` 一致。随后仍用原启动器重启服务，`cliVersion`、`appServerVersion`、`managedCodexVersion` 三者一致才算闭环。
+- **不要用固定包替代正式渠道**：`--from-cli` 会标记为固定包（pinned）。需要回到正式发行渠道时按当前 `daemon update` 的 help 与官方说明处理，不要长期把旧渠道状态留在机器上。
 
 ### 避免引入新的全局改动
 
@@ -114,6 +133,7 @@ app server is running but is not managed by codex app-server daemon
 ## 官方依据与版本边界
 
 - **核对日期**：2026-11-20；案例 CLI / 新服务为 `0.171.0`，旧运行服务为 `0.164.0`。已只读检查 `daemon --help`、`restart --help`、`update --help`、`daemon version`；没有为编写本文再次重启用户服务。
+- **二次核对（2026-11-25）**：CLI `0.172.0`，由桌面端 SSH 启动、未受 daemon 托管的远程后台仍运行 `0.171.0`；按“分支二”正常终止并按原参数重启后，`appServerVersion` 变为 `0.172.0`。`managedCodexVersion` 原为 `0.162.1`，核实上游 `app-server-daemon/README` 中“生命周期命令使用选中托管包”的说明后，用 `daemon update --from-cli` 刷新为 `0.172.0` 的 `local-[hash]` 固定包，旧 `0.162.1` 目录保留。客户端在重启后数秒内自动重连并拉起新的 `app-server proxy`。本次只复现本文流程，未重新核对 CLI 0.172.0 的其余官方文档与源码。
 - **上游锚点**：GitHub API 返回最新 release 为 [`rust-v0.171.0`](https://github.com/openai/codex/releases/tag/rust-v0.171.0)，当时仓库 HEAD 为 `45ace810b3d394f177fb6b1c8a10db9c698e6e05`；release 和 HEAD 分开记录，源码核对使用固定 release，不冒充桌面 App 的源码版本。
 - **官方文档**：已实际 GET 核对[命令与 `/daemon`](https://learn.chatgpt.com/docs/developer-commands)、[app-server 与 `model/list`](https://learn.chatgpt.com/docs/app-server)、[模型可用性](https://learn.chatgpt.com/docs/models)。这些完整 URL 是当前可访问的 fallback，属于滚动文档；后续先读目标版本 help，不能把本文版本冻结成永久要求。
 - **固定版本源码**：已读取该 release 的 [README / 安装说明](https://github.com/openai/codex/blob/rust-v0.171.0/README.md)、[配置入口](https://github.com/openai/codex/blob/rust-v0.171.0/docs/config.md)、[daemon 生命周期说明](https://github.com/openai/codex/blob/rust-v0.171.0/codex-rs/app-server-daemon/README.md)、[管理归属与版本探针](https://github.com/openai/codex/blob/rust-v0.171.0/codex-rs/app-server-daemon/src/lib.rs)、[CLI 参数声明](https://github.com/openai/codex/blob/rust-v0.171.0/codex-rs/cli/src/main.rs)及[模型缓存版本校验](https://github.com/openai/codex/blob/rust-v0.171.0/codex-rs/models-manager/src/cache.rs)。daemon 属于实验性接口，后续版本须重新核对。
